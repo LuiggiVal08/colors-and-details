@@ -11,6 +11,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { loginSchema } from '@/schemas/loginSchema';
 import { useState } from 'react';
 import HelpButton from '@/components/HelpButton';
+import { Format } from '@/helpers/Formats';
 
 const roles = [
   { label: 'Usuario', role: 'user' as const },
@@ -51,8 +52,7 @@ export default function LoginScreen() {
           </Text>
         </View>
         <LoginForm />
-        <LoginForm />
-        <LoginForm />
+
         <View className="my-4 flex flex-row items-center justify-center">
           <TouchableOpacity onPress={() => router.push('/rescue')}>
             <Text className="text-xl text-blue-700">¿Olvidaste tu contraseña?</Text>
@@ -75,7 +75,9 @@ const LoginForm = () => {
     defaultValues: { username: '', password: '' },
   });
   const [secureEntery, setSecureEntery] = useState(true);
-  const onSubmit = () => {};
+  const onSubmit = (data: { username: string; password: string }) => {
+    console.log(data);
+  };
 
   return (
     <View className="mt-4 w-full max-w-md">
@@ -96,7 +98,7 @@ const LoginForm = () => {
                 label="Nombre de usuario"
                 mode="outlined"
                 onBlur={onBlur}
-                onChangeText={onChange}
+                onChangeText={(text) => onChange(Format.username(text))}
                 value={value}
                 error={!!errors.username} // Se pone rojo si hay error
                 left={<TextInput.Icon icon="account" />}
@@ -115,12 +117,18 @@ const LoginForm = () => {
             <View className="mt-2 w-full">
               <TextInput
                 className="w-full"
+                theme={{
+                  colors: {
+                    primary: '#4DB6AC', // Color del borde cuando está enfocado
+                    // error: '#E57373', // Color del borde cuando hay error
+                  },
+                }}
                 label="Contraseña"
                 mode="outlined"
                 // 1. Usamos el estado aquí
                 secureTextEntry={secureEntery}
                 onBlur={onBlur}
-                onChangeText={onChange}
+                onChangeText={(text) => onChange(Format.password(text))}
                 value={value}
                 error={!!errors.password}
                 left={<TextInput.Icon icon="lock" />}
