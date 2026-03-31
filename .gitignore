@@ -10,7 +10,9 @@ npm-debug.*
 *.orig.*
 web-build/
 
-
+# Ignorar carpetas de agentes y configuración de IA
+.agents/
+.cursor/
 
 
 ios
