@@ -1,9 +1,8 @@
 import { Stack, useRouter, Redirect } from 'expo-router';
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
-import { Avatar, Menu, Text } from 'react-native-paper';
+import { Avatar, Divider, Menu, Text } from 'react-native-paper';
 import { useAuthStore } from '../../store/auth';
-import Logo from '@/components/Logo';
 
 export default function AppLayout() {
   const user = useAuthStore((state) => state.user);
@@ -41,17 +40,36 @@ export default function AppLayout() {
                 <Avatar.Text size={36} label={user.name.slice(0, 1).toUpperCase()} />
               </TouchableOpacity>
             }>
-            <Menu.Item onPress={() => handleMenu('/profile')} title="Perfil" />
-            <Menu.Item onPress={() => handleMenu('/settings')} title="Configuración" />
-            <Menu.Item onPress={() => handleMenu('/inventory')} title="Mantenimiento" />
-            <Menu.Item onPress={() => handleMenu('/help')} title="Ayuda" />
+            <Menu.Item
+              onPress={() => handleMenu('/profile')}
+              leadingIcon="account"
+              title="Perfil"
+            />
+            <Menu.Item
+              onPress={() => handleMenu('/settings')}
+              leadingIcon="cog"
+              title="Configuración"
+            />
+            <Menu.Item
+              onPress={() => handleMenu('/inventory')}
+              leadingIcon="tools"
+              title="Mantenimiento"
+            />
+            <Menu.Item
+              onPress={() => handleMenu('/help')}
+              leadingIcon="help-circle"
+              title="Ayuda"
+            />
+            <Divider />
             <Menu.Item
               onPress={() => {
                 logout();
                 setVisible(false);
                 router.replace('/login');
               }}
+              leadingIcon="logout"
               title="Cerrar sesión"
+              //   titleStyle={{ color: 'red' }} // Opcional: para resaltar que es salir
             />
           </Menu>
         ),
