@@ -1,6 +1,6 @@
+import ScreenLayout from '@/components/layout/ScreenLayout';
+import { useAuthStore } from '@/store/auth';
 import { Text, View } from 'react-native';
-import { useAuthStore } from '../../store/auth';
-import ScreenLayout from '../../components/layout/ScreenLayout';
 
 export default function HelpScreen() {
   const user = useAuthStore((state) => state.user);
@@ -11,7 +11,7 @@ export default function HelpScreen() {
         <Text className="mb-4 text-3xl font-bold text-slate-900">Ayuda</Text>
         <Text className="mb-4 text-base leading-7 text-slate-600">
           {user
-            ? `Hola, ${user.name}. Esta es la página de ayuda para usuarios con sesión.`
+            ? `Hola, ${user.username}. Esta es la página de ayuda para usuarios con sesión.`
             : 'Esta sección es accesible sin sesión. Aquí puedes ver contenido general de ayuda.'}
         </Text>
         <Text className="text-sm text-slate-500">

@@ -1,10 +1,17 @@
-import { Slot } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Stack } from 'expo-router';
 
 export default function AuthLayout() {
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <Slot initialRouteName="login" />
-    </SafeAreaView>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="help"
+        options={{ headerShown: true, title: 'Ayuda', animation: 'ios_from_right' }}
+      />
+      <Stack.Screen
+        name="rescue"
+        options={{ headerShown: true, title: 'Recuperar cuenta', animation: 'ios_from_right' }}
+      />
+    </Stack>
   );
 }

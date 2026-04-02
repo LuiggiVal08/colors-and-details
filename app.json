@@ -1,7 +1,8 @@
 {
     "expo": {
-        "name": "Colores y Detalles",
-        "slug": "Colores y Detalles",
+        "name": "Color y Detalles",
+        "slug": "color-y-detalles",
+        "scheme": "color-y-detalles",
         "version": "1.0.0",
         "web": {
             "favicon": "./assets/favicon.png"
@@ -25,14 +26,25 @@
             "**/*"
         ],
         "ios": {
-            "supportsTablet": true
+            "supportsTablet": true,
+            "bundleIdentifier": "com.colorydetalles.app",
+            "buildNumber": "1.0.0",
+            "infoPlist": {
+                "NSCameraUsageDescription": "Para escanear códigos de barras",
+                "NSFaceIDUsageDescription": "Para autenticar con Face ID"
+            }
         },
         "android": {
             "softwareKeyboardLayoutMode": "resize",
             "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
+                "foregroundImage": "./assets/logo.png",
                 "backgroundColor": "#ffffff"
-            }
+            },
+            "permissions": [
+                "USE_BIOMETRIC"
+            ],
+            "versionCode": 1,
+            "package": "com.colorydetalles.app"
         }
     }
 }

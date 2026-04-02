@@ -12,11 +12,6 @@ export default function MoreScreen() {
         </Text>
         <View className="space-y-3">
           <Link
-            href="/profile"
-            className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
-            <Text className="text-base font-semibold text-slate-900">Perfil</Text>
-          </Link>
-          <Link
             href="/payments-methods"
             className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
             <Text className="text-base font-semibold text-slate-900">Métodos de pago</Text>
@@ -25,11 +20,6 @@ export default function MoreScreen() {
             href="/inventory"
             className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
             <Text className="text-base font-semibold text-slate-900">Inventario</Text>
-          </Link>
-          <Link
-            href="/settings"
-            className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
-            <Text className="text-base font-semibold text-slate-900">Configuración</Text>
           </Link>
         </View>
       </View>
