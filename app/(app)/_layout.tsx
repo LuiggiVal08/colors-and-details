@@ -6,9 +6,14 @@ import { useAuthStore } from '../../store/auth';
 
 export default function AppLayout() {
   const user = useAuthStore((state) => state.user);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
   const logout = useAuthStore((state) => state.logout);
   const router = useRouter();
   const [visible, setVisible] = useState(false);
+
+  if (!hasHydrated) {
+    return null;
+  }
 
   if (!user) {
     return <Redirect href="/login" />;
@@ -37,7 +42,7 @@ export default function AppLayout() {
             }}
             anchor={
               <TouchableOpacity onPress={() => setVisible(true)} className="mr-3">
-                <Avatar.Text size={36} label={user.name.slice(0, 1).toUpperCase()} />
+                <Avatar.Text size={36} label={user?.username?.slice(0, 1).toUpperCase() || ''} />
               </TouchableOpacity>
             }>
             <Menu.Item

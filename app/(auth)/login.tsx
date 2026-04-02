@@ -1,10 +1,10 @@
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 import ScreenLayout from '../../components/layout/ScreenLayout';
-import { useAuthStore } from '../../store/auth';
-import { TextInput, Button, HelperText } from 'react-native-paper';
-
+import { useAuthStore, User } from '../../store/auth';
+import { TextInput, Button, HelperText, Snackbar } from 'react-native-paper';
+import { useMutation } from '@tanstack/react-query';
 import Logo from '@/components/Logo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -12,38 +12,39 @@ import { loginSchema } from '@/schemas/loginSchema';
 import { useState } from 'react';
 import HelpButton from '@/components/HelpButton';
 import { Format } from '@/helpers/Formats';
+import { type LoginCredentials, signIn } from '@/services/auth.service';
 
-const roles = [
-  { label: 'Usuario', role: 'user' as const },
-  { label: 'Admin', role: 'admin' as const },
-  { label: 'Superadmin', role: 'superadmin' as const },
-];
+// const roles = [
+//   { label: 'Usuario', role: 'user' as const },
+//   { label: 'Admin', role: 'admin' as const },
+//   { label: 'Superadmin', role: 'superadmin' as const },
+// ];
 
 export default function LoginScreen() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
+  const user = useAuthStore((state) => state.user);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
 
-  const handleLogin = (role: 'user' | 'admin' | 'superadmin') => {
-    login({ name: role === 'superadmin' ? 'Súper' : role === 'admin' ? 'Admin' : 'Cliente', role });
-    router.replace('/shopping');
-  };
+  // 1. Mueve el hook de estado AQUÍ arriba
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
 
+  // 2. Definición de funciones (también antes de los retornos)
+  const onDismissSnackbar = () => setSnackbar({ ...snackbar, visible: false });
+  const showError = (message: string) => setSnackbar({ visible: true, message });
+
+  // 3. Ahora sí, los retornos condicionales
+  if (!hasHydrated) {
+    return null;
+  }
+
+  if (user) {
+    return <Redirect href="/shopping" />;
+  }
+
+  // 4. El renderizado principal
   return (
     <ScreenLayout>
-      <View className="w-full max-w-md items-center justify-center rounded-3xl border border-slate-300 bg-white/90 p-8 shadow-lg">
-        <Text className="text-lg text-gray-700">Iniciar sesión como:</Text>
-        <View className="mt-4 flex-row justify-between">
-          {roles.map(({ label, role }) => (
-            <TouchableOpacity
-              key={role}
-              onPress={() => handleLogin(role)}
-              className={classStyles.button}>
-              <Text className="text-xl text-gray-700">{label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-      <View className=" w-full max-w-md items-center justify-center rounded-3xl border border-slate-300 bg-white p-8 shadow-lg">
+      <View className="w-full max-w-md items-center justify-center rounded-3xl border border-slate-300 bg-white p-8 shadow-lg">
         <View className="flex items-center justify-center">
           <Logo />
           <Text className="text-xl text-gray-700">Bienvenido a Colores y Detalles</Text>
@@ -51,7 +52,8 @@ export default function LoginScreen() {
             Ingresa tus credenciales para Iniciar sesión
           </Text>
         </View>
-        <LoginForm />
+
+        <LoginForm onAuthError={showError} />
 
         <View className="my-4 flex flex-row items-center justify-center">
           <TouchableOpacity onPress={() => router.push('/rescue')}>
@@ -61,46 +63,72 @@ export default function LoginScreen() {
       </View>
 
       <HelpButton />
+
+      <Snackbar
+        visible={snackbar.visible}
+        onDismiss={onDismissSnackbar}
+        duration={4000}
+        action={{ label: 'OK', onPress: onDismissSnackbar }}
+        style={{ backgroundColor: '#B00020' }}>
+        {snackbar.message}
+      </Snackbar>
     </ScreenLayout>
   );
 }
 
-const LoginForm = () => {
+// Definimos la interfaz para las props
+interface LoginFormProps {
+  onAuthError: (message: string) => void;
+}
+
+const LoginForm = ({ onAuthError }: LoginFormProps) => {
+  const router = useRouter();
+  const login = useAuthStore((state) => state.login);
+
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: { username: '', password: '' },
   });
-  const [secureEntery, setSecureEntery] = useState(true);
-  const onSubmit = (data: { username: string; password: string }) => {
-    console.log(data);
+
+  const [secureEntry, setSecureEntry] = useState(true);
+
+  const mutation = useMutation<User, Error, LoginCredentials>({
+    mutationFn: (variables: LoginCredentials) => signIn(variables),
+    onSuccess: (data) => {
+      login(data);
+      router.replace('/shopping');
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Error de conexión con el servidor';
+      // Llamamos a la función que recibimos por props
+      onAuthError(message);
+    },
+  });
+
+  const onSubmit = (data: LoginCredentials) => {
+    mutation.mutate(data);
   };
 
   return (
     <View className="mt-4 w-full max-w-md">
-      <View className=" space-y-4">
-        {/* Campo de Usuario */}
+      <View className="space-y-4">
         <Controller
           control={control}
           name="username"
           render={({ field: { onChange, onBlur, value } }) => (
-            <View className=" w-full">
+            <View className="w-full">
               <TextInput
-                theme={{
-                  colors: {
-                    primary: '#4DB6AC', // Color del borde cuando está enfocado
-                    // error: '#E57373', // Color del borde cuando hay error
-                  },
-                }}
+                theme={{ colors: { primary: '#4DB6AC' } }}
                 label="Nombre de usuario"
                 mode="outlined"
                 onBlur={onBlur}
                 onChangeText={(text) => onChange(Format.username(text))}
                 value={value}
-                error={!!errors.username} // Se pone rojo si hay error
+                error={!!errors.username}
                 left={<TextInput.Icon icon="account" />}
               />
               <HelperText type="error" visible={!!errors.username}>
@@ -109,34 +137,26 @@ const LoginForm = () => {
             </View>
           )}
         />
-        {/* Campo de Contraseña */}
+
         <Controller
           control={control}
           name="password"
           render={({ field: { onChange, onBlur, value } }) => (
             <View className="mt-2 w-full">
               <TextInput
-                className="w-full"
-                theme={{
-                  colors: {
-                    primary: '#4DB6AC', // Color del borde cuando está enfocado
-                    // error: '#E57373', // Color del borde cuando hay error
-                  },
-                }}
+                theme={{ colors: { primary: '#4DB6AC' } }}
                 label="Contraseña"
                 mode="outlined"
-                // 1. Usamos el estado aquí
-                secureTextEntry={secureEntery}
+                secureTextEntry={secureEntry}
                 onBlur={onBlur}
                 onChangeText={(text) => onChange(Format.password(text))}
                 value={value}
                 error={!!errors.password}
                 left={<TextInput.Icon icon="lock" />}
-                // 2. Añadimos el "ojito" a la derecha
                 right={
                   <TextInput.Icon
-                    icon={secureEntery ? 'eye' : 'eye-off'}
-                    onPress={() => setSecureEntery(!secureEntery)}
+                    icon={secureEntry ? 'eye' : 'eye-off'}
+                    onPress={() => setSecureEntry(!secureEntry)}
                   />
                 }
               />
@@ -148,19 +168,14 @@ const LoginForm = () => {
         />
       </View>
 
-      {/* Botón de Envío */}
       <Button
         mode="contained"
         onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
+        loading={mutation.isPending}
+        disabled={mutation.isPending}
         className="mt-6 py-1">
         Iniciar Sesión
       </Button>
     </View>
   );
-};
-
-const classStyles = {
-  button:
-    'flex-row items-center justify-between rounded-lg border border-slate-300 bg-white/90 p-4 shadow-lg',
 };
