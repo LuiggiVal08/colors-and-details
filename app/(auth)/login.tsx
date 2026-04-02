@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 
 import ScreenLayout from '../../components/layout/ScreenLayout';
 import { useAuthStore, User } from '../../store/auth';
-import { TextInput, Button, HelperText, Snackbar } from 'react-native-paper';
+import { TextInput, Button, HelperText, Snackbar, ActivityIndicator } from 'react-native-paper';
 import { useMutation } from '@tanstack/react-query';
 import Logo from '@/components/Logo';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +34,7 @@ export default function LoginScreen() {
 
   // 3. Ahora sí, los retornos condicionales
   if (!hasHydrated) {
-    return null;
+    return <ActivityIndicator size="large" color="#4DB6AC" />;
   }
 
   if (user) {

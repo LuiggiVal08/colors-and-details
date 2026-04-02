@@ -1,8 +1,10 @@
-import { Stack, useRouter, Redirect } from 'expo-router';
-import { useState } from 'react';
-import { TouchableOpacity } from 'react-native';
-import { Avatar, Divider, Menu, Text } from 'react-native-paper';
-import { useAuthStore } from '../../store/auth';
+import { useEffect } from 'react'; // 👈 Importamos useEffect
+import { useRouter, Stack, Redirect } from 'expo-router';
+import { useAuthStore } from '@/store/auth';
+import api from '@/services/api'; // 👈 Tu instancia de Axios con interceptores
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
+import { Avatar, Menu, Divider } from 'react-native-paper';
+import React, { useState } from 'react';
 
 export default function AppLayout() {
   const user = useAuthStore((state) => state.user);
@@ -11,8 +13,32 @@ export default function AppLayout() {
   const router = useRouter();
   const [visible, setVisible] = useState(false);
 
+  // 🛡️ EFECTO DE VALIDACIÓN SILENCIOSA
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        // Hacemos la petición al endpoint que acabamos de crear
+        await api.get('/validate');
+        console.log('Sesión verificada con éxito');
+      } catch (error) {
+        // No necesitas hacer nada aquí.
+        // Tu interceptor de Axios ya detectará el 401 y ejecutará el logout()
+        console.log('La sesión expiró o es inválida');
+      }
+    };
+
+    // Solo verificamos si ya cargó el SecureStore y si hay un usuario logueado
+    if (hasHydrated && user) {
+      checkSession();
+    }
+  }, [hasHydrated, user?.token]); // Se ejecuta al abrir y si el token cambia
+
   if (!hasHydrated) {
-    return null;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#4DB6AC" />
+      </View>
+    );
   }
 
   if (!user) {
@@ -33,13 +59,7 @@ export default function AppLayout() {
             visible={visible}
             anchorPosition="bottom"
             onDismiss={() => setVisible(false)}
-            theme={{
-              colors: {
-                elevation: {
-                  level2: '#fff',
-                },
-              },
-            }}
+            theme={{ colors: { elevation: { level2: '#fff' } } }}
             anchor={
               <TouchableOpacity onPress={() => setVisible(true)} className="mr-3">
                 <Avatar.Text size={36} label={user?.username?.slice(0, 1).toUpperCase() || ''} />
@@ -74,7 +94,6 @@ export default function AppLayout() {
               }}
               leadingIcon="logout"
               title="Cerrar sesión"
-              //   titleStyle={{ color: 'red' }} // Opcional: para resaltar que es salir
             />
           </Menu>
         ),
