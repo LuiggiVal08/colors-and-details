@@ -54,6 +54,8 @@ export default function AppLayout() {
     <Stack
       screenOptions={{
         headerTitle: 'Colores y Detalles',
+        animation: 'ios_from_right',
+
         headerRight: () => (
           <Menu
             visible={visible}
@@ -99,10 +101,13 @@ export default function AppLayout() {
         ),
       }}>
       <Stack.Screen name="(tabs)" options={{ title: 'Inicio' }} />
-      <Stack.Screen name="profile" options={{ title: 'Mi Perfil' }} />
-      <Stack.Screen name="payments-methods" options={{ title: 'Formas de pago' }} />
-      <Stack.Screen name="(admin)" options={{ title: 'Administración' }} />
-      <Stack.Screen name="(super)" options={{ title: 'Gestión' }} />
+      <Stack.Screen name="profile" options={{ title: 'Mi Perfil', headerRight: () => null }} />
+      <Stack.Screen
+        name="payments-methods"
+        options={{ title: 'Formas de pago', headerRight: () => null }}
+      />
+      <Stack.Screen name="(admin)" options={{ title: 'Administración', headerRight: () => null }} />
+      <Stack.Screen name="(super)" options={{ title: 'Gestión', headerRight: () => null }} />
     </Stack>
   );
 }
