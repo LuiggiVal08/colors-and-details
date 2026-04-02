@@ -7,9 +7,8 @@ export default function MaintenanceTabs() {
       screenOptions={{
         headerShown: false,
         tabBarPosition: 'top',
-        tabBarActiveTintColor: '#007AFF', // Color del icono cuando está seleccionado
-        tabBarInactiveTintColor: 'gray', // Color del icono cuando no está seleccionado
-      }}>
+      }}
+      safeAreaInsets={{ top: 0 }}>
       <Tabs.Screen
         name="inventory"
         options={{
