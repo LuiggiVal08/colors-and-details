@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons'; // Importamos la librería de ico
 export default function SettingsTabs() {
   return (
     <Tabs
+      safeAreaInsets={{ top: 0 }}
       screenOptions={{
         headerShown: false,
         tabBarPosition: 'top',
