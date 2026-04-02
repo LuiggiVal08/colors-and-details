@@ -7,3 +7,4 @@ const Service = () => {
     </View>
   );
 };
+export default Service;
