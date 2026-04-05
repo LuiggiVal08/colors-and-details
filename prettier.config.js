@@ -1,5 +1,5 @@
 module.exports = {
-  printWidth: 100,
+  printWidth: 120, // Alineado con max-len de ESLint
   tabWidth: 2,
   singleQuote: true,
   bracketSameLine: true,
