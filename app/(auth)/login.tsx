@@ -24,18 +24,10 @@ import { type LoginCredentials, signIn } from '@/services/auth.service';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { maskUsername } from '@/helpers/maskUsername';
 
 const LINKED_CREDENTIALS_KEY = 'linked_credentials';
 const LINKED_USERNAME_KEY = 'linked_username';
-
-// --- Helpers ---
-export function maskUsername(username: string) {
-  if (!username || username.length < 2) return username;
-  const first = username[0];
-  const last = username[username.length - 1];
-  const middleMask = '*'.repeat(Math.max(1, username.length - 2));
-  return `${first}${middleMask}${last}`;
-}
 
 // --- Componente Principal ---
 export default function LoginScreen() {
@@ -88,7 +80,7 @@ export default function LoginScreen() {
   if (user) return <Redirect href="/shopping" />;
 
   return (
-    <ScreenLayout>
+    <ScreenLayout centerContent={true}>
       <View className="w-full max-w-md items-center justify-center rounded-3xl border border-slate-700 bg-white p-8 px-6 py-8 shadow-xl">
         <View className="items-center justify-center pb-6">
           <Logo />
@@ -143,12 +135,12 @@ const BiometricLoginView = ({ username, onBiometricPress, onPasswordPress, onUnl
       <Text className="text-base text-slate-600">Iniciar sesión como </Text>
       <Text className="text-3xl font-semibold text-slate-800">{maskUsername(username)}</Text>
       <TouchableOpacity
-        className="my-4 h-16 w-16 items-center justify-center rounded-full bg-rose-500 shadow-lg"
+        className="my-4 h-16 w-16 items-center justify-center rounded-full bg-[#4DB6AC] shadow-lg"
         onPress={onBiometricPress}>
         <Ionicons name="finger-print" size={40} color="#fff" />
       </TouchableOpacity>
       <TouchableOpacity onPress={onPasswordPress}>
-        <Text className="text-base font-bold text-rose-500 underline">
+        <Text className="text-base font-bold text-[#4DB6AC] underline">
           Ingresa con tu contraseña
         </Text>
       </TouchableOpacity>
@@ -215,10 +207,10 @@ const LinkedPasswordModal = ({
           loading={isLoading}
           disabled={isLoading}
           className="mt-6 py-1">
-          Iniciar Sesión
+          <Text>Iniciar Sesión</Text>
         </Button>
         <Button mode="text" onPress={onDismiss} className="mt-2">
-          Cancelar
+          <Text>Cancelar</Text>
         </Button>
       </Modal>
     </Portal>
@@ -296,7 +288,7 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
         onPress={handleSubmit(onSubmit)}
         loading={isLoading}
         className="mt-4">
-        Entrar
+        <Text>Iniciar Sesión</Text>
       </Button>
       <TouchableOpacity onPress={() => router.push('/rescue')} className="mx-auto mt-6">
         <Text className="text-sm text-slate-400 underline">¿Olvidaste tu contraseña?</Text>
