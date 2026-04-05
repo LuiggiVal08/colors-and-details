@@ -84,12 +84,12 @@
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
-      "computedHash": "10eb4ec94577b79ae98c63ce3e7f35f8a6a06436a4011bff083b397de6960eeb"
+      "computedHash": "575757e3e25761c8c562d6e395d29f0b76c98b1273c0bd72d88e6ab1bc9c7d42"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
-      "computedHash": "184db86b99c0c5204247f497605b0e5be9f3b31b4a062a81244668d3ae98f32b"
+      "computedHash": "43ca6c197f8ec13055079da7053232d477068b03ca443f9ac1bc819b95cdd432"
     }
   }
 }
