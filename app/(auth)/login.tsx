@@ -3,15 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenLayout from '../../components/layout/ScreenLayout';
 import { useAuthStore, User } from '../../store/auth';
-import {
-  TextInput,
-  Button,
-  HelperText,
-  Snackbar,
-  ActivityIndicator,
-  Modal,
-  Portal,
-} from 'react-native-paper';
+import { TextInput, Button, HelperText, Snackbar, ActivityIndicator, Modal, Portal } from 'react-native-paper';
 import { useMutation } from '@tanstack/react-query';
 import Logo from '@/components/Logo';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,10 +17,13 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { maskUsername } from '@/helpers/maskUsername';
+import { AxiosError } from 'axios';
 
 const LINKED_CREDENTIALS_KEY = 'linked_credentials';
 const LINKED_USERNAME_KEY = 'linked_username';
-
+interface ApiError {
+  message: string;
+}
 // --- Componente Principal ---
 export default function LoginScreen() {
   const router = useRouter();
@@ -43,7 +38,7 @@ export default function LoginScreen() {
 
   const showError = (message: string) => setSnackbar({ visible: true, message });
 
-  const mutation = useMutation<User, Error, LoginCredentials>({
+  const mutation = useMutation<User, AxiosError<ApiError>, LoginCredentials>({
     mutationFn: (variables: LoginCredentials) => signIn(variables),
     onSuccess: async (data, variables) => {
       login(data);
@@ -55,7 +50,7 @@ export default function LoginScreen() {
       setIsModalVisible(false);
       router.replace('/shopping');
     },
-    onError: (error: any) => {
+    onError: (error) => {
       const message = error.response?.data?.message || 'Error de conexión';
       showError(message);
     },
@@ -121,15 +116,20 @@ export default function LoginScreen() {
       <Snackbar
         visible={snackbar.visible}
         onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
-        style={{ backgroundColor: '#B00020' }}>
+        className="bg-red-500">
         {snackbar.message}
       </Snackbar>
     </ScreenLayout>
   );
 }
-
+interface BiometricLoginViewProps {
+  username: string;
+  onBiometricPress: () => void;
+  onPasswordPress: () => void;
+  onUnlink: () => void;
+}
 // --- Sub-componente: Vista Biométrica ---
-const BiometricLoginView = ({ username, onBiometricPress, onPasswordPress, onUnlink }: any) => (
+const BiometricLoginView = ({ username, onBiometricPress, onPasswordPress, onUnlink }: BiometricLoginViewProps) => (
   <View className=" items-center justify-center">
     <View className=" my-8 items-center justify-center ">
       <Text className="text-base text-slate-600">Iniciar sesión como </Text>
@@ -140,15 +140,11 @@ const BiometricLoginView = ({ username, onBiometricPress, onPasswordPress, onUnl
         <Ionicons name="finger-print" size={40} color="#fff" />
       </TouchableOpacity>
       <TouchableOpacity onPress={onPasswordPress}>
-        <Text className="text-base font-bold text-[#4DB6AC] underline">
-          Ingresa con tu contraseña
-        </Text>
+        <Text className="text-base font-bold text-[#4DB6AC] underline">Ingresa con tu contraseña</Text>
       </TouchableOpacity>
     </View>
 
-    <TouchableOpacity
-      onPress={onUnlink}
-      className="mt-4 flex flex-row items-center gap-2 rounded-lg bg-slate-100 p-2">
+    <TouchableOpacity onPress={onUnlink} className="mt-4 flex flex-row items-center gap-2 rounded-lg bg-slate-100 p-2">
       <Ionicons name="log-out-outline" size={20} color="#4DB6AC" />
       <Text className="text-base text-slate-400 ">Desvincular dispositivo</Text>
     </TouchableOpacity>
@@ -163,13 +159,7 @@ interface LinkedPasswordFormProps {
   visible: boolean;
 }
 // --- Sub-componente: Modal de Password ---
-const LinkedPasswordModal = ({
-  visible,
-  onDismiss,
-  username,
-  onSubmit,
-  isLoading,
-}: LinkedPasswordFormProps) => {
+const LinkedPasswordModal = ({ visible, onDismiss, username, onSubmit, isLoading }: LinkedPasswordFormProps) => {
   const [password, setPassword] = useState('');
   const [secure, setSecure] = useState(true);
 
@@ -179,15 +169,13 @@ const LinkedPasswordModal = ({
         visible={visible}
         onDismiss={onDismiss}
         contentContainerStyle={{
-          backgroundColor: 'white',
+          backgroundColor: '#fff',
           padding: 25,
           margin: 20,
           borderRadius: 20,
         }}>
         <Text className="mb-4 text-lg font-bold text-slate-800">Confirmar Contraseña</Text>
-        <Text className="mb-4 text-sm text-slate-500">
-          Ingresa la clave para {maskUsername(username)}
-        </Text>
+        <Text className="mb-4 text-sm text-slate-500">Ingresa la clave para {maskUsername(username)}</Text>
 
         <TextInput
           label="Contraseña"
@@ -196,9 +184,7 @@ const LinkedPasswordModal = ({
           value={password}
           onChangeText={setPassword}
           theme={{ colors: { primary: '#4DB6AC' } }}
-          right={
-            <TextInput.Icon icon={secure ? 'eye' : 'eye-off'} onPress={() => setSecure(!secure)} />
-          }
+          right={<TextInput.Icon icon={secure ? 'eye' : 'eye-off'} onPress={() => setSecure(!secure)} />}
         />
 
         <Button
@@ -271,10 +257,7 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
               error={!!errors.password}
               left={<TextInput.Icon icon="lock" />}
               right={
-                <TextInput.Icon
-                  icon={secureEntry ? 'eye' : 'eye-off'}
-                  onPress={() => setSecureEntry(!secureEntry)}
-                />
+                <TextInput.Icon icon={secureEntry ? 'eye' : 'eye-off'} onPress={() => setSecureEntry(!secureEntry)} />
               }
             />
             <HelperText type="error" visible={!!errors.password}>
@@ -283,11 +266,7 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
           </View>
         )}
       />
-      <Button
-        mode="contained"
-        onPress={handleSubmit(onSubmit)}
-        loading={isLoading}
-        className="mt-4">
+      <Button mode="contained" onPress={handleSubmit(onSubmit)} loading={isLoading} className="mt-4">
         <Text>Iniciar Sesión</Text>
       </Button>
       <TouchableOpacity onPress={() => router.push('/rescue')} className="mx-auto mt-6">

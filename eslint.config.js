@@ -23,10 +23,7 @@ module.exports = defineConfig([
       'no-alert': 'error',
 
       // TypeScript
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-      ],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-inferrable-types': 'off',
@@ -35,7 +32,7 @@ module.exports = defineConfig([
       // React Native
       'react-native/no-unused-styles': 'error',
       'react-native/no-inline-styles': 'off',
-      'react-native/no-color-literals': 'warn',
+      'react-native/no-color-literals': 'off',
       'react-native/no-raw-text': ['error', { skip: ['CustomText'] }],
       'react-native/split-platform-components': 'warn',
       'react-native/no-single-element-style-arrays': 'error',
