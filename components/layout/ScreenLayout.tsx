@@ -1,54 +1,42 @@
 import React from 'react';
-import {
-  View,
-  ImageBackground,
-  Keyboard,
-  TouchableWithoutFeedback,
-  StyleSheet,
-} from 'react-native';
+import { View, ImageBackground, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 interface ScreenLayoutProps {
   children: React.ReactNode;
+  centerContent?: boolean;
 }
 
-const ScreenLayout = ({ children }: ScreenLayoutProps) => {
+const ScreenLayout = ({ children, centerContent = false }: ScreenLayoutProps) => {
   return (
     <ImageBackground
       source={require('../../assets/background.jpg')}
       resizeMode="cover"
-      style={StyleSheet.absoluteFillObject}>
-      {/* Filtro oscuro opcional si quieres que el fondo sea tenue */}
-      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
+      className="absolute inset-0">
+      <View className="absolute inset-0 bg-black/40" />
 
       <KeyboardAwareScrollView
         bottomOffset={20}
         keyboardShouldPersistTaps="handled"
-        // flexGrow: 1 permite que el contenido ocupe todo el alto y se pueda centrar
-        contentContainerStyle={styles.scrollContent}>
+        // PASAMOS EL CENTRADO AQUÍ:
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: centerContent ? 'center' : 'flex-start',
+        }}
+        // Quitamos el className que causaba el error
+      >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.innerContainer}>{children}</View>
+          {/* El flex-1 aquí permite que el contenido ocupe el espacio del flexGrow */}
+          <View
+            className={`w-full flex-1 items-center px-5 pt-5 ${
+              centerContent ? 'justify-center' : 'justify-start'
+            }`}>
+            {children}
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAwareScrollView>
     </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1, // Crucial para el centrado vertical
-    justifyContent: 'center',
-  },
-  innerContainer: {
-    flex: 1,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-});
 
 export default ScreenLayout;

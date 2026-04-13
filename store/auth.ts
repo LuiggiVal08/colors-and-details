@@ -14,6 +14,7 @@ export interface User {
   username: string;
   fullName: string; // Concatenación de nombre y apellido
   role: UserRole;
+  active: boolean;
   token?: string; // Ahora es obligatorio si está logueado
 }
 

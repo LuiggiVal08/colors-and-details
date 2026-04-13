@@ -1,37 +1,29 @@
-import { useEffect } from 'react'; // 👈 Importamos useEffect
+import { useEffect, useState } from 'react'; // 👈 Importamos useEffect
 import { useRouter, Stack, Redirect } from 'expo-router';
 import { useAuthStore } from '@/store/auth';
 import api from '@/services/api'; // 👈 Tu instancia de Axios con interceptores
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { Avatar, Menu, Divider } from 'react-native-paper';
-import React, { useState } from 'react';
 
+export const validateSessionAction = async () => {
+  const { user, _hasHydrated } = useAuthStore.getState();
+  if (!_hasHydrated || !user?.token) return;
+  try {
+    await api.get('/validate');
+    console.info('Sesión validada imperativamente');
+  } catch (error) {
+    console.info('Error en validación silenciosa', error);
+  }
+};
 export default function AppLayout() {
   const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
   const logout = useAuthStore((state) => state.logout);
   const router = useRouter();
   const [visible, setVisible] = useState(false);
-
-  // 🛡️ EFECTO DE VALIDACIÓN SILENCIOSA
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        // Hacemos la petición al endpoint que acabamos de crear
-        await api.get('/validate');
-        console.log('Sesión verificada con éxito');
-      } catch (error) {
-        // No necesitas hacer nada aquí.
-        // Tu interceptor de Axios ya detectará el 401 y ejecutará el logout()
-        console.log('La sesión expiró o es inválida');
-      }
-    };
-
-    // Solo verificamos si ya cargó el SecureStore y si hay un usuario logueado
-    if (hasHydrated && user) {
-      checkSession();
-    }
-  }, [hasHydrated, user?.token]); // Se ejecuta al abrir y si el token cambia
+    if (hasHydrated) validateSessionAction();
+  }, [hasHydrated]);
 
   if (!hasHydrated) {
     return (
