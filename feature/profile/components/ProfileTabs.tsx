@@ -30,7 +30,7 @@ export const ProfileTabs = () => {
           { value: 'seguridad', label: 'Seguridad', icon: 'shield-outline' },
         ]}
       />
-      <View className="mt-4 flex min-h-[300px] w-full max-w-2xl gap-4 rounded-3xl bg-white/90 p-8 shadow-lg">
+      <View className="mt-4 flex min-h-[300px] w-full max-w-2xl gap-4 rounded-3xl bg-white/90 p-8 shadow-lg dark:bg-primary-dark">
         {renderContent()}
       </View>
     </View>
