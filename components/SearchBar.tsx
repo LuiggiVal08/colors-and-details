@@ -25,7 +25,7 @@ export function SearchBar({
             onChangeText={onChangeText}
             placeholder={placeholder}
             selectionColor="#4DB6AC"
-            className="ml-3 flex-1 text-base text-slate-900"
+            className="ml-3 flex-1 text-base text-slate-900 dark:text-white"
             style={{ minHeight: 40 }}
             autoCorrect={false}
             autoCapitalize="none"

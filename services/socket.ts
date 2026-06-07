@@ -40,7 +40,7 @@ export const connectSocket = (token: string) => {
   });
 
   socket.on('nueva_notificacion', (notif: Notification) => {
-    console.info('Socket.IO: nueva notificación', notif.titulo);
+    console.info('Socket.IO: nueva notificación', notif.mensaje);
     useNotificationStore.getState().addNotification(notif);
   });
 

@@ -15,7 +15,7 @@ const serviceService = {
     return response.data;
   },
   update: async (id: string, data: UpdateServicioDTO): Promise<Servicio> => {
-    const response = await api.put(`/service/${id}`, data);
+    const response = await api.put<Servicio>(`/service/${id}`, data);
     return response.data;
   },
   search: async (query: string, page: number = 1, limit: number = 20): Promise<Servicio[]> => {

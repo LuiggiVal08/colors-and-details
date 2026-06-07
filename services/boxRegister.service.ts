@@ -88,8 +88,9 @@ const boxRegisterService = {
       return data.map(normalizeControl);
     }
     const wrapped = data as Record<string, unknown>;
-    const arr = (wrapped.data as Record<string, unknown>[]) || [];
-    return arr.map(normalizeControl);
+    const raw = wrapped.data;
+    if (Array.isArray(raw)) return raw.map(normalizeControl);
+    return [];
   },
 
   getEstadoActual: async (cajaId: string): Promise<ControlCaja & ControlSummary> => {

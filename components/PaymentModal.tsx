@@ -153,19 +153,19 @@ const PaymentModal = forwardRef<PaymentModalRef, PaymentModalProps>(
           contentContainerStyle={{ paddingBottom: 24 }}>
           <View className="mb-3 rounded-2xl bg-[#4DB6AC]/10 p-4">
             <View className="flex-row items-center justify-between py-1">
-              <Text className="text-sm text-slate-600">Sub-Total</Text>
-              <Text className="text-sm text-slate-900">Bs. {fmt(totalSinIva)}</Text>
+              <Text className="text-sm text-slate-600 dark:text-slate-300">Sub-Total</Text>
+              <Text className="text-sm text-slate-900 dark:text-white">Bs. {fmt(totalSinIva)}</Text>
             </View>
             <View className="flex-row items-center justify-between py-1">
-              <Text className="text-sm text-slate-600">IVA</Text>
-              <Text className="text-sm text-slate-900">Bs. {fmt(ivaMonto)}</Text>
+              <Text className="text-sm text-slate-600 dark:text-slate-300">IVA</Text>
+              <Text className="text-sm text-slate-900 dark:text-white">Bs. {fmt(ivaMonto)}</Text>
             </View>
             <View className="mt-1 flex-row items-center justify-between border-t border-[#4DB6AC]/20 pt-2">
-              <Text className="text-base font-bold text-slate-900">Total</Text>
-              <Text className="text-xl font-bold text-slate-900">Bs. {fmt(totalBs)}</Text>
+              <Text className="text-base font-bold text-slate-900 dark:text-white">Total</Text>
+              <Text className="text-xl font-bold text-slate-900 dark:text-white">Bs. {fmt(totalBs)}</Text>
             </View>
             <View className="mt-2 flex-row items-center justify-between border-t border-[#4DB6AC]/20 pt-2">
-              <Text className="text-sm text-slate-600">Pendiente</Text>
+              <Text className="text-sm text-slate-600 dark:text-slate-300">Pendiente</Text>
               <Text className={`text-base font-semibold ${pending === 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {pending === 0 ? '✓ Cubierto' : `Bs. ${fmt(pending)}`}
               </Text>
@@ -173,30 +173,30 @@ const PaymentModal = forwardRef<PaymentModalRef, PaymentModalProps>(
           </View>
 
           <View className="mb-3">
-            <Text className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">Notas adicionales</Text>
+            <Text className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Notas adicionales</Text>
             <BottomSheetTextInput
               value={notas}
               onChangeText={setNotas}
               placeholder="Opcional..."
               multiline
               numberOfLines={2}
-              className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900"
+              className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 dark:border-slate-700 dark:bg-primary-dark dark:text-white"
               textAlignVertical="top"
             />
           </View>
 
           {payments.length > 0 && (
             <View className="mb-3">
-              <Text className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Pagos agregados</Text>
+              <Text className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Pagos agregados</Text>
               {payments.map((p, i) => (
                 <View
-                  key={i}
-                  className="mb-1.5 flex-row items-center justify-between rounded-xl border border-slate-100 bg-white p-3">
+                  key={`${p.metodo_pago_id}-${i}`}
+                  className="mb-1.5 flex-row items-center justify-between rounded-xl border border-slate-100 bg-white p-3 dark:border-slate-700 dark:bg-primary-dark">
                   <View className="min-w-0 flex-1">
-                    <Text className="text-sm font-medium text-slate-900">{p.metodo_pago_nombre}</Text>
-                    <Text className="text-xs text-slate-500">Bs. {fmt(p.monto)}</Text>
+                    <Text className="text-sm font-medium text-slate-900 dark:text-white">{p.metodo_pago_nombre}</Text>
+                    <Text className="text-xs text-slate-500 dark:text-slate-400">Bs. {fmt(p.monto)}</Text>
                     {p.referencia && p.referencia !== 'N/A' && (
-                      <Text className="text-xs text-slate-400">Ref: {p.referencia}</Text>
+                      <Text className="text-xs text-slate-400 dark:text-slate-500">Ref: {p.referencia}</Text>
                     )}
                   </View>
                   <TouchableOpacity onPress={() => handleRemovePayment(i)} className="ml-2">
@@ -214,9 +214,9 @@ const PaymentModal = forwardRef<PaymentModalRef, PaymentModalProps>(
             </View>
           )}
 
-          {pending > 0 && !activeMethodId && hasMethods && (
+          {pending > 0 && !activeMethodId && activeMethods.length > 0 && (
             <View className="mb-3">
-              <Text className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Método de pago</Text>
+              <Text className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Método de pago</Text>
               <View className="gap-1.5">
                 {activeMethods.map((method) => {
                   const config = METHOD_CONFIG[method.tipo] || { icon: 'ellipsis-horizontal', requiereRef: false };
@@ -228,11 +228,11 @@ const PaymentModal = forwardRef<PaymentModalRef, PaymentModalProps>(
                         setActiveMethodId(String(method.id));
                         setAmountText(pending.toFixed(2));
                       }}
-                      className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5">
+                      className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 dark:border-slate-700 dark:bg-primary-dark">
                       <View className="h-9 w-9 items-center justify-center rounded-full bg-[#4DB6AC]/10">
                         <Ionicons name={iconName(config.icon)} size={18} color="#4DB6AC" />
                       </View>
-                      <Text className="text-sm font-medium text-slate-900">{method.nombre}</Text>
+                      <Text className="text-sm font-medium text-slate-900 dark:text-white">{method.nombre}</Text>
                       <Ionicons name="chevron-forward" size={18} color="#CBD5E1" style={{ marginLeft: 'auto' }} />
                     </TouchableOpacity>
                   );
@@ -242,9 +242,9 @@ const PaymentModal = forwardRef<PaymentModalRef, PaymentModalProps>(
           )}
 
           {pending > 0 && !hasMethods && (
-            <View className="mb-3 items-center rounded-2xl bg-amber-50 p-6">
+            <View className="mb-3 items-center rounded-2xl bg-amber-50 p-6 dark:bg-amber-950/30">
               <Ionicons name="alert-circle-outline" size={28} color="#F59E0B" />
-              <Text className="mt-2 text-center text-sm text-amber-700">No hay métodos de pago configurados</Text>
+              <Text className="mt-2 text-center text-sm text-amber-700 dark:text-amber-400">No hay métodos de pago configurados</Text>
             </View>
           )}
 
@@ -253,51 +253,54 @@ const PaymentModal = forwardRef<PaymentModalRef, PaymentModalProps>(
               <View className="mb-3 flex-row items-center justify-between">
                 <View className="flex-row items-center gap-2">
                   {activeConfig && <Ionicons name={iconName(activeConfig.icon)} size={20} color="#4DB6AC" />}
-                  <Text className="text-base font-semibold text-slate-900">{activeMethod.nombre}</Text>
+                  <Text className="text-base font-semibold text-slate-900 dark:text-white">{activeMethod.nombre}</Text>
                 </View>
                 <TouchableOpacity onPress={() => setActiveMethodId(null)}>
                   <Ionicons name="close" size={20} color="#64748B" />
                 </TouchableOpacity>
               </View>
               <View className="mb-3">
-                <Text className="mb-1 text-xs text-slate-600">Monto (Bs.)</Text>
-                <View className="flex-row items-center rounded-xl border border-slate-300 bg-white px-3">
-                  <Text className="text-base text-slate-500">Bs. </Text>
+                <Text className="mb-1 text-xs text-slate-600 dark:text-slate-300">Monto (Bs.)</Text>
+                <View className="flex-row items-center rounded-xl border border-slate-300 bg-white px-3 dark:border-slate-600 dark:bg-primary-dark">
+                  <Text className="text-base text-slate-500 dark:text-slate-400">Bs. </Text>
                   <BottomSheetTextInput
                     value={amountText}
                     onChangeText={setAmountText}
                     keyboardType="decimal-pad"
-                    className="flex-1 py-2.5 text-base text-slate-900"
+                    className="flex-1 py-2.5 text-base text-slate-900 dark:text-white"
                   />
                 </View>
               </View>
               {activeConfig?.requiereRef && (
                 <View className="mb-3">
-                  <Text className="mb-1 text-xs text-slate-600">Referencia</Text>
+                  <Text className="mb-1 text-xs text-slate-600 dark:text-slate-300">Referencia</Text>
                   <BottomSheetTextInput
                     value={reference}
                     onChangeText={setReference}
                     placeholder="N° de referencia"
-                    className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900"
+                    className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 dark:border-slate-600 dark:bg-primary-dark dark:text-white"
                   />
                 </View>
               )}
               {activeMethod.tipo === 'efectivo' && change > 0 && (
-                <View className="mb-3 rounded-xl bg-emerald-50 p-3">
-                  <Text className="text-sm font-semibold text-emerald-700">Vuelto: Bs. {fmt(change)}</Text>
+                <View className="mb-3 rounded-xl bg-emerald-50 p-3 dark:bg-emerald-950/30">
+                  <Text className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">Vuelto: Bs. {fmt(change)}</Text>
                 </View>
               )}
-              <TouchableOpacity onPress={handleAddPayment} className="items-center rounded-xl bg-[#4DB6AC] py-3">
+              <TouchableOpacity
+                onPress={handleAddPayment}
+                disabled={isProcessing}
+                className={`items-center rounded-xl py-3 ${isProcessing ? 'bg-slate-300' : 'bg-[#4DB6AC]'}`}>
                 <Text className="font-semibold text-white">Agregar Pago</Text>
               </TouchableOpacity>
             </View>
           )}
 
-          <View className="mt-3 flex-row gap-3 border-t border-slate-100 pt-3">
+          <View className="mt-3 flex-row gap-3 border-t border-slate-100 pt-3 dark:border-slate-700">
             <TouchableOpacity
               onPress={() => bottomSheetRef.current?.dismiss()}
-              className="flex-1 items-center rounded-2xl border border-slate-200 py-3.5">
-              <Text className="font-medium text-slate-600">Cancelar</Text>
+              className="flex-1 items-center rounded-2xl border border-slate-200 py-3.5 dark:border-slate-700">
+              <Text className="font-medium text-slate-600 dark:text-slate-300">Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleConfirm}

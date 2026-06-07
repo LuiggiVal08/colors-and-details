@@ -114,8 +114,10 @@ const orderService = {
   },
 
   getPayments: async (pedidoId: number): Promise<OrderPayment[]> => {
-    const { data } = await api.get<Record<string, unknown>[]>('/order-payment');
-    return (data ?? []).map(normalizePayment).filter((p) => p.pedido_id === pedidoId);
+    const { data } = await api.get<Record<string, unknown>[]>('/order-payment', {
+      params: { pedido_id: pedidoId },
+    });
+    return (data ?? []).map(normalizePayment);
   },
 
   createPayment: async (payload: CreateOrderPaymentDTO): Promise<OrderPayment> => {

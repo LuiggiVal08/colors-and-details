@@ -25,31 +25,41 @@ export default function DatePickerInput({ value, onChange, label, error }: DateP
 
   const handleChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
     if (Platform.OS === 'android') setShow(false);
+    if (_event.type === 'dismissed') setShow(false);
     if (selectedDate) onChange(selectedDate);
   };
 
   return (
     <View className="flex-1">
-      {label && <Text className="mb-1 text-xs text-slate-500">{label}</Text>}
+      {label && <Text className="mb-1 text-xs text-slate-500 dark:text-slate-400">{label}</Text>}
       <TouchableOpacity
         onPress={() => setShow(true)}
         className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 dark:bg-primary-dark dark:border-slate-700">
         <Ionicons name="calendar-outline" size={20} color="#4DB6AC" />
         <View className="flex-1">
-          <Text className="text-sm font-medium text-slate-900">{toShortDate(value)}</Text>
-          <Text className="text-xs text-slate-400">{toLongDate(value)}</Text>
+          <Text className="text-sm font-medium text-slate-900 dark:text-white">{toShortDate(value)}</Text>
+          <Text className="text-xs text-slate-400 dark:text-slate-500">{toLongDate(value)}</Text>
         </View>
         <Ionicons name="chevron-down" size={16} color="#94A3B8" />
       </TouchableOpacity>
       {error && <Text className="mt-1 text-xs text-rose-600">{error}</Text>}
       {show && (
-        <DateTimePicker
-          value={value}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          minimumDate={new Date()}
-          onChange={handleChange}
-        />
+        <View>
+          {Platform.OS === 'ios' && (
+            <View className="flex-row justify-end pt-2">
+              <TouchableOpacity onPress={() => setShow(false)}>
+                <Text className="font-semibold text-info">Listo</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <DateTimePicker
+            value={value}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            minimumDate={new Date()}
+            onChange={handleChange}
+          />
+        </View>
       )}
     </View>
   );

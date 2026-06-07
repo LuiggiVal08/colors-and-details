@@ -1,4 +1,4 @@
-import { View, Text, Dimensions } from 'react-native';
+import { View, Text, Dimensions, useColorScheme } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import type { SalesByDateItem } from '@/services/analytics.service';
 
@@ -9,6 +9,7 @@ interface SalesChartProps {
 }
 
 export default function SalesChart({ data }: SalesChartProps) {
+  const isDark = useColorScheme() === 'dark';
   const labels = data.map((item) =>
     new Date(item.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
   );
@@ -20,7 +21,7 @@ export default function SalesChart({ data }: SalesChartProps) {
         <View className="rounded-md bg-cyan-200 px-2 py-1">
           <Text className="text-xs font-bold text-cyan-800">$</Text>
         </View>
-        <Text className="text-base font-semibold text-slate-800">Total Ventas</Text>
+        <Text className="text-base font-semibold text-slate-800 dark:text-white">Total Ventas</Text>
       </View>
 
       <BarChart
@@ -33,18 +34,18 @@ export default function SalesChart({ data }: SalesChartProps) {
         yAxisLabel="$"
         yAxisSuffix=""
         chartConfig={{
-          backgroundGradientFrom: '#ffffff',
-          backgroundGradientTo: '#ffffff',
+          backgroundGradientFrom: isDark ? '#1E1E1E' : '#ffffff',
+          backgroundGradientTo: isDark ? '#1E1E1E' : '#ffffff',
           fillShadowGradient: '#06B6D4',
           fillShadowGradientOpacity: 1,
           color: () => '#06B6D4',
           barPercentage: 0.5,
           propsForBackgroundLines: {
             strokeDasharray: '3,3',
-            stroke: '#E2E8F0',
+            stroke: isDark ? '#334155' : '#E2E8F0',
           },
           propsForLabels: {
-            fill: '#94A3B8',
+            fill: isDark ? '#475569' : '#94A3B8',
             fontSize: 10,
           },
         }}

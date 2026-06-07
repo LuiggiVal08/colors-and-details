@@ -154,7 +154,7 @@ export default function SaleDetailScreen() {
 
             {sale.detalles?.map((detalle, i) => (
               <View
-                key={i}
+                key={`${detalle.producto_id}-${i}`}
                 className="flex-row items-center justify-between border-b border-slate-100 py-3 dark:border-slate-700">
                 <View className="min-w-0 flex-1">
                   <Text className="font-medium text-slate-900">
@@ -180,7 +180,7 @@ export default function SaleDetailScreen() {
             <Card className="mb-4">
               <Text className="mb-3 text-lg font-bold text-slate-900">Pagos</Text>
               {sale.pagos.map((pago, i) => (
-                <View key={i} className="flex-row items-center justify-between border-b border-slate-100 py-2 dark:border-slate-700">
+                <View key={pago.id || `pago-${i}`} className="flex-row items-center justify-between border-b border-slate-100 py-2 dark:border-slate-700">
                   <View className="flex-row items-center gap-2">
                     <View className="h-7 w-7 items-center justify-center rounded-full bg-[#4DB6AC]/10">
                       <Ionicons name={getPaymentIcon(pago.metodo_pago_nombre)} size={14} color="#4DB6AC" />

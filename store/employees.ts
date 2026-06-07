@@ -20,35 +20,7 @@ interface EmployeesState {
   setEmployees: (employees: Employee[]) => void;
 }
 
-const initialEmployees: Employee[] = [
-  {
-    id: 'emp-001',
-    nombre: 'Laura Mendoza',
-    correo: 'laura.mendoza@coloresydetalles.com',
-    telefono: '0412-1234567',
-    role: 'admin',
-    active: true,
-    priceEditEnabled: true,
-  },
-  {
-    id: 'emp-002',
-    nombre: 'Carlos Paredes',
-    correo: 'carlos.paredes@coloresydetalles.com',
-    telefono: '0414-7654321',
-    role: 'employee',
-    active: true,
-    priceEditEnabled: false,
-  },
-  {
-    id: 'emp-003',
-    nombre: 'María Rodríguez',
-    correo: 'maria.rodriguez@coloresydetalles.com',
-    telefono: '0424-8899001',
-    role: 'employee',
-    active: false,
-    priceEditEnabled: false,
-  },
-];
+const initialEmployees: Employee[] = [];
 
 export const useEmployeesStore = create<EmployeesState>((set) => ({
   employees: initialEmployees,

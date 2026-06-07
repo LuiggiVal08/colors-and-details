@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { ActivityIndicator } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import clientService from '@/services/client.service';
-import debounce from 'lodash.debounce';
 import { impactLight } from '@/helpers/haptics';
 
 interface SelectCustomerModalProps {
@@ -42,14 +41,6 @@ const SelectCustomerModal = forwardRef<SelectCustomerModalRef, SelectCustomerMod
       queryFn: () => clientService.search(search, 1, 30),
       enabled: search.length > 0,
     });
-
-    const debouncedSearch = useMemo(
-      () =>
-        debounce((value: string) => {
-          setSearch(value);
-        }, 400),
-      []
-    );
 
     const results = useMemo(() => {
       if (search.length === 0) return [];
@@ -107,7 +98,8 @@ const SelectCustomerModal = forwardRef<SelectCustomerModalRef, SelectCustomerMod
           <View className="mb-4 flex-row items-center rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 dark:border-slate-700 dark:bg-primary-dark">
             <Ionicons name="search" size={20} color="#94A3B8" />
             <BottomSheetTextInput
-              onChangeText={debouncedSearch}
+              value={search}
+              onChangeText={setSearch}
               placeholder="Buscar por nombre o cédula..."
               className="ml-3 flex-1 text-base text-slate-900 dark:text-white"
               autoCapitalize="none"

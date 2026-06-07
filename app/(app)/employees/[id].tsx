@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, View, TouchableOpacity, Modal, Linking, Alert } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import employeeService from '@/services/employee.service';
 import ScreenLayout from '@/components/layout/ScreenLayout';
-import { Divider, Menu } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import ErrorRetryCard from '@/components/ErrorRetryCard';
 import SkeletonLoader from '@/components/SkeletonLoader';
@@ -30,8 +30,6 @@ export default function EmployeeDetails() {
     queryFn: () => employeeService.getById(id as string),
     enabled: !!id,
   });
-  const [visible, setVisible] = useState(false);
-
   if (isLoading)
     return (
       <View className="flex-1 px-4 py-6">

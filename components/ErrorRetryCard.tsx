@@ -15,8 +15,8 @@ const ErrorRetryCard = ({
   buttonLabel = 'Reintentar',
 }: ErrorRetryCardProps) => (
   <View className="mx-4 my-6 rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/80 dark:bg-primary-dark">
-    <Text className="mb-3 text-lg font-semibold text-slate-900">{title}</Text>
-    <Text className="mb-5 text-sm leading-6 text-slate-600">{message}</Text>
+    <Text className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">{title}</Text>
+    <Text className="mb-5 text-sm leading-6 text-slate-600 dark:text-slate-300">{message}</Text>
     <TouchableOpacity
       onPress={onRetry}
       activeOpacity={0.7}

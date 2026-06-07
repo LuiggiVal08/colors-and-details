@@ -10,7 +10,7 @@ interface ButtonProps extends TouchableOpacityProps {
 
 const variantClasses: Record<ButtonVariant, { button: string; text: string }> = {
   primary: { button: 'bg-[#4DB6AC]', text: 'text-white' },
-  secondary: { button: 'border border-slate-200 bg-white', text: 'text-slate-600' },
+  secondary: { button: 'border border-slate-200 bg-white dark:border-slate-600 dark:bg-primary-dark', text: 'text-slate-600 dark:text-slate-300' },
   danger: { button: 'bg-rose-500', text: 'text-white' },
   text: { button: 'bg-transparent', text: 'text-[#4DB6AC]' },
 };
@@ -30,7 +30,7 @@ export function Button({
   return (
     <TouchableOpacity
       disabled={isDisabled}
-      className={`items-center justify-center rounded-full ${config.button} ${isDisabled ? 'bg-slate-300' : ''} ${className}`}
+      className={`items-center justify-center rounded-full ${config.button} ${isDisabled ? 'bg-slate-300 dark:bg-slate-600' : ''} ${className}`}
       style={[{ minHeight: 44 }, style]}
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled }}

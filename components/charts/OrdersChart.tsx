@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, LayoutChangeEvent } from 'react-native';
+import { View, Text, LayoutChangeEvent, useColorScheme } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import type { OrdersByMonthItem } from '@/services/analytics.service';
 
@@ -9,6 +9,7 @@ interface OrdersChartProps {
 // 80,132
 // 610,370
 export default function OrdersChart({ data }: OrdersChartProps) {
+  const isDark = useColorScheme() === 'dark';
   const [width, setWidth] = useState(0);
 
   const labels = data.map((item) => item.month);
@@ -22,7 +23,7 @@ export default function OrdersChart({ data }: OrdersChartProps) {
         <View className="rounded-md bg-purple-200 px-2 py-1">
           <Text className="text-xs font-bold text-purple-800">#</Text>
         </View>
-        <Text className="text-base font-semibold text-slate-800">Número de Pedidos</Text>
+        <Text className="text-base font-semibold text-slate-800 dark:text-white">Número de Pedidos</Text>
       </View>
 
       {width > 0 && (
@@ -35,16 +36,16 @@ export default function OrdersChart({ data }: OrdersChartProps) {
           height={220}
           yAxisSuffix=""
           chartConfig={{
-            backgroundGradientFrom: '#ffffff',
-            backgroundGradientTo: '#ffffff',
+            backgroundGradientFrom: isDark ? '#1E1E1E' : '#ffffff',
+            backgroundGradientTo: isDark ? '#1E1E1E' : '#ffffff',
             color: () => '#8B5CF6',
             strokeWidth: 3,
             propsForBackgroundLines: {
               strokeDasharray: '3,3',
-              stroke: '#E2E8F0',
+              stroke: isDark ? '#334155' : '#E2E8F0',
             },
             propsForLabels: {
-              fill: '#94A3B8',
+              fill: isDark ? '#475569' : '#94A3B8',
               fontSize: 10,
             },
             propsForDots: {

@@ -1,4 +1,4 @@
-import { View, Text, Dimensions } from 'react-native';
+import { View, Text, Dimensions, useColorScheme } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import type { LowStockItem } from '@/services/analytics.service';
 
@@ -9,6 +9,7 @@ interface LowStockChartProps {
 }
 
 export default function LowStockChart({ data }: LowStockChartProps) {
+  const isDark = useColorScheme() === 'dark';
   const labels = data.map((item) =>
     item.product.length > 10 ? `${item.product.slice(0, 8)}..` : item.product
   );
@@ -20,7 +21,7 @@ export default function LowStockChart({ data }: LowStockChartProps) {
         <View className="rounded-md bg-rose-200 px-2 py-1">
           <Text className="text-xs font-bold text-rose-800">!</Text>
         </View>
-        <Text className="text-base font-semibold text-slate-800">Stock Bajo</Text>
+        <Text className="text-base font-semibold text-slate-800 dark:text-white">Stock Bajo</Text>
       </View>
 
       <BarChart
@@ -33,18 +34,18 @@ export default function LowStockChart({ data }: LowStockChartProps) {
         yAxisLabel=""
         yAxisSuffix=""
         chartConfig={{
-          backgroundGradientFrom: '#ffffff',
-          backgroundGradientTo: '#ffffff',
+          backgroundGradientFrom: isDark ? '#1E1E1E' : '#ffffff',
+          backgroundGradientTo: isDark ? '#1E1E1E' : '#ffffff',
           fillShadowGradient: '#F43F5E',
           fillShadowGradientOpacity: 1,
           color: () => '#F43F5E',
           barPercentage: 0.5,
           propsForBackgroundLines: {
             strokeDasharray: '3,3',
-            stroke: '#E2E8F0',
+            stroke: isDark ? '#334155' : '#E2E8F0',
           },
           propsForLabels: {
-            fill: '#94A3B8',
+            fill: isDark ? '#475569' : '#94A3B8',
             fontSize: 9,
           },
         }}

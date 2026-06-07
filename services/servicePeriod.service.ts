@@ -3,7 +3,7 @@ import type { ServicePeriod, CreateServicePeriodDTO } from '@/types/servicePerio
 
 const servicePeriodService = {
   getByService: async (servicioId: number): Promise<ServicePeriod[]> => {
-    const { data } = await api.get(`/service-period/by-service/${servicioId}`);
+    const { data } = await api.get<ServicePeriod[] | { data: ServicePeriod[]; periods?: ServicePeriod[] }>(`/service-period/by-service/${servicioId}`);
     const raw = data?.data ?? data?.periods ?? data;
     if (Array.isArray(raw)) return raw;
     return [];

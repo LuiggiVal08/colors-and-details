@@ -15,7 +15,7 @@ const clientService = {
     return data;
   },
   update: async (id: string, payload: UpdateClientDTO): Promise<Client> => {
-    const { data } = await api.put(`/customer/${id}`, payload);
+    const { data } = await api.put<Client>(`/customer/${id}`, payload);
     return data;
   },
   search: async (query: string, page: number = 1, limit: number = 20): Promise<Client[]> => {

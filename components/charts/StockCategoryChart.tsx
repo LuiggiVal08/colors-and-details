@@ -1,4 +1,4 @@
-import { View, Text, Dimensions } from 'react-native';
+import { View, Text, Dimensions, useColorScheme } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
 import type { StockByCategoryItem } from '@/services/analytics.service';
 
@@ -9,11 +9,12 @@ interface StockCategoryChartProps {
 }
 
 export default function StockCategoryChart({ data }: StockCategoryChartProps) {
+  const isDark = useColorScheme() === 'dark';
   const chartData = data.map((item) => ({
     name: item.category,
     population: item.totalItems,
     color: item.color,
-    legendFontColor: '#94A3B8',
+    legendFontColor: isDark ? '#CBD5E1' : '#94A3B8',
     legendFontSize: 12,
   }));
 
@@ -23,7 +24,7 @@ export default function StockCategoryChart({ data }: StockCategoryChartProps) {
         <View className="rounded-md bg-emerald-200 px-2 py-1">
           <Text className="text-xs font-bold text-emerald-800">%</Text>
         </View>
-        <Text className="text-base font-semibold text-slate-800">Stock por Categoría</Text>
+        <Text className="text-base font-semibold text-slate-800 dark:text-white">Stock por Categoría</Text>
       </View>
 
       <PieChart
@@ -31,7 +32,7 @@ export default function StockCategoryChart({ data }: StockCategoryChartProps) {
         width={screenWidth - 72}
         height={220}
         chartConfig={{
-          color: () => '#1E293B',
+          color: () => (isDark ? '#E2E8F0' : '#1E293B'),
         }}
         accessor="population"
         backgroundColor="transparent"
@@ -42,7 +43,7 @@ export default function StockCategoryChart({ data }: StockCategoryChartProps) {
         {data.map((item) => (
           <View key={item.category} className="flex-row items-center gap-1">
             <View style={{ backgroundColor: item.color }} className="h-3 w-3 rounded-full" />
-            <Text className="text-xs text-slate-600">{item.category}</Text>
+            <Text className="text-xs text-slate-600 dark:text-slate-400">{item.category}</Text>
           </View>
         ))}
       </View>

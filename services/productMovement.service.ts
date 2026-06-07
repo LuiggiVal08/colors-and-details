@@ -37,7 +37,7 @@ const mapMovement = (item: MovementApiItem): InventoryMovement => {
 };
 
 const productMovementService = {
-  getAll: async ({ search = '', tipo = '', page = 1, limit = 20 }: GetAllParams = {}): Promise<InventoryMovement[]> => {
+  getAll: async ({ search = '', tipo = '', producto_id = '', page = 1, limit = 20 }: GetAllParams = {}): Promise<InventoryMovement[]> => {
     const params: Record<string, string | number> = { page, limit };
     if (search) params.search = search;
     if (tipo) params.tipo = tipo;

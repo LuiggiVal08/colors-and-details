@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, ImageBackground, Keyboard } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface ScreenLayoutProps {
   children: React.ReactNode;
@@ -22,29 +23,38 @@ const ScreenLayout = ({ children, centerContent = false, scrollEnabled = true, c
     </GestureDetector>
   );
 
+  const bg = (
+    <ImageBackground source={require('../../assets/background.jpg')} resizeMode="cover" className="absolute inset-0">
+      <View className="absolute inset-0 bg-black/40" />
+    </ImageBackground>
+  );
+
   if (!scrollEnabled) {
     return (
-      <ImageBackground source={require('../../assets/background.jpg')} resizeMode="cover" className="absolute inset-0">
-        <View className="absolute inset-0 bg-black/40" />
-        {content}
-      </ImageBackground>
+      <View className="flex-1">
+        {bg}
+        <SafeAreaView edges={['bottom']} className="flex-1">
+          {content}
+        </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <ImageBackground source={require('../../assets/background.jpg')} resizeMode="cover" className="absolute inset-0">
-      <View className="absolute inset-0 bg-black/40" />
-
-      <KeyboardAwareScrollView
-        bottomOffset={20}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: centerContent ? 'center' : 'flex-start',
-        }}>
-        {content}
-      </KeyboardAwareScrollView>
-    </ImageBackground>
+    <View className="flex-1">
+      {bg}
+      <SafeAreaView edges={['bottom']} className="flex-1">
+        <KeyboardAwareScrollView
+          bottomOffset={20}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: centerContent ? 'center' : 'flex-start',
+          }}>
+          {content}
+        </KeyboardAwareScrollView>
+      </SafeAreaView>
+    </View>
   );
 };
 

@@ -37,8 +37,8 @@ export function ConfirmModal({
             <View className={`h-14 w-14 items-center justify-center rounded-full ${iconBg}`}>
               <Ionicons name={iconName} size={28} color={iconColor} />
             </View>
-            <Text className="mt-3 text-center text-lg font-bold text-slate-900">{title}</Text>
-            <Text className="mt-2 text-center text-sm text-slate-500">{message}</Text>
+            <Text className="mt-3 text-center text-lg font-bold text-slate-900 dark:text-white">{title}</Text>
+            <Text className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">{message}</Text>
           </View>
 
           <View className="mt-6 flex-row gap-3">
@@ -46,7 +46,7 @@ export function ConfirmModal({
               onPress={onCancel}
               disabled={isLoading}
               className="flex-1 items-center rounded-2xl border border-slate-200 py-3">
-              <Text className="font-medium text-slate-600">{cancelText}</Text>
+              <Text className="font-medium text-slate-600 dark:text-slate-300">{cancelText}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onConfirm}

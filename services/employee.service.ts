@@ -3,23 +3,23 @@ import api from './api';
 
 const employeeService = {
   getAll: async (page: number = 1, limit: number = 20): Promise<Employee[]> => {
-    const response = await api.get<Employee[]>('/employe', { params: { page, limit } });
+    const response = await api.get<Employee[]>('/employee', { params: { page, limit } });
     return response.data;
   },
   getById: async (id: string): Promise<Employee> => {
-    const response = await api.get<Employee>(`/employe/${id}`);
+    const response = await api.get<Employee>(`/employee/${id}`);
     return response.data;
   },
   create: async (data: CreateEmployeeDTO): Promise<Employee> => {
-    const response = await api.post<Employee>('/employe', data);
+    const response = await api.post<Employee>('/employee', data);
     return response.data;
   },
   update: async (id: string, data: UpdateEmployeeDTO): Promise<Employee> => {
-    const response = await api.put(`/employe/${id}`, data);
+    const response = await api.put<Employee>(`/employee/${id}`, data);
     return response.data;
   },
   search: async (query: string, page: number = 1, limit: number = 20): Promise<Employee[]> => {
-    const { data } = await api.get<Employee[]>('/employe', {
+    const { data } = await api.get<Employee[]>('/employee', {
       params: {
         search: query,
         page,
@@ -29,10 +29,10 @@ const employeeService = {
     return data;
   },
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/employe/${id}`);
+    await api.delete(`/employee/${id}`);
   },
   getEmployeeByUserId: async (userId: number): Promise<Employee> => {
-    const response = await api.get(`/employe/${userId}/user`);
+    const response = await api.get<Employee>(`/employee/${userId}/user`);
     return response.data;
   },
 };

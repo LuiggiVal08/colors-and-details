@@ -65,7 +65,11 @@ const SelectProductModal = forwardRef<SelectProductModalRef, SelectProductModalP
         subtotal: product.precio * qty,
         stockDisponible: product.stock,
       });
-      setSelectedQty((prev) => ({ ...prev, [id]: undefined }));
+      setSelectedQty((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
       bottomSheetRef.current?.dismiss();
     };
 

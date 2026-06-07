@@ -45,7 +45,7 @@ export default function AppLayout() {
     };
 
     validate();
-  }, [hasHydrated]);
+  }, [hasHydrated, logout]);
 
   useEffect(() => {
     if (hasHydrated) loadTasa();
@@ -69,15 +69,22 @@ export default function AppLayout() {
       if (nextState === 'active') {
         const { user, _hasHydrated } = useAuthStore.getState();
         if (!_hasHydrated || !user?.token) return;
-        api.get('/validate').catch(() => {
-          disconnectSocket();
-          logout();
+        api.get('/validate').catch(async () => {
+          await new Promise((r) => setTimeout(r, 2000));
+          const { user: u, _hasHydrated: h } = useAuthStore.getState();
+          if (!h || !u?.token) return;
+          try {
+            await api.get('/validate');
+          } catch {
+            disconnectSocket();
+            logout();
+          }
         });
       }
     });
 
     return () => subscription.remove();
-  }, [hasHydrated]);
+  }, [hasHydrated, logout]);
 
   if (!hasHydrated || isValidating) {
     return (

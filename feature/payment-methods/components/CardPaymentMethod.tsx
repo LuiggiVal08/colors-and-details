@@ -10,21 +10,6 @@ interface CardPaymentMethodProps {
   onEdit: (paymentMethod: PaymentMethod) => void;
 }
 
-const getTipoIcon = (tipo: string) => {
-  switch (tipo) {
-    case 'efectivo':
-      return 'cash';
-    case 'tarjeta':
-      return 'card';
-    case 'digital':
-      return 'phone-portrait';
-    case 'transferencia':
-      return 'swap-horizontal';
-    default:
-      return 'help-circle';
-  }
-};
-
 const CardPaymentMethod = ({ paymentMethod, onEdit }: CardPaymentMethodProps) => {
   const handleEdit = async () => {
     impactLight();

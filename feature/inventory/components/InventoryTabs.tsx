@@ -19,7 +19,8 @@ export const InventoryTabs = ({ value, onValueChange }: InventoryTabsProps) => {
       <SegmentedButtons
         value={value}
         onValueChange={onValueChange}
-        style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 20 }}
+        className="bg-white/95 dark:bg-primary-dark/95"
+        style={{ borderRadius: 20 }}
         buttons={tabOptions.map((tab) => ({
           value: tab.value,
           label: tab.label,

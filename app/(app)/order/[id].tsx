@@ -280,7 +280,7 @@ export default function OrderDetailScreen() {
           <View className="mb-4 rounded-2xl border border-slate-100 bg-white dark:bg-primary-dark dark:border-slate-700">
             {order.detalles?.map((d, i) => (
               <View
-                key={i}
+                key={`${d.producto_id}-${i}`}
                 className={`mx-4 py-3 ${i < (order.detalles?.length ?? 0) - 1 ? 'border-b border-slate-100' : ''}`}>
                 <View className="flex-row items-center justify-between">
                   <View className="min-w-0 flex-1">

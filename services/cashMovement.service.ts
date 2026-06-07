@@ -23,8 +23,9 @@ const cashMovementService = {
       return data.map(normalizeMovement);
     }
     const wrapped = data as Record<string, unknown>;
-    const arr = (wrapped.data as Record<string, unknown>[]) || [];
-    return arr.map(normalizeMovement);
+    const raw = wrapped.data;
+    if (Array.isArray(raw)) return raw.map(normalizeMovement);
+    return [];
   },
 
   getByControl: async (controlId: string): Promise<CashMovement[]> => {
@@ -33,8 +34,9 @@ const cashMovementService = {
       return data.map(normalizeMovement);
     }
     const wrapped = data as Record<string, unknown>;
-    const arr = (wrapped.data as Record<string, unknown>[]) || [];
-    return arr.map(normalizeMovement);
+    const raw = wrapped.data;
+    if (Array.isArray(raw)) return raw.map(normalizeMovement);
+    return [];
   },
 
   getById: async (id: string): Promise<CashMovement> => {

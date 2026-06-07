@@ -24,7 +24,8 @@ export const ProfileTabs = () => {
       <SegmentedButtons
         value={value}
         onValueChange={setValue}
-        style={{ backgroundColor: 'rgb(255 255 255 / 0.9)', borderRadius: 20 }}
+        className="bg-white/90 dark:bg-primary-dark/90"
+        style={{ borderRadius: 20 }}
         buttons={[
           { value: 'datos', label: 'Datos', icon: 'card-account-details-outline' },
           { value: 'seguridad', label: 'Seguridad', icon: 'shield-outline' },

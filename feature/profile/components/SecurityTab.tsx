@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
 import { impactLight, selection } from '@/helpers/haptics';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +16,7 @@ const LINKED_CREDENTIALS_KEY = 'linked_credentials';
 
 export const SecurityTab = () => {
   const id = useAuthStore((state) => state.user?.id);
+  const colorScheme = useColorScheme();
 
   // Feedback
   const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
@@ -98,8 +99,8 @@ export const SecurityTab = () => {
               }}
             />
           }
-          theme={{ colors: { background: '#121212', text: 'white', placeholder: 'gray' } }}
-          textColor="white"
+          theme={colorScheme === 'dark' ? { colors: { background: '#121212', text: 'white', placeholder: 'gray' } } : undefined}
+          textColor={colorScheme === 'dark' ? 'white' : undefined}
         />
 
         <ControlledInput
@@ -118,8 +119,8 @@ export const SecurityTab = () => {
               }}
             />
           }
-          theme={{ colors: { background: '#121212', text: 'white', placeholder: 'gray' } }}
-          textColor="white"
+          theme={colorScheme === 'dark' ? { colors: { background: '#121212', text: 'white', placeholder: 'gray' } } : undefined}
+          textColor={colorScheme === 'dark' ? 'white' : undefined}
         />
 
         <ControlledInput
@@ -138,7 +139,7 @@ export const SecurityTab = () => {
               }}
             />
           }
-          theme={{ colors: { background: '#121212', text: 'white', placeholder: 'gray' } }}
+          theme={colorScheme === 'dark' ? { colors: { background: '#121212', text: 'white', placeholder: 'gray' } } : undefined}
           textColor="white"
         />
 
