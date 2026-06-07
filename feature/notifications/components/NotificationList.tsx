@@ -37,7 +37,7 @@ export const NotificationList = () => {
 
   if (loading && notifications.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className="w-full flex-1 items-center justify-center">
         <ActivityIndicator size="large" color="#4DB6AC" />
       </View>
     );
@@ -45,7 +45,7 @@ export const NotificationList = () => {
 
   if (!loading && notifications.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center px-6">
+      <View className="w-full flex-1 items-center justify-center px-6">
         <Text className="mb-2 text-4xl">🔔</Text>
         <Text className="text-center text-base text-gray-500 dark:text-gray-400">
           No tienes notificaciones
@@ -55,7 +55,7 @@ export const NotificationList = () => {
   }
 
   return (
-    <View className="flex-1">
+    <View className="w-full flex-1">
       {unreadCount > 0 && (
         <TouchableOpacity
           onPress={markAllAsRead}
