@@ -9,10 +9,14 @@ export interface LoginCredentials {
 
 export const signIn = async (credentials: LoginCredentials) => {
   // Axios ya sabe que debe pegarle a API_BASE_URL + '/user/singin'
-  const response = await api.post('/user/singin', credentials);
+  const response = await api.post('/user/signin', credentials);
 
   // Retornamos la respuesta. Axios guarda lo que manda el server en .data
   return response.data;
+};
+
+export const serverLogout = async () => {
+  await api.post('/user/logout');
 };
 
 export const changePassword = async (id: number, data: SecurityFormData) => {
@@ -24,7 +28,6 @@ export const changePassword = async (id: number, data: SecurityFormData) => {
   };
 
   const response = await api.post(`/user/change-password/${id}`, payload);
-  console.log(response);
 
   return response.data;
 };

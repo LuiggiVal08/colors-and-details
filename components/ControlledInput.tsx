@@ -7,6 +7,7 @@ interface ControlledInputProps<T extends FieldValues> extends Omit<TextInputProp
   label: string;
   control: Control<T>;
   error?: string; // Ahora tu 'string' no choca con nadie
+  readOnly?: boolean;
 }
 
 // Añadimos <T extends FieldValues> antes de los argumentos
@@ -15,8 +16,21 @@ export const ControlledInput = <T extends FieldValues>({
   label,
   control,
   error,
+  readOnly = false,
+  onChangeText,
+  style,
+  outlineStyle,
   ...props
 }: ControlledInputProps<T>) => {
+  const inputOutlineStyle = [
+    {
+      borderRadius: 12,
+      backgroundColor: readOnly ? '#f8fafc' : '#ffffff',
+      borderColor: readOnly ? '#cbd5e1' : undefined,
+    },
+    outlineStyle,
+  ];
+
   return (
     <View className="mb-4">
       <Controller
@@ -30,9 +44,11 @@ export const ControlledInput = <T extends FieldValues>({
             // siempre enviamos string al input
             value={value !== undefined && value !== null ? String(value) : ''}
             onBlur={onBlur}
-            onChangeText={onChange}
+            onChangeText={(text) => onChange(onChangeText ? onChangeText(text) : text)}
             error={!!error}
-            outlineStyle={{ borderRadius: 12 }}
+            editable={!readOnly}
+            outlineStyle={inputOutlineStyle}
+            style={[style, readOnly ? { backgroundColor: '#f8fafc' } : undefined]}
             {...props}
           />
         )}
