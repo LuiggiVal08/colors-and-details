@@ -1,5 +1,5 @@
-import { Slot, Redirect } from 'expo-router';
-import { useAuthStore } from '../../../store/auth';
+import { Stack, Redirect } from 'expo-router';
+import { useAuthStore } from '@/store/auth';
 
 export default function SuperAdminLayout() {
   const user = useAuthStore((state) => state.user);
@@ -9,5 +9,5 @@ export default function SuperAdminLayout() {
     return <Redirect href="/shopping" />;
   }
 
-  return <Slot />;
+  return <Stack screenOptions={{ headerShown: true, animation: 'ios_from_right' }} />;
 }

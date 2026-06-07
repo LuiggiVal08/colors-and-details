@@ -1,5 +1,7 @@
 import { Redirect, useRouter } from 'expo-router';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenLayout from '../../components/layout/ScreenLayout';
 import { useAuthStore, User } from '../../store/auth';
@@ -10,14 +12,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { loginSchema } from '@/schemas/loginSchema';
 import { useEffect, useState } from 'react';
-import HelpButton from '@/components/HelpButton';
 import { Format } from '@/helpers/Formats';
+import { impactLight, selection } from '@/helpers/haptics';
 import { type LoginCredentials, signIn } from '@/services/auth.service';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { maskUsername } from '@/helpers/maskUsername';
 import { AxiosError } from 'axios';
+import ExpandableFAB from '@/components/ExpandableFAB';
+import Card from '@/components/Card';
+import { API_BASE_URL } from '@/constants';
+import { connectSocket } from '@/services/socket';
 
 const LINKED_CREDENTIALS_KEY = 'linked_credentials';
 const LINKED_USERNAME_KEY = 'linked_username';
@@ -35,6 +41,7 @@ export default function LoginScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoadingStorage, setIsLoadingStorage] = useState(true);
   const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
+  const [bioFailCount, setBioFailCount] = useState(0);
 
   const showError = (message: string) => setSnackbar({ visible: true, message });
 
@@ -42,16 +49,20 @@ export default function LoginScreen() {
     mutationFn: (variables: LoginCredentials) => signIn(variables),
     onSuccess: async (data, variables) => {
       login(data);
+      if (data?.token) connectSocket(data.token);
       if (variables?.username && variables?.password) {
         await SecureStore.setItemAsync(LINKED_CREDENTIALS_KEY, JSON.stringify(variables));
         await AsyncStorage.setItem(LINKED_USERNAME_KEY, variables.username);
         setLinkedUsername(variables.username);
       }
       setIsModalVisible(false);
-      router.replace('/shopping');
+
+      router.replace('/(tabs)');
     },
     onError: (error) => {
       const message = error.response?.data?.message || 'Error de conexión';
+      console.info(error);
+
       showError(message);
     },
   });
@@ -68,41 +79,80 @@ export default function LoginScreen() {
     await SecureStore.deleteItemAsync(LINKED_CREDENTIALS_KEY);
     await AsyncStorage.removeItem(LINKED_USERNAME_KEY);
     setLinkedUsername(null);
+    setBioFailCount(0);
     showError('Dispositivo desvinculado');
   };
 
+  const handleBioFail = () => {
+    const next = bioFailCount + 1;
+    setBioFailCount(next);
+    if (next >= 3) {
+      setBioFailCount(0);
+      setIsModalVisible(true);
+    }
+  };
+
   if (!hasHydrated || isLoadingStorage) return <ActivityIndicator size="large" color="#4DB6AC" />;
-  if (user) return <Redirect href="/shopping" />;
+  if (user) return <Redirect href="/(tabs)" />;
 
   return (
-    <ScreenLayout centerContent={true}>
-      <View className="w-full max-w-md items-center justify-center rounded-3xl border border-slate-700 bg-white p-8 px-6 py-8 shadow-xl">
+    <ScreenLayout centerContent={true} className="px-4">
+      <Card className="w-full max-w-md items-center justify-center p-8 shadow-xl">
         <View className="items-center justify-center pb-6">
           <Logo />
           {/* <Text className="text-xl font-bold text-slate-800">Bienvenido a Colores y Detalles</Text> */}
+          <Pressable
+            onPress={async () => {
+              try {
+                console.info('Testing connection...', `${API_BASE_URL}/health`);
+
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.status === 200) {
+                  console.info('Connection successful');
+                } else {
+                  console.info('Connection failed');
+                  showError('Error al conectar con el servidor');
+                }
+              } catch (error) {
+                console.info(error);
+                showError('Error al conectar con el servidor');
+              }
+            }}>
+            <Text className="text-xl font-bold text-slate-800">Testear conexión</Text>
+          </Pressable>
         </View>
 
         {linkedUsername ? (
           <BiometricLoginView
             username={linkedUsername}
             onBiometricPress={async () => {
+              selection();
               const result = await LocalAuthentication.authenticateAsync({
                 promptMessage: 'Acceder con autenticación biométrica',
                 promptDescription:
                   'Ingrese su huella dactilar o coloque su rostro frente al dispositivo para iniciar sesión',
               });
               if (result.success) {
+                setBioFailCount(0);
                 const stored = await SecureStore.getItemAsync(LINKED_CREDENTIALS_KEY);
                 if (stored) mutation.mutate(JSON.parse(stored));
+              } else {
+                handleBioFail();
               }
             }}
-            onPasswordPress={() => setIsModalVisible(true)}
-            onUnlink={handleUnlink}
+            onPasswordPress={() => {
+              impactLight();
+              setIsModalVisible(true);
+            }}
+            onUnlink={() => {
+              impactLight();
+              handleUnlink();
+            }}
           />
         ) : (
           <LoginForm onSubmit={(creds) => mutation.mutate(creds)} isLoading={mutation.isPending} />
         )}
-      </View>
+      </Card>
 
       <LinkedPasswordModal
         visible={isModalVisible}
@@ -112,11 +162,18 @@ export default function LoginScreen() {
         isLoading={mutation.isPending}
       />
 
-      <HelpButton />
+      <ExpandableFAB
+        icon={<Ionicons name="help-circle" size={24} color="white" />}
+        label="Ayuda"
+        tooltipText="Soporte y Ayuda"
+        onPress={() => router.push('/help')}
+        delay={3500} // Se contrae a los 3.5 segundos
+        bgColorClass="bg-[#4DB6AC]" // Puedes cambiar el color dependiendo de la pantalla
+      />
       <Snackbar
         visible={snackbar.visible}
         onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
-        className="bg-red-500">
+        className="bg-rose-600">
         {snackbar.message}
       </Snackbar>
     </ScreenLayout>
@@ -162,6 +219,7 @@ interface LinkedPasswordFormProps {
 const LinkedPasswordModal = ({ visible, onDismiss, username, onSubmit, isLoading }: LinkedPasswordFormProps) => {
   const [password, setPassword] = useState('');
   const [secure, setSecure] = useState(true);
+  const colorScheme = useColorScheme();
 
   return (
     <Portal>
@@ -169,35 +227,42 @@ const LinkedPasswordModal = ({ visible, onDismiss, username, onSubmit, isLoading
         visible={visible}
         onDismiss={onDismiss}
         contentContainerStyle={{
-          backgroundColor: '#fff',
+          backgroundColor: colorScheme === 'dark' ? '#1E293B' : '#fff',
           padding: 25,
           margin: 20,
           borderRadius: 20,
         }}>
-        <Text className="mb-4 text-lg font-bold text-slate-800">Confirmar Contraseña</Text>
-        <Text className="mb-4 text-sm text-slate-500">Ingresa la clave para {maskUsername(username)}</Text>
+        <KeyboardAvoidingView behavior="padding">
+          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <Text className="mb-4 text-lg font-bold text-slate-800 dark:text-white">Confirmar Contraseña</Text>
+            <Text className="mb-4 text-sm text-slate-500 dark:text-slate-400">Ingresa la clave para {maskUsername(username)}</Text>
 
-        <TextInput
-          label="Contraseña"
-          mode="outlined"
-          secureTextEntry={secure}
-          value={password}
-          onChangeText={setPassword}
-          theme={{ colors: { primary: '#4DB6AC' } }}
-          right={<TextInput.Icon icon={secure ? 'eye' : 'eye-off'} onPress={() => setSecure(!secure)} />}
-        />
+            <TextInput
+              label="Contraseña"
+              mode="outlined"
+              secureTextEntry={secure}
+              value={password}
+              onChangeText={setPassword}
+              theme={{ colors: { primary: '#4DB6AC' } }}
+              right={<TextInput.Icon icon={secure ? 'eye' : 'eye-off'} onPress={() => setSecure(!secure)} />}
+            />
 
-        <Button
-          mode="contained"
-          onPress={() => onSubmit(password)}
-          loading={isLoading}
-          disabled={isLoading}
-          className="mt-6 py-1">
-          <Text>Iniciar Sesión</Text>
-        </Button>
-        <Button mode="text" onPress={onDismiss} className="mt-2">
-          <Text>Cancelar</Text>
-        </Button>
+            <Button
+              mode="contained"
+              onPress={() => {
+                impactLight();
+                onSubmit(password);
+              }}
+              loading={isLoading}
+              disabled={isLoading}
+              className="mt-6 py-1">
+              <Text>Iniciar Sesión</Text>
+            </Button>
+            <Button mode="text" onPress={onDismiss} className="mt-2">
+              <Text>Cancelar</Text>
+            </Button>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </Modal>
     </Portal>
   );
@@ -266,7 +331,14 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
           </View>
         )}
       />
-      <Button mode="contained" onPress={handleSubmit(onSubmit)} loading={isLoading} className="mt-4">
+      <Button
+        mode="contained"
+        onPress={() => {
+          impactLight();
+          handleSubmit(onSubmit)();
+        }}
+        loading={isLoading}
+        className="mt-4">
         <Text>Iniciar Sesión</Text>
       </Button>
       <TouchableOpacity onPress={() => router.push('/rescue')} className="mx-auto mt-6">

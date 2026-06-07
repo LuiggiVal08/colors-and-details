@@ -1,9 +1,12 @@
 import { Stack } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
+import { StatusBar, useColorScheme, View } from 'react-native';
 import '@/global.css';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { themePaper } from '@/constants/theme';
+import { themeLight, themeDark } from '@/constants/theme';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,16 +31,31 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+  const theme = colorScheme === 'dark' ? themeDark : themeLight;
+
   return (
-    <KeyboardProvider>
-      <PaperProvider theme={themePaper}>
-        <QueryClientProvider client={queryClient}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(app)" />
-          </Stack>
-        </QueryClientProvider>
-      </PaperProvider>
-    </KeyboardProvider>
+    <>
+      <StatusBar
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={colorScheme === 'dark' ? themeDark.colors.background : themeLight.colors.background}
+      />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <KeyboardProvider>
+            <View className={colorScheme === 'dark' ? 'dark' : ''} style={{ flex: 1 }}>
+              <PaperProvider theme={theme}>
+                <QueryClientProvider client={queryClient}>
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(app)" />
+                  </Stack>
+                </QueryClientProvider>
+              </PaperProvider>
+            </View>
+          </KeyboardProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </>
   );
 }
