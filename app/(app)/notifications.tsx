@@ -12,7 +12,7 @@ export default function NotificationsScreen() {
   }, [load]);
 
   return (
-    <ScreenLayout>
+    <ScreenLayout scrollEnabled={false}>
       <Stack.Screen options={{ title: 'Notificaciones', headerRight: () => null }} />
       <NotificationList />
     </ScreenLayout>
