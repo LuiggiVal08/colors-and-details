@@ -1,6 +1,7 @@
 // services/api.ts
 import { API_BASE_URL } from '@/constants';
 import { useAuthStore } from '@/store/auth';
+import { connectSocket, disconnectSocket } from '@/services/socket';
 import axios from 'axios';
 
 const api = axios.create({
@@ -37,7 +38,8 @@ api.interceptors.response.use(
           ...currentUser,
           token: newToken,
         });
-        // Al ejecutar login(), Zustand actualiza el SecureStore automáticamente
+        disconnectSocket();
+        connectSocket(newToken);
       }
     }
 
@@ -46,6 +48,7 @@ api.interceptors.response.use(
   (error) => {
     // Si el backend dice que no estamos autorizados (token vencido)
     if (error.response?.status === 401) {
+      disconnectSocket();
       useAuthStore.getState().logout();
     }
 
