@@ -1,18 +1,17 @@
-// En tu archivo de esquema/tipos
 import { z } from 'zod';
 
 export const employeeSchema = z.object({
-  id: z.number(),
-  nombre: z.string().min(1, 'Requerido'),
-  apellido: z.string().min(1, 'Requerido'),
-  cedula: z.string().min(6, 'Mínimo 6 caracteres'),
-  telefono: z.string().min(6, 'Mínimo 6 caracteres'),
+  nombre: z.string().min(1, 'Nombre requerido'),
+  apellido: z.string().min(1, 'Apellido requerido'),
+  cedula: z.string().min(6, 'Cédula debe tener al menos 6 caracteres'),
+  telefono: z.string().min(6, 'Teléfono debe tener al menos 6 caracteres'),
   email: z.string().email('Email inválido'),
-  direccion: z.string().min(1, 'Requerida'),
-  //   fecha_ingreso: z.coerce.date(), // El server espera un Date
-  salario_base: z.string(), // El server espera un String
+  direccion: z.string().min(1, 'Dirección requerida'),
+  salario_base: z.string().min(1, 'Salario base requerido'),
+  frecuencia_pago: z.enum(['mensual', 'quincenal', 'semanal'], {
+    required_error: 'Selecciona la frecuencia de pago',
+  }),
   activo: z.boolean().optional(),
-  empresa_id: z.number().int(),
 });
 
 export type EmployeeFormData = z.infer<typeof employeeSchema>;

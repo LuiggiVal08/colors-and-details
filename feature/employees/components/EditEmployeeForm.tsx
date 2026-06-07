@@ -2,39 +2,56 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import employeeService from '@/services/employee.service';
-import type { Employee } from '@/types/employee';
+import { Employee, UpdateEmployeeDTO } from '@/types/employee';
 import { EmployeeFormData, employeeSchema } from '@/schemas/employeeSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { ControlledInput } from '@/components/ControlledInput';
+import employeeService from '@/services/employee.service';
+import { SegmentedButtons, Switch } from 'react-native-paper';
 
 interface Props {
   initialData: Employee;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export const EmployeeForm = ({ initialData, onClose }: Props) => {
+export const EditEmployeeForm = ({ initialData, onClose, onSuccess }: Props) => {
   const queryClient = useQueryClient();
+
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<EmployeeFormData>({
-    // <--- Usamos el tipo inferido de Zod
     resolver: zodResolver(employeeSchema),
-    // Forzamos el tipado de los valores iniciales para que coincidan exactamente
-    defaultValues: initialData as EmployeeFormData,
+    defaultValues: {
+      nombre: initialData.nombre,
+      apellido: initialData.apellido,
+      cedula: initialData.cedula,
+      telefono: initialData.telefono,
+      email: initialData.email,
+      direccion: initialData.direccion,
+      salario_base: initialData.salario_base,
+      frecuencia_pago: initialData.frecuencia_pago,
+      activo: initialData.activo,
+    },
   });
 
-  const mutation = useMutation({
-    mutationFn: (data: EmployeeFormData) =>
-      employeeService.update(initialData.id.toString(), { ...initialData, ...data }),
+  const updateMutation = useMutation({
+    mutationFn: (data: UpdateEmployeeDTO) => employeeService.update(initialData.id.toString(), data),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
       queryClient.invalidateQueries({ queryKey: ['employee', initialData.id] });
+      onSuccess?.();
       onClose();
     },
   });
+
+  const onSubmit = (data: EmployeeFormData) => {
+    updateMutation.mutate(data);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -43,8 +60,8 @@ export const EmployeeForm = ({ initialData, onClose }: Props) => {
         <TouchableOpacity onPress={onClose}>
           <Text className="text-[#4DB6AC]">Cancelar</Text>
         </TouchableOpacity>
-        <Text className="text-lg font-bold">Perfil de Empleado</Text>
-        <TouchableOpacity onPress={handleSubmit((d) => mutation.mutate(d))}>
+        <Text className="text-lg font-bold">Editar Empleado</Text>
+        <TouchableOpacity onPress={handleSubmit(onSubmit)}>
           <Text className="font-bold text-[#4DB6AC]">Guardar</Text>
         </TouchableOpacity>
       </View>
@@ -60,11 +77,16 @@ export const EmployeeForm = ({ initialData, onClose }: Props) => {
             control={control}
             error={errors.cedula?.message}
             keyboardType="numeric"
+            editable={false}
           />
+          <View className="flex-row items-center justify-between py-2">
+            <Text className="text-base text-slate-700">Estado</Text>
+            <Switch value={control._formValues.activo} onValueChange={(value) => setValue('activo', value)} />
+          </View>
         </FormSection>
 
         {/* SECCIÓN: Contacto */}
-        <FormSection title="Contacto y Ubicación">
+        <FormSection title="Contacto">
           <ControlledInput
             name="email"
             label="Correo Electrónico"
@@ -88,23 +110,37 @@ export const EmployeeForm = ({ initialData, onClose }: Props) => {
           />
         </FormSection>
 
-        {/* SECCIÓN: Laboral (Solo lectura o ajustes) */}
-        <FormSection title="Datos Laborales">
-          {/* Ejemplo de campo informativo no editable en el form */}
-          <View className="mt-2 rounded-lg bg-slate-100 p-4">
-            <Text className="text-xs text-slate-500">Salario Base</Text>
-            <Text className="text-slate-800">${Number(initialData.salario_base).toLocaleString()}</Text>
-          </View>
-          <View className="mt-2 rounded-lg bg-slate-100 p-4">
-            <Text className="text-xs text-slate-500">Fecha de Ingreso</Text>
-            <Text className="text-slate-800">{initialData.fecha_ingreso}</Text>
-          </View>
-
-          <View className="mt-2 rounded-lg bg-slate-100 p-4">
-            <Text className="text-xs text-slate-500">Estado</Text>
-            <Text className={initialData.activo ? 'text-green-600' : 'text-red-600'}>
-              {initialData.activo ? 'Activo' : 'Inactivo'}
-            </Text>
+        {/* SECCIÓN: Información Laboral */}
+        <FormSection title="Información Laboral">
+          <ControlledInput
+            name="salario_base"
+            label="Salario Base"
+            control={control}
+            error={errors.salario_base?.message}
+            keyboardType="numeric"
+          />
+          <View className="mb-2">
+            <Text className="mb-2 text-sm font-medium text-slate-700">Frecuencia de Pago</Text>
+            <Controller
+              control={control}
+              name="frecuencia_pago"
+              render={({ field: { onChange, value } }) => (
+                <SegmentedButtons
+                  value={value || ''}
+                  onValueChange={onChange}
+                  buttons={[
+                    { value: 'mensual', label: 'Mensual' },
+                    { value: 'quincenal', label: 'Quincenal' },
+                    { value: 'semanal', label: 'Semanal' },
+                  ]}
+                />
+              )}
+            />
+            {errors.frecuencia_pago?.message && (
+              <Text className="ml-1 mt-1 text-xs font-medium text-red-500">
+                {errors.frecuencia_pago.message}
+              </Text>
+            )}
           </View>
         </FormSection>
 

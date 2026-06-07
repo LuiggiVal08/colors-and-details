@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { impactLight, selection } from '@/helpers/haptics';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TextInput, Snackbar, ActivityIndicator } from 'react-native-paper';
@@ -9,6 +10,7 @@ import { SecurityFormData, securitySchema } from '@/schemas/securitySchema';
 import { useMutation } from '@tanstack/react-query';
 import { changePassword } from '@/services/auth.service';
 import * as SecureStore from 'expo-secure-store';
+import { Format } from '@/helpers/Formats';
 
 const LINKED_CREDENTIALS_KEY = 'linked_credentials';
 
@@ -71,27 +73,29 @@ export const SecurityTab = () => {
 
   return (
     <>
-      <Text className="mb-4 text-2xl font-bold text-white">Seguridad</Text>
+      <Text className="mb-4 text-2xl font-bold text-slate-900 dark:text-white">Seguridad</Text>
 
       {/* TARJETA 1: Formulario */}
       <View className="mb-4">
         <View className="mb-4 flex-row items-center gap-2">
-          <Text className="text-lg font-bold text-white">Cambiar Contraseña</Text>
+          <Text className="text-lg font-bold text-slate-900 dark:text-white">Cambiar Contraseña</Text>
         </View>
-        <Text className="mb-5 text-sm text-gray-400">
-          Actualiza tu contraseña para mantener tu cuenta segura
-        </Text>
+        <Text className="mb-5 text-sm text-slate-500 dark:text-slate-400">Actualiza tu contraseña para mantener tu cuenta segura</Text>
 
         <ControlledInput
           name="currentPassword"
           label="Contraseña Actual"
           control={control}
           error={errors.currentPassword?.message}
+          onChangeText={(t) => Format.password(t)}
           secureTextEntry={!showCurrent}
           right={
             <TextInput.Icon
               icon={showCurrent ? 'eye-off' : 'eye'}
-              onPress={() => setShowCurrent(!showCurrent)}
+              onPress={() => {
+                selection();
+                setShowCurrent(!showCurrent);
+              }}
             />
           }
           theme={{ colors: { background: '#121212', text: 'white', placeholder: 'gray' } }}
@@ -103,11 +107,15 @@ export const SecurityTab = () => {
           label="Nueva Contraseña"
           control={control}
           error={errors.newPassword?.message}
+          onChangeText={(t) => Format.password(t)}
           secureTextEntry={!showNew}
           right={
             <TextInput.Icon
               icon={showNew ? 'eye-off' : 'eye'}
-              onPress={() => setShowNew(!showNew)}
+              onPress={() => {
+                selection();
+                setShowNew(!showNew);
+              }}
             />
           }
           theme={{ colors: { background: '#121212', text: 'white', placeholder: 'gray' } }}
@@ -119,11 +127,15 @@ export const SecurityTab = () => {
           label="Confirmar Nueva Contraseña"
           control={control}
           error={errors.confirmPassword?.message}
+          onChangeText={(t) => Format.password(t)}
           secureTextEntry={!showConfirm}
           right={
             <TextInput.Icon
               icon={showConfirm ? 'eye-off' : 'eye'}
-              onPress={() => setShowConfirm(!showConfirm)}
+              onPress={() => {
+                selection();
+                setShowConfirm(!showConfirm);
+              }}
             />
           }
           theme={{ colors: { background: '#121212', text: 'white', placeholder: 'gray' } }}
@@ -131,10 +143,13 @@ export const SecurityTab = () => {
         />
 
         <TouchableOpacity
-          onPress={handleSubmit(onSubmit)}
+          onPress={() => {
+            impactLight();
+            handleSubmit(onSubmit)();
+          }}
           disabled={mutation.isPending}
           className={`mt-2 h-12 items-center justify-center rounded-full ${
-            mutation.isPending ? 'bg-gray-700' : 'bg-red-500'
+            mutation.isPending ? 'bg-slate-700' : 'bg-[#4DB6AC]'
           }`}>
           {mutation.isPending ? (
             <ActivityIndicator color="white" size="small" />
@@ -145,8 +160,8 @@ export const SecurityTab = () => {
       </View>
 
       {/* TARJETA 2: Recomendaciones */}
-      <View className="mb-8 rounded-3xl border border-red-900/50 bg-red-950/30 p-5">
-        <Text className="mb-3 text-base font-bold text-red-400">Recomendaciones de seguridad:</Text>
+      <View className="mb-8 rounded-3xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
+        <Text className="mb-3 text-base font-bold text-red-700 dark:text-red-400">Recomendaciones de seguridad:</Text>
         <View className="pl-2">
           <RecommendationItem text="Usa al menos 8 caracteres" />
           <RecommendationItem text="Incluye mayúsculas, minúsculas y números" />
@@ -169,7 +184,7 @@ export const SecurityTab = () => {
 
 const RecommendationItem = ({ text }: { text: string }) => (
   <View className="mb-2 flex-row items-center gap-2">
-    <Text className="font-bold text-red-400">•</Text>
-    <Text className="flex-1 text-sm text-gray-300">{text}</Text>
+    <Text className="font-bold text-red-500 dark:text-red-400">•</Text>
+    <Text className="flex-1 text-sm text-slate-600 dark:text-gray-300">{text}</Text>
   </View>
 );

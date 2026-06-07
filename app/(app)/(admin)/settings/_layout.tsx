@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons'; // Importamos la librería de iconos
+import { Ionicons } from '@expo/vector-icons';
+
 export default function SettingsTabs() {
   return (
     <Tabs
@@ -9,39 +10,17 @@ export default function SettingsTabs() {
         tabBarPosition: 'top',
       }}>
       <Tabs.Screen
-        name="general"
+        name="tasa"
         options={{
-          title: 'General',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cog-outline" size={size} color={color} />
-          ),
+          title: 'Tasa',
+          tabBarIcon: ({ color, size }) => <Ionicons name="cash-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="account"
+        name="Iva"
         options={{
-          title: 'Cuenta',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="service"
-        options={{
-          title: 'Servicio',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="build-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="employe"
-        options={{
-          title: 'Empleado',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
-          ),
+          title: 'IVA',
+          tabBarIcon: ({ color, size }) => <Ionicons name="receipt-outline" size={size} color={color} />,
         }}
       />
     </Tabs>
