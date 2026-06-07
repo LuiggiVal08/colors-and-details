@@ -1,12 +1,23 @@
 export const regExp = {
   name: /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]{3,}$/,
-  dni: /^[\d\s.]{7,12}$/, // Ajustado para incluir puntos
-  rif: /^[VJEGP]-[0-9]{8,9}-[0-9]$/,
-  username: /^[a-z0-9_.\-]{4,16}$/,
-  email: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+  dni: /^[\d\s]{9,10}$/,
+  rif: /^[VJEGP]-?\d{8,9}-\d$/, // Regex para el RIF
+  username: /^[A-Za-z0-9_.\-]{4,16}$/,
+  email:
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+  date: /^\d{4}[-\/]\d{2}[-\/]\d{2}$/,
+  password: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d_.-]{8,16}$/,
+  token: /^\d{8}$/,
   phone: /^\+58 \(\d{3}\) \d{3}-\d{4}$/,
-  float: /^[0-9.]+,[0-9]{2}$/,
-  // ... el resto de tus regex se mantienen
+  text: /^[A-Za-zÁÉÍÓÚÑáéíóúñüÜ0-9\s.,!?¡¿()-_&$%#@+:;'"]{1,}$/,
+  uuid: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+  file: /^\.(sql|json|txt)$/,
+  number: /^[0-9]+$/, // Números
+  float: /^(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}$/,
+  // Expresión regular para validar URLs
+  url: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+  // Expresión regular para validar imágenes
+  image: /\.(jpe?g|png|gif|bmp|webp)$/i,
 };
 
 export class Format {
@@ -35,17 +46,17 @@ export class Format {
     const cleaned = value.replace(/\D/g, '');
     if (!cleaned) return '';
     // Formato con puntos: 26.123.456
-    return cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
   static rif = (value: string) => {
     // 1. Limpiar: Solo letras permitidas y números
-    let raw = value.toUpperCase().replace(/[^VJEGP0-9]/g, '');
+    const raw = value.toUpperCase().replace(/[^VJEGP0-9]/g, '');
 
     if (raw.length === 0) return '';
 
     // Asegurar que empiece con letra, si no, poner V por defecto o nada
-    let letra = raw[0].match(/[VJEGP]/) ? raw[0] : '';
+    const letra = raw[0].match(/[VJEGP]/) ? raw[0] : '';
     let numeros = letra ? raw.slice(1) : raw;
     numeros = numeros.substring(0, 10); // Máximo de números en RIF
 
@@ -111,7 +122,7 @@ export class Format {
 
   static date = (value: string) => {
     // Formato simple DD/MM/YYYY progresivo
-    let raw = value.replace(/\D/g, '').substring(0, 8);
+    const raw = value.replace(/\D/g, '').substring(0, 8);
     if (raw.length <= 2) return raw;
     if (raw.length <= 4) return `${raw.substring(0, 2)}/${raw.substring(2)}`;
     return `${raw.substring(0, 2)}/${raw.substring(2, 4)}/${raw.substring(4)}`;
