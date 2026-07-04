@@ -1,4 +1,4 @@
-import { Linking, View, Text, TouchableOpacity, Image } from 'react-native';
+import { Linking, View, Text, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenLayout from '@/components/layout/ScreenLayout';
@@ -34,8 +34,8 @@ export default function HelpScreen() {
           <View className="min-w-[280px] flex-1 rounded-[32px] bg-white p-6 shadow-lg shadow-slate-200/80 dark:bg-primary-dark">
             <Text className="mb-4 text-2xl font-semibold text-slate-900">Manual técnico</Text>
             <View className="mb-4 rounded-[30px] border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-primary-dark">
-              <View className="h-48 rounded-[24px] bg-white shadow-sm dark:bg-primary-dark">
-                <Image source={require('../../assets/manual.png')} className="h-48 w-full rounded-[24px]" />
+              <View className="h-48 items-center justify-center rounded-[24px] bg-white shadow-sm dark:bg-primary-dark">
+                <Ionicons name="book-outline" size={48} color="#94a3b8" />
               </View>
             </View>
             <Text className="mb-3 text-sm text-slate-500">
