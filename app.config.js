@@ -17,7 +17,7 @@ export default {
     },
     plugins: ['expo-router', 'expo-secure-store'],
     orientation: 'portrait',
-    icon: './assets/icon.png',
+    icon: './assets/logo.png',
     userInterfaceStyle: 'automatic',
     splash: {
       image: './assets/splash.png',
@@ -37,7 +37,7 @@ export default {
     android: {
       softwareKeyboardLayoutMode: 'resize',
       adaptiveIcon: {
-        foregroundImage: './assets/icon.png',
+        foregroundImage: './assets/logo.png',
         backgroundColor: '#ffffff',
       },
 
