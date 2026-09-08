@@ -111,6 +111,20 @@ export class Format {
     }).format(numberValue);
   };
 
+  static monto = (value: string) => {
+    if (!value) return '';
+    const raw = value.replace(/\D/g, '').slice(0, 10);
+    if (!raw) return '';
+    const numberValue = parseFloat(raw) / 100;
+    return numberValue.toFixed(2);
+  };
+
+  static montoFijo = (value: string | number | null | undefined) => {
+    const num = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
+    if (!Number.isFinite(num)) return '0.00';
+    return num.toFixed(2);
+  };
+
   static number = (value: string) => {
     return value.replace(/[^0-9]/g, '');
   };

@@ -9,7 +9,7 @@ export const employeeSchema = z.object({
   direccion: z.string().min(1, 'Dirección requerida'),
   salario_base: z.string().min(1, 'Salario base requerido'),
   frecuencia_pago: z.enum(['mensual', 'quincenal', 'semanal'], {
-    required_error: 'Selecciona la frecuencia de pago',
+    message: 'Selecciona la frecuencia de pago',
   }),
   activo: z.boolean().optional(),
 });

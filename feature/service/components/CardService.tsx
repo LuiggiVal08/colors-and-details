@@ -8,10 +8,11 @@ interface CardServiceProps {
   servicio: Servicio;
   onEdit: (servicio: Servicio) => void;
   onPress?: (servicio: Servicio) => void;
+  onDelete?: (servicio: Servicio) => void;
 }
 
-const CardService = ({ servicio, onEdit, onPress }: CardServiceProps) => {
-  const precioActual = servicio.precios?.[0]?.precio;
+const CardService = ({ servicio, onEdit, onPress, onDelete }: CardServiceProps) => {
+  const precio = servicio.precio;
 
   const handleEdit = async () => {
     impactLight();
@@ -20,6 +21,11 @@ const CardService = ({ servicio, onEdit, onPress }: CardServiceProps) => {
 
   const handlePress = () => {
     onPress?.(servicio);
+  };
+
+  const handleDelete = () => {
+    impactLight();
+    onDelete?.(servicio);
   };
 
   return (
@@ -43,18 +49,25 @@ const CardService = ({ servicio, onEdit, onPress }: CardServiceProps) => {
             ) : null}
             <View className="flex-row items-center gap-2">
               <Text className="text-sm text-slate-500">Corte dia {servicio.dia_corte}</Text>
-              {precioActual ? (
+              {precio ? (
                 <>
                   <Text className="text-sm text-slate-300">|</Text>
-                  <Text className="text-sm font-medium text-emerald-600">${precioActual}</Text>
+                  <Text className="text-sm font-medium text-emerald-600">${precio}</Text>
                 </>
               ) : null}
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleEdit} className="rounded-full p-2" activeOpacity={0.7}>
-          <Ionicons name="pencil" size={20} color="#64748b" />
-        </TouchableOpacity>
+        <View className="flex-row items-center gap-1">
+          <TouchableOpacity onPress={handleEdit} className="rounded-full p-2" activeOpacity={0.7}>
+            <Ionicons name="pencil" size={20} color="#64748b" />
+          </TouchableOpacity>
+          {onDelete ? (
+            <TouchableOpacity onPress={handleDelete} className="rounded-full p-2" activeOpacity={0.7}>
+              <Ionicons name="trash-outline" size={20} color="#EF4444" />
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
     </Card>
   );

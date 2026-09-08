@@ -10,8 +10,7 @@ interface OrderCardProps {
   onPress: () => void;
 }
 
-const fmt = (n: number) =>
-  n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmt = (n: number) => n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function diffDays(a: Date, b: Date): number {
   const d1 = new Date(a.getFullYear(), a.getMonth(), a.getDate());
@@ -19,8 +18,7 @@ function diffDays(a: Date, b: Date): number {
   return Math.round((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-const shortDate = (iso: string) =>
-  new Date(iso).toLocaleDateString('es-VE', { day: '2-digit', month: 'short' });
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString('es-VE', { day: '2-digit', month: 'short' });
 
 export default function OrderCard({ order, onPress }: OrderCardProps) {
   const tasa = useExchangeRateStore((state) => state.tasa);
@@ -29,12 +27,11 @@ export default function OrderCard({ order, onPress }: OrderCardProps) {
   const tieneFecha = order.fecha_entrega !== null;
   const entrega = tieneFecha ? new Date(order.fecha_entrega!) : null;
   const dias = entrega ? diffDays(entrega, hoy) : 0;
-  const esVencido =
-    tieneFecha && dias < 0 && order.estado !== 'completado' && order.estado !== 'cancelado';
+  const esVencido = tieneFecha && dias < 0 && order.estado !== 'completado' && order.estado !== 'cancelado';
 
   const pagoCompleto = order.estado_pago === 'pagado';
   const pagoParcial = order.estado_pago === 'parcial';
-  const totalUSD = tasa ? order.total / tasa : 0;
+  const totalBs = tasa ? order.total * tasa : 0;
 
   return (
     <Card className="mb-2.5 rounded-2xl p-4" onPress={onPress}>
@@ -88,11 +85,11 @@ export default function OrderCard({ order, onPress }: OrderCardProps) {
         <View className="min-w-0 flex-1 flex-row items-center gap-1.5">
           <Ionicons name="cash-outline" size={15} color="#64748B" />
           <Text className="text-sm font-semibold text-slate-900" numberOfLines={1}>
-            Bs. {fmt(order.total)}
+            ${fmt(order.total)}
           </Text>
-          {tasa && totalUSD > 0 && (
+          {tasa && totalBs > 0 && (
             <Text className="text-xs text-slate-400" numberOfLines={1}>
-              (${fmt(totalUSD)})
+              (Bs. {fmt(totalBs)})
             </Text>
           )}
         </View>

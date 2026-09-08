@@ -9,7 +9,8 @@ import type {
   OrderListParams,
 } from '@/types/order';
 
-function normalizeOrder(raw: Record<string, unknown>): Order {
+function normalizeOrder(rawParam: Record<string, unknown>): Order {
+  const raw = (rawParam.pedido as Record<string, unknown> | undefined) ?? rawParam;
   const cliente = raw.cliente as Record<string, unknown> | undefined;
   const usuario = raw.usuario as Record<string, unknown> | undefined;
   const iva = raw.iva as Record<string, unknown> | undefined;
@@ -31,13 +32,11 @@ function normalizeOrder(raw: Record<string, unknown>): Order {
   return {
     id: Number(raw.id),
     cliente_id: Number(raw.cliente_id),
-    cliente_nombre: cliente
-      ? `${cliente.nombre ?? ''} ${cliente.apellido ?? ''}`.trim()
-      : '',
+    cliente_nombre: cliente ? `${cliente.nombre ?? ''} ${cliente.apellido ?? ''}`.trim() : '',
     usuario_id: Number(raw.usuario_id),
     usuario_nombre: empleado
       ? `${empleado.nombre ?? ''} ${empleado.apellido ?? ''}`.trim()
-      : (usuario?.username as string) ?? '',
+      : ((usuario?.username as string) ?? ''),
     iva_id: Number(raw.iva_id),
     iva_porcentaje: ivaPorcentaje,
     fecha: raw.fecha as string,
@@ -69,7 +68,8 @@ function normalizeDetail(raw: Record<string, unknown>): OrderDetail {
   };
 }
 
-function normalizePayment(raw: Record<string, unknown>): OrderPayment {
+function normalizePayment(rawParam: Record<string, unknown>): OrderPayment {
+  const raw = (rawParam.data as Record<string, unknown> | undefined) ?? rawParam;
   const metodo = raw.metodo as Record<string, unknown> | undefined;
   return {
     id: Number(raw.id),
@@ -119,10 +119,12 @@ const orderService = {
   },
 
   createPayment: async (payload: CreateOrderPaymentDTO): Promise<OrderPayment> => {
-    const { data } = await api.post<Record<string, unknown>>(
-      '/order-payment',
-      payload
-    );
+    const { data } = await api.post<Record<string, unknown>>('/order-payment', payload);
+    return normalizePayment(data);
+  },
+
+  updatePayment: async (id: number, payload: CreateOrderPaymentDTO): Promise<OrderPayment> => {
+    const { data } = await api.put<Record<string, unknown>>(`/order-payment/${id}`, payload);
     return normalizePayment(data);
   },
 };

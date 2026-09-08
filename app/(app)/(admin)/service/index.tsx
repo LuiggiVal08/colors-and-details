@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { NativeSyntheticEvent, NativeScrollEvent, View, Modal } from 'react-native';
+import { NativeSyntheticEvent, NativeScrollEvent, View, Modal, Alert } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import ExpandableFAB from '@/components/ExpandableFAB';
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import BarToSearchService from '@/feature/service/components/BarToSearchService';
 import ListServices from '@/feature/service/components/ListServices';
@@ -15,11 +15,15 @@ import type { Servicio } from '@/types/service';
 import { EditServiceForm } from '@/feature/service/components/EditServiceForm';
 import ErrorRetryCard from '@/components/ErrorRetryCard';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import { Snackbar } from 'react-native-paper';
+import { impactLight } from '@/helpers/haptics';
+import { apiErrorMessage } from '@/helpers/apiErrorMessage';
 
 export default function ServicesScreen() {
   const [inputValue, setInputValue] = useState('');
   const [search, setSearch] = useState('');
   const [editingServicio, setEditingServicio] = useState<Servicio | null>(null);
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
 
   const headerTranslate = useSharedValue(0);
   const lastScrollY = useRef(0);
@@ -64,6 +68,32 @@ export default function ServicesScreen() {
   const handleEdit = useCallback((servicio: Servicio) => {
     setEditingServicio(servicio);
   }, []);
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => serviceService.delete(id),
+    onSuccess: () => {
+      impactLight();
+      refetch();
+      setSnackbar({ visible: true, message: 'Servicio eliminado' });
+    },
+    onError: (err: unknown) => {
+      setSnackbar({ visible: true, message: apiErrorMessage(err, 'No se pudo eliminar el servicio') });
+    },
+  });
+
+  const handleDelete = useCallback(
+    (servicio: Servicio) => {
+      Alert.alert(
+        'Eliminar servicio',
+        `¿Eliminar "${servicio.nombre}"?\nSi ya tiene períodos o pagos asociados, el sistema lo impedirá.`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Eliminar', style: 'destructive', onPress: () => deleteMutation.mutate(String(servicio.id)) },
+        ]
+      );
+    },
+    [deleteMutation]
+  );
 
   const handlePress = useCallback(
     (servicio: Servicio) => {
@@ -135,6 +165,7 @@ export default function ServicesScreen() {
               servicios={servicios}
               onEdit={handleEdit}
               onPress={handlePress}
+              onDelete={handleDelete}
               onScroll={handleListScroll}
               refreshing={isRefetching}
               onRefresh={handleRefresh}
@@ -167,6 +198,12 @@ export default function ServicesScreen() {
             </View>
           </KeyboardAvoidingView>
         </Modal>
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          className="bg-rose-600">
+          {snackbar.message}
+        </Snackbar>
       </ScreenLayout>
     </>
   );

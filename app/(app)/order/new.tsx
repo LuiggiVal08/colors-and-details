@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FlashList } from '@shopify/flash-list';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Snackbar, ActivityIndicator } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenLayout from '@/components/layout/ScreenLayout';
@@ -11,7 +11,8 @@ import MiniHeader from '@/components/MiniHeader';
 import SelectProductModal, { type SelectProductModalRef } from '@/components/SelectProductModal';
 import SelectCustomerModal, { type SelectCustomerModalRef } from '@/components/SelectCustomerModal';
 import orderService from '@/services/order.service';
-import ivaService from '@/services/iva.service';
+import { useAuthStore } from '@/store/auth';
+import { useIVAStore } from '@/store/iva';
 import { useExchangeRateStore } from '@/store/exchangeRate';
 import { useBoxRegisterStore } from '@/store/boxRegister';
 import type { CartItem } from '@/feature/shopping/types';
@@ -22,6 +23,11 @@ import { impactLight, selection } from '@/helpers/haptics';
 function fmtLocale(n: number): string {
   return n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
+
+const toStr = (n: number) => n.toFixed(2);
+
+const toISODate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 export default function NewOrderScreen() {
   const router = useRouter();
@@ -50,34 +56,27 @@ export default function NewOrderScreen() {
 
   const insets = useSafeAreaInsets();
   const tasa = useExchangeRateStore((state) => state.tasa);
+  const ivaId = useIVAStore((state) => state.id);
+  const user = useAuthStore((s) => s.user);
 
-  const { data: ivaActual } = useQuery({
-    queryKey: ['iva', 'actual'],
-    queryFn: () => ivaService.getActual(),
-  });
-
-  const totalUSD = useMemo(
-    () => items.reduce((sum, item) => sum + item.subtotal, 0),
-    [items]
-  );
+  const totalUSD = useMemo(() => items.reduce((sum, item) => sum + item.subtotal, 0), [items]);
 
   const createMutation = useMutation({
     mutationFn: () => {
-      const totalStr = fmtLocale(totalUSD);
       return orderService.create({
         cliente_id: String(clienteId!),
-        iva_id: String(ivaActual?.id ?? '1'),
-        fecha: new Date().toISOString(),
-        fecha_entrega: fechaEntrega.toISOString(),
-        total: totalStr,
+        usuario_id: String(user?.id ?? ''),
+        iva_id: String(ivaId || ''),
+        fecha_entrega: toISODate(fechaEntrega),
+        total: toStr(totalUSD),
         observaciones: observaciones || undefined,
         detalles: items.map((i) => ({
           producto_id: String(i.producto_id),
           detalle_pedido_producto: productNotes[i.producto_id] || undefined,
           cantidad: String(i.cantidad),
-          precio_unitario: fmtLocale(i.precioUnitario),
-          precio_pedido_producto: '0,00',
-          subtotal: fmtLocale(i.subtotal),
+          precio_unitario: toStr(i.precioUnitario),
+          precio_pedido_producto: toStr(i.precioUnitario),
+          subtotal: toStr(i.subtotal),
         })),
       });
     },
@@ -140,18 +139,32 @@ export default function NewOrderScreen() {
       setSnackbar({ visible: true, message: 'Agrega al menos un producto' });
       return;
     }
+    const sinStock = items.find((i) => i.cantidad > i.stockDisponible);
+    if (sinStock) {
+      setSnackbar({
+        visible: true,
+        message: `Stock insuficiente para "${sinStock.nombre}". Disponible: ${sinStock.stockDisponible}`,
+      });
+      return;
+    }
+    if (!ivaId) {
+      setSnackbar({ visible: true, message: 'IVA no disponible. Espera y vuelve a intentar.' });
+      return;
+    }
     if (!activeBox) {
       setShowCajaModal(true);
       return;
     }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (fechaEntrega <= today) {
+    const entrega = new Date(fechaEntrega);
+    entrega.setHours(0, 0, 0, 0);
+    if (entrega.getTime() <= today.getTime()) {
       setSnackbar({ visible: true, message: 'La fecha de entrega debe ser posterior a hoy' });
       return;
     }
     createMutation.mutate();
-  }, [clienteId, items.length, activeBox, fechaEntrega, createMutation]);
+  }, [clienteId, items, activeBox, fechaEntrega, createMutation, ivaId]);
 
   return (
     <>
@@ -163,7 +176,7 @@ export default function NewOrderScreen() {
             <Text className="text-xl font-bold text-slate-900">Nuevo Pedido</Text>
             <TouchableOpacity
               onPress={() => router.back()}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-1.5 dark:bg-primary-dark dark:border-slate-700">
+              className="rounded-2xl border border-slate-200 bg-white px-3 py-1.5 dark:border-slate-700 dark:bg-primary-dark">
               <Text className="text-sm text-slate-600">Cancelar</Text>
             </TouchableOpacity>
           </View>
@@ -173,7 +186,7 @@ export default function NewOrderScreen() {
               impactLight();
               customerModalRef.current?.present();
             }}
-            className="mb-3 flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:bg-primary-dark dark:border-slate-700">
+            className="mb-3 flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-primary-dark">
             <Text className={clienteNombre ? 'font-medium text-slate-900' : 'text-slate-500'}>
               {clienteNombre || 'Seleccionar cliente'}
             </Text>
@@ -189,11 +202,7 @@ export default function NewOrderScreen() {
             )}
           </TouchableOpacity>
 
-          <DatePickerInput
-            value={fechaEntrega}
-            onChange={setFechaEntrega}
-            label="Fecha de Entrega"
-          />
+          <DatePickerInput value={fechaEntrega} onChange={setFechaEntrega} label="Fecha de Entrega" />
 
           <View className="mb-3">
             <TextInput
@@ -203,7 +212,7 @@ export default function NewOrderScreen() {
               multiline
               numberOfLines={2}
               textAlignVertical="top"
-              className="rounded-2xl border border-slate-200 bg-white p-3 text-sm text-slate-900 dark:bg-primary-dark dark:border-slate-700 dark:text-white"
+              className="rounded-2xl border border-slate-200 bg-white p-3 text-sm text-slate-900 dark:border-slate-700 dark:bg-primary-dark dark:text-white"
             />
           </View>
 
@@ -237,21 +246,15 @@ export default function NewOrderScreen() {
                     <View className="flex-row items-center justify-between">
                       <View className="min-w-0 flex-1">
                         <Text className="text-sm font-semibold text-slate-900">{item.nombre}</Text>
-                        <Text className="text-xs text-slate-500">
-                          ${fmtLocale(item.precioUnitario)} c/u
-                        </Text>
+                        <Text className="text-xs text-slate-500">${fmtLocale(item.precioUnitario)} c/u</Text>
                       </View>
-                      <Text className="text-sm font-semibold text-slate-900">
-                        ${fmtLocale(item.subtotal)}
-                      </Text>
+                      <Text className="text-sm font-semibold text-slate-900">${fmtLocale(item.subtotal)}</Text>
                     </View>
                     <TextInput
                       value={productNotes[item.producto_id] || ''}
-                      onChangeText={(text) =>
-                        setProductNotes((prev) => ({ ...prev, [item.producto_id]: text }))
-                      }
+                      onChangeText={(text) => setProductNotes((prev) => ({ ...prev, [item.producto_id]: text }))}
                       placeholder="Nota del producto (color, tamaño, etc.)"
-                      className="mt-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 dark:bg-primary-dark dark:border-slate-700"
+                      className="mt-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 dark:border-slate-700 dark:bg-primary-dark"
                     />
                     <View className="mt-2 flex-row items-center justify-between">
                       <View className="flex-row items-center gap-3">
@@ -263,9 +266,7 @@ export default function NewOrderScreen() {
                           className="h-7 w-7 items-center justify-center rounded-full bg-slate-100">
                           <Ionicons name="remove" size={14} color="#475569" />
                         </TouchableOpacity>
-                        <Text className="min-w-[24px] text-center font-semibold text-slate-900">
-                          {item.cantidad}
-                        </Text>
+                        <Text className="min-w-[24px] text-center font-semibold text-slate-900">{item.cantidad}</Text>
                         <TouchableOpacity
                           onPress={() => {
                             selection();
@@ -290,12 +291,10 @@ export default function NewOrderScreen() {
           </View>
 
           <View className="w-full" style={{ paddingBottom: insets.bottom || 16 }}>
-            <View className="rounded-2xl border border-slate-200 bg-white p-4 dark:bg-primary-dark dark:border-slate-700">
+            <View className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-primary-dark">
               <View className="flex-row items-center justify-between">
                 <Text className="text-base font-semibold text-slate-700">Total (USD)</Text>
-                <Text className="text-xl font-bold text-slate-900">
-                  ${fmtLocale(totalUSD)}
-                </Text>
+                <Text className="text-xl font-bold text-slate-900">${fmtLocale(totalUSD)}</Text>
               </View>
               {tasa && (
                 <View className="mt-1 flex-row items-center justify-between">
@@ -328,11 +327,7 @@ export default function NewOrderScreen() {
         existingIds={items.map((i) => i.producto_id)}
       />
 
-      <SelectCustomerModal
-        ref={customerModalRef}
-        onDismiss={() => {}}
-        onSelect={handleSelectCustomer}
-      />
+      <SelectCustomerModal ref={customerModalRef} onDismiss={() => {}} onSelect={handleSelectCustomer} />
 
       <Modal visible={showCajaModal} transparent animationType="fade">
         <View className="flex-1 items-center justify-center bg-black/40 px-6">

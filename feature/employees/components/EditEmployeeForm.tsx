@@ -23,6 +23,7 @@ export const EditEmployeeForm = ({ initialData, onClose, onSuccess }: Props) => 
     control,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeSchema),
@@ -81,7 +82,7 @@ export const EditEmployeeForm = ({ initialData, onClose, onSuccess }: Props) => 
           />
           <View className="flex-row items-center justify-between py-2">
             <Text className="text-base text-slate-700">Estado</Text>
-            <Switch value={control._formValues.activo} onValueChange={(value) => setValue('activo', value)} />
+            <Switch value={!!watch('activo')} onValueChange={(value) => setValue('activo', value)} />
           </View>
         </FormSection>
 
@@ -137,9 +138,7 @@ export const EditEmployeeForm = ({ initialData, onClose, onSuccess }: Props) => 
               )}
             />
             {errors.frecuencia_pago?.message && (
-              <Text className="ml-1 mt-1 text-xs font-medium text-red-500">
-                {errors.frecuencia_pago.message}
-              </Text>
+              <Text className="ml-1 mt-1 text-xs font-medium text-red-500">{errors.frecuencia_pago.message}</Text>
             )}
           </View>
         </FormSection>
@@ -154,6 +153,8 @@ export const EditEmployeeForm = ({ initialData, onClose, onSuccess }: Props) => 
 const FormSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <View className="mb-6">
     <Text className="mb-2 ml-1 text-xs font-bold uppercase text-slate-400">{title}</Text>
-    <View className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-primary-dark">{children}</View>
+    <View className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-primary-dark">
+      {children}
+    </View>
   </View>
 );

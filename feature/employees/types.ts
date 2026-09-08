@@ -1,4 +1,6 @@
 // Re-export from types/employee.d.ts
+import type { Employee } from '@/types/employee';
+
 export type { Employee, CreateEmployeeDTO, UpdateEmployeeDTO } from '@/types/employee';
 
 export interface EmployeeCardProps {

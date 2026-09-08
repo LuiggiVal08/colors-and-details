@@ -8,6 +8,7 @@ interface ListPaymentMethodsProps {
   paddingTop?: number; // Espacio superior para evitar solapamiento con el header.
   paymentMethods: PaymentMethod[]; // Datos recibidos desde el padre.
   onEdit: (paymentMethod: PaymentMethod) => void; // Función para abrir el editor del método.
+  onDelete?: (paymentMethod: PaymentMethod) => void; // Función para eliminar el método.
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void; // Scroll event para animar el header.
   refreshing?: boolean; // Estado de refresco en pull-to-refresh.
   onRefresh?: () => void; // Callback para recargar los datos.
@@ -17,6 +18,7 @@ const ListPaymentMethods = ({
   paddingTop,
   paymentMethods,
   onEdit,
+  onDelete,
   onScroll,
   refreshing,
   onRefresh,
@@ -37,7 +39,7 @@ const ListPaymentMethods = ({
       data={paymentMethods}
       renderItem={({ item }) => (
         <Pressable>
-          <CardPaymentMethod paymentMethod={item} onEdit={onEdit} />
+          <CardPaymentMethod paymentMethod={item} onEdit={onEdit} onDelete={onDelete} />
         </Pressable>
       )}
       keyExtractor={(item) => item.id}

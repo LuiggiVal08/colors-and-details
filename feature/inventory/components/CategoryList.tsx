@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
-import { Text, View, Alert } from 'react-native';
+import { Text, View, Alert, RefreshControl } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { RefreshControl, Snackbar } from 'react-native-paper';
+import { Snackbar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useInventoryStore } from '@/store/inventory';
 import { CategoryCard } from '@/feature/inventory/components/CategoryCard';

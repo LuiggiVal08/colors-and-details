@@ -33,7 +33,11 @@ export const useAuthStore = create<AuthState>()(
       _hasHydrated: false,
       setHasHydrated: (state) => set({ _hasHydrated: state }),
       login: (user) => set({ user }),
-      logout: () => set({ user: null }),
+      logout: async () => {
+        set({ user: null });
+        const { disconnectSocket } = await import('@/services/socket');
+        disconnectSocket();
+      },
     }),
     {
       name: 'auth-storage',

@@ -29,8 +29,8 @@ export default function SaleHistoryScreen() {
     <>
       <Stack.Screen options={{ title: 'Historial de Ventas' }} />
       <ScreenLayout scrollEnabled={false}>
-        <View className="flex-1 w-full px-4 pt-2">
-          <View className="mb-4 flex-row items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 dark:bg-primary-dark dark:border-slate-700">
+        <View className="w-full flex-1 px-4 pt-2">
+          <View className="mb-4 flex-row items-center rounded-2xl border border-slate-200 bg-white px-4 py-2 dark:border-slate-700 dark:bg-primary-dark">
             <Ionicons name="search" size={20} color="#94A3B8" />
             <TextInput
               value={search}
@@ -50,15 +50,16 @@ export default function SaleHistoryScreen() {
           ) : (
             <FlashList
               data={filtered}
-              estimatedItemSize={100}
               keyExtractor={(item) => String(item.id)}
               renderItem={({ item }) => (
-                <Card className="mb-3" onPress={() => router.push(`/shopping/${item.id}`)}>
+                <Card className="mb-3" onPress={() => router.push(`/ventas/${item.id}`)}>
                   <View className="flex-row items-center justify-between">
                     <View className="min-w-0 flex-1">
                       <View className="flex-row items-center gap-2">
                         <View className="h-2 w-2 rounded-full bg-emerald-500" />
-                        <Text className="font-semibold text-slate-900">{item.cliente_nombre || 'Cliente Genérico'}</Text>
+                        <Text className="font-semibold text-slate-900">
+                          {item.cliente_nombre || 'Cliente Genérico'}
+                        </Text>
                       </View>
                       <Text className="text-sm text-slate-500">
                         {new Date(item.fecha).toLocaleDateString('es-VE', {
@@ -71,7 +72,11 @@ export default function SaleHistoryScreen() {
                       </Text>
                     </View>
                     <Text className="text-lg font-bold text-slate-900">
-                      Bs. {(item.total as number)?.toLocaleString('es-VE') || '0'}
+                      $
+                      {(Number(item.total) || 0).toLocaleString('es-VE', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </Text>
                   </View>
                 </Card>

@@ -66,15 +66,17 @@ export default function SaleDetailScreen() {
       text += line('');
       text += line('--- Productos ---');
       sale.detalles?.forEach((d) => {
-        text += line(`  ${d.producto_nombre || `Prod #${d.producto_id}`} x${d.cantidad}  Bs. ${(d.subtotal || 0).toLocaleString('es-VE')}`);
+        text += line(
+          `  ${d.producto_nombre || `Prod #${d.producto_id}`} x${d.cantidad}  $ ${(d.subtotal || 0).toLocaleString('es-VE')}`
+        );
       });
       text += line('');
-      text += line(`TOTAL: Bs. ${((sale.total as number) || 0).toLocaleString('es-VE')}`);
+      text += line(`TOTAL: $ ${((sale.total as number) || 0).toLocaleString('es-VE')}`);
       text += line('');
       if (sale.pagos && sale.pagos.length > 0) {
         text += line('--- Pagos ---');
         sale.pagos.forEach((p) => {
-          text += line(`  ${p.metodo_pago_nombre || 'Pago'}: Bs. ${(p.monto || 0).toLocaleString('es-VE')}`);
+          text += line(`  ${p.metodo_pago_nombre || 'Pago'}: $ ${(p.monto || 0).toLocaleString('es-VE')}`);
           if (p.referencia_pago) text += line(`    Ref: ${p.referencia_pago}`);
         });
       }
@@ -102,7 +104,9 @@ export default function SaleDetailScreen() {
               <Text className="mb-6 text-center text-sm text-slate-500">
                 La venta que buscas no existe o ha sido eliminada.
               </Text>
-              <TouchableOpacity onPress={() => router.back()} className="w-full items-center rounded-full bg-[#4DB6AC] py-3">
+              <TouchableOpacity
+                onPress={() => router.back()}
+                className="w-full items-center rounded-full bg-[#4DB6AC] py-3">
                 <Text className="text-center font-semibold text-white">Volver</Text>
               </TouchableOpacity>
             </Card>
@@ -116,7 +120,7 @@ export default function SaleDetailScreen() {
     <>
       <Stack.Screen options={{ title: `Venta #${sale.id}` }} />
       <ScreenLayout>
-        <View className="flex-1 w-full px-4 py-6">
+        <View className="w-full flex-1 px-4 py-6">
           <Card className="mb-4">
             <View className="mb-4 flex-row items-center justify-between">
               <View>
@@ -138,9 +142,7 @@ export default function SaleDetailScreen() {
 
             <View className="mb-4 flex-row items-center gap-3 rounded-2xl bg-slate-50 p-4">
               <Ionicons name="person-outline" size={22} color="#64748B" />
-              <Text className="text-base font-medium text-slate-900">
-                {sale.cliente_nombre || 'Cliente Genérico'}
-              </Text>
+              <Text className="text-base font-medium text-slate-900">{sale.cliente_nombre || 'Cliente Genérico'}</Text>
             </View>
 
             {sale.observaciones && (
@@ -162,16 +164,14 @@ export default function SaleDetailScreen() {
                   </Text>
                   <Text className="text-sm text-slate-500">x{detalle.cantidad}</Text>
                 </View>
-                <Text className="font-medium text-slate-900">
-                  Bs. {(detalle.subtotal || 0).toLocaleString('es-VE')}
-                </Text>
+                <Text className="font-medium text-slate-900">$ {(detalle.subtotal || 0).toLocaleString('es-VE')}</Text>
               </View>
             ))}
 
             <View className="mt-4 flex-row items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
               <Text className="text-lg font-bold text-slate-900">Total</Text>
               <Text className="text-2xl font-bold text-slate-900">
-                Bs. {((sale.total as number) || 0).toLocaleString('es-VE')}
+                $ {((sale.total as number) || 0).toLocaleString('es-VE')}
               </Text>
             </View>
           </Card>
@@ -180,18 +180,16 @@ export default function SaleDetailScreen() {
             <Card className="mb-4">
               <Text className="mb-3 text-lg font-bold text-slate-900">Pagos</Text>
               {sale.pagos.map((pago, i) => (
-                <View key={i} className="flex-row items-center justify-between border-b border-slate-100 py-2 dark:border-slate-700">
+                <View
+                  key={i}
+                  className="flex-row items-center justify-between border-b border-slate-100 py-2 dark:border-slate-700">
                   <View className="flex-row items-center gap-2">
                     <View className="h-7 w-7 items-center justify-center rounded-full bg-[#4DB6AC]/10">
                       <Ionicons name={getPaymentIcon(pago.metodo_pago_nombre)} size={14} color="#4DB6AC" />
                     </View>
-                    <Text className="text-slate-600">
-                      {pago.metodo_pago_nombre || `Pago #${pago.metodo_pago_id}`}
-                    </Text>
+                    <Text className="text-slate-600">{pago.metodo_pago_nombre || `Pago #${pago.metodo_pago_id}`}</Text>
                   </View>
-                  <Text className="font-medium text-slate-900">
-                    Bs. {(pago.monto || 0).toLocaleString('es-VE')}
-                  </Text>
+                  <Text className="font-medium text-slate-900">Bs. {(pago.monto || 0).toLocaleString('es-VE')}</Text>
                 </View>
               ))}
             </Card>

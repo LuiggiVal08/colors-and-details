@@ -1,5 +1,5 @@
 import { Redirect, useRouter } from 'expo-router';
-import { Pressable, Text, TouchableOpacity, View, useColorScheme } from 'react-native';
+import { Text, TouchableOpacity, View, useColorScheme } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,7 +22,6 @@ import { maskUsername } from '@/helpers/maskUsername';
 import { AxiosError } from 'axios';
 import ExpandableFAB from '@/components/ExpandableFAB';
 import Card from '@/components/Card';
-import { API_BASE_URL } from '@/constants';
 import { connectSocket } from '@/services/socket';
 
 const LINKED_CREDENTIALS_KEY = 'linked_credentials';
@@ -100,26 +99,6 @@ export default function LoginScreen() {
       <Card className="w-full max-w-md items-center justify-center p-8 shadow-xl">
         <View className="items-center justify-center pb-6">
           <Logo />
-          {/* <Text className="text-xl font-bold text-slate-800">Bienvenido a Colores y Detalles</Text> */}
-          <Pressable
-            onPress={async () => {
-              try {
-                console.info('Testing connection...', `${API_BASE_URL}/health`);
-
-                const response = await fetch(`${API_BASE_URL}/health`);
-                if (response.status === 200) {
-                  console.info('Connection successful');
-                } else {
-                  console.info('Connection failed');
-                  showError('Error al conectar con el servidor');
-                }
-              } catch (error) {
-                console.info(error);
-                showError('Error al conectar con el servidor');
-              }
-            }}>
-            <Text className="text-xl font-bold text-slate-800">Testear conexión</Text>
-          </Pressable>
         </View>
 
         {linkedUsername ? (
@@ -235,7 +214,9 @@ const LinkedPasswordModal = ({ visible, onDismiss, username, onSubmit, isLoading
         <KeyboardAvoidingView behavior="padding">
           <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
             <Text className="mb-4 text-lg font-bold text-slate-800 dark:text-white">Confirmar Contraseña</Text>
-            <Text className="mb-4 text-sm text-slate-500 dark:text-slate-400">Ingresa la clave para {maskUsername(username)}</Text>
+            <Text className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+              Ingresa la clave para {maskUsername(username)}
+            </Text>
 
             <TextInput
               label="Contraseña"

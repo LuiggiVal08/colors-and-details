@@ -1,6 +1,11 @@
 import { useState, useMemo, useRef, useImperativeHandle, forwardRef } from 'react';
 import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
-import { BottomSheetModal, BottomSheetScrollView, BottomSheetTextInput, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetTextInput,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@tanstack/react-query';
 import { ActivityIndicator } from 'react-native-paper';
@@ -78,7 +83,9 @@ const SelectProductModal = forwardRef<SelectProductModalRef, SelectProductModalP
         keyboardBehavior="extend"
         enablePanDownToClose={false}
         onDismiss={onDismiss}
-        backdropComponent={(props) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />
+        )}
         backgroundStyle={{
           backgroundColor: isDark ? '#1E293B' : '#fff',
           borderTopLeftRadius: 24,
@@ -120,7 +127,6 @@ const SelectProductModal = forwardRef<SelectProductModalRef, SelectProductModalP
           ) : (
             <FlashList
               data={filtered}
-              estimatedItemSize={80}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
               renderItem={({ item }) => {
@@ -157,7 +163,9 @@ const SelectProductModal = forwardRef<SelectProductModalRef, SelectProductModalP
                             className="h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700">
                             <Ionicons name="remove" size={16} color="#475569" />
                           </TouchableOpacity>
-                          <Text className="min-w-[24px] text-center font-semibold text-slate-900 dark:text-white">{qty}</Text>
+                          <Text className="min-w-[24px] text-center font-semibold text-slate-900 dark:text-white">
+                            {qty}
+                          </Text>
                           <TouchableOpacity
                             onPress={() => {
                               selection();

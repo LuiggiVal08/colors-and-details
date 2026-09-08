@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { NativeSyntheticEvent, NativeScrollEvent, View, Modal } from 'react-native';
+import { NativeSyntheticEvent, NativeScrollEvent, View, Modal, Alert } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import ExpandableFAB from '@/components/ExpandableFAB';
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import BarToSearchPaymentMethod from '@/feature/payment-methods/components/BarToSearchPaymentMethod';
 import ListPaymentMethods from '@/feature/payment-methods/components/ListPaymentMethods';
@@ -15,12 +15,16 @@ import type { PaymentMethod } from '@/types/paymentMethod';
 import { EditPaymentMethodForm } from '@/feature/payment-methods/components/EditPaymentMethodForm';
 import ErrorRetryCard from '@/components/ErrorRetryCard';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import { Snackbar } from 'react-native-paper';
+import { impactLight } from '@/helpers/haptics';
+import { apiErrorMessage } from '@/helpers/apiErrorMessage';
 
 export default function PaymentsMethodsScreen() {
   const [inputValue, setInputValue] = useState('');
   const [search, setSearch] = useState('');
   const [tipo, setTipo] = useState('');
   const [editingPaymentMethod, setEditingPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
 
   // Valor animado que controla la posición del header.
   const headerTranslate = useSharedValue(0);
@@ -73,6 +77,32 @@ export default function PaymentsMethodsScreen() {
   const handleEdit = useCallback((paymentMethod: PaymentMethod) => {
     setEditingPaymentMethod(paymentMethod);
   }, []);
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => paymentMethodService.delete(id),
+    onSuccess: () => {
+      impactLight();
+      refetch();
+      setSnackbar({ visible: true, message: 'Método de pago eliminado' });
+    },
+    onError: (err: unknown) => {
+      setSnackbar({ visible: true, message: apiErrorMessage(err, 'No se pudo eliminar el método de pago') });
+    },
+  });
+
+  const handleDelete = useCallback(
+    (paymentMethod: PaymentMethod) => {
+      Alert.alert(
+        'Eliminar método de pago',
+        `¿Eliminar "${paymentMethod.nombre}"?\nSi ya se usó en ventas o pedidos, el sistema lo impedirá.`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Eliminar', style: 'destructive', onPress: () => deleteMutation.mutate(paymentMethod.id) },
+        ]
+      );
+    },
+    [deleteMutation]
+  );
 
   const handleRefresh = useCallback(async () => {
     await refetch();
@@ -148,6 +178,7 @@ export default function PaymentsMethodsScreen() {
               paddingTop={headerHeight}
               paymentMethods={paymentMethods}
               onEdit={handleEdit}
+              onDelete={handleDelete}
               onScroll={handleListScroll}
               refreshing={isRefetching}
               onRefresh={handleRefresh}
@@ -180,6 +211,12 @@ export default function PaymentsMethodsScreen() {
             </View>
           </KeyboardAvoidingView>
         </Modal>
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          className="bg-rose-600">
+          {snackbar.message}
+        </Snackbar>
       </ScreenLayout>
     </>
   );

@@ -49,11 +49,9 @@ export default function OrderPaymentScreen() {
     queryFn: () => paymentMethodService.getAll(1, 50),
   });
 
+  const totalConIva = (order?.total ?? 0) + (order?.total ?? 0) * ((order?.iva_porcentaje ?? 0) / 100);
   const totalPagado = payments?.reduce((sum, p) => sum + p.monto, 0) ?? 0;
-  const saldoPendiente = useMemo(
-    () => Math.max(0, (order?.total ?? 0) - totalPagado),
-    [order?.total, totalPagado]
-  );
+  const saldoPendiente = useMemo(() => Math.max(0, totalConIva - totalPagado), [totalConIva, totalPagado]);
 
   const activeMethods = methods?.filter((m) => m.activo !== false) || [];
   const activeMethod = useMemo(() => {
@@ -67,14 +65,11 @@ export default function OrderPaymentScreen() {
   const mutation = useMutation({
     mutationFn: () => {
       const montoNum = parseFloat(amountText) || 0;
-      const montoStr = montoNum.toLocaleString('es-VE', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
       return orderService.createPayment({
         pedido_id: String(orderId),
         metodo_pago_id: String(activeMethod!.id),
-        monto: montoStr,
+        fecha: new Date().toISOString(),
+        monto: montoNum.toFixed(2),
         referencia_pago: reference.trim() || undefined,
       });
     },
@@ -123,8 +118,7 @@ export default function OrderPaymentScreen() {
     mutation.mutate();
   };
 
-  const fmt = (n: number) =>
-    n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmt = (n: number) => n.toFixed(2);
 
   return (
     <>
@@ -135,43 +129,44 @@ export default function OrderPaymentScreen() {
           contentContainerStyle={{ paddingBottom: 24 }}
           keyboardShouldPersistTaps="handled">
           <View className="mb-4 rounded-2xl border border-[#4DB6AC]/30 bg-[#4DB6AC]/5 p-4">
-            <Text className="text-xs font-medium uppercase tracking-wide text-[#4DB6AC]">
-              Pedido #{orderId}
-            </Text>
+            <Text className="text-xs font-medium uppercase tracking-wide text-[#4DB6AC]">Pedido #{orderId}</Text>
             <View className="mt-2 flex-row items-center justify-between">
-              <Text className="text-sm text-slate-600">Total</Text>
-              <Text className="text-lg font-bold text-slate-900">
-                Bs. {fmt(order?.total ?? 0)}
-              </Text>
+              <Text className="text-sm text-slate-600">Subtotal (sin IVA)</Text>
+              <Text className="text-sm text-slate-900">${fmt(order?.total ?? 0)}</Text>
+            </View>
+            {order?.iva_porcentaje ? (
+              <View className="mt-1 flex-row items-center justify-between">
+                <Text className="text-sm text-slate-600">IVA ({order.iva_porcentaje}%)</Text>
+                <Text className="text-sm text-slate-900">${fmt((order.total * order.iva_porcentaje) / 100)}</Text>
+              </View>
+            ) : null}
+            <View className="mt-1 flex-row items-center justify-between border-t border-[#4DB6AC]/20 pt-1">
+              <Text className="text-sm font-semibold text-slate-700">Total con IVA</Text>
+              <Text className="text-lg font-bold text-slate-900">${fmt(totalConIva)}</Text>
             </View>
             <View className="mt-1 flex-row items-center justify-between">
               <Text className="text-sm text-slate-600">Pagado</Text>
-              <Text className="text-sm font-semibold text-emerald-600">Bs. {fmt(totalPagado)}</Text>
+              <Text className="text-sm font-semibold text-emerald-600">${fmt(totalPagado)}</Text>
             </View>
             <View className="mt-1 flex-row items-center justify-between border-t border-[#4DB6AC]/20 pt-1">
               <Text className="text-sm font-semibold text-slate-700">Saldo Pendiente</Text>
-              <Text className="text-xl font-bold text-rose-600">Bs. {fmt(saldoPendiente)}</Text>
+              <Text className="text-xl font-bold text-rose-600">${fmt(saldoPendiente)}</Text>
             </View>
           </View>
 
-          <View className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 dark:bg-primary-dark dark:border-slate-700">
+          <View className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-primary-dark">
             <View className="flex-row items-center justify-between">
               <Text className="text-sm font-semibold text-slate-700">Monto a pagar</Text>
               <TouchableOpacity
                 onPress={handleTogglePartial}
-                className={`rounded-full px-3 py-1 ${
-                  partialMode ? 'bg-amber-100' : 'bg-slate-100'
-                }`}>
-                <Text
-                  className={`text-xs font-medium ${
-                    partialMode ? 'text-amber-700' : 'text-slate-600'
-                  }`}>
+                className={`rounded-full px-3 py-1 ${partialMode ? 'bg-amber-100' : 'bg-slate-100'}`}>
+                <Text className={`text-xs font-medium ${partialMode ? 'text-amber-700' : 'text-slate-600'}`}>
                   {partialMode ? 'Pago parcial' : 'Pago completo'}
                 </Text>
               </TouchableOpacity>
             </View>
             <View className="mt-2 flex-row items-center rounded-xl border border-slate-300 bg-slate-50 px-3 dark:border-slate-700 dark:bg-primary-dark">
-              <Text className="text-base text-slate-500">Bs. </Text>
+              <Text className="text-base text-slate-500">$ </Text>
               <TextInput
                 value={amountText}
                 onChangeText={setAmountText}
@@ -183,32 +178,27 @@ export default function OrderPaymentScreen() {
             <View className="mt-1 flex-row gap-2">
               <TouchableOpacity
                 onPress={() => setAmountText(saldoPendiente.toFixed(2))}
-                className="flex-1 rounded-lg border border-slate-200 bg-white py-1.5 dark:bg-primary-dark dark:border-slate-700">
+                className="flex-1 rounded-lg border border-slate-200 bg-white py-1.5 dark:border-slate-700 dark:bg-primary-dark">
                 <Text className="text-center text-xs text-slate-600">Todo</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setAmountText((saldoPendiente / 2).toFixed(2))}
-                className="flex-1 rounded-lg border border-slate-200 bg-white py-1.5 dark:bg-primary-dark dark:border-slate-700">
+                className="flex-1 rounded-lg border border-slate-200 bg-white py-1.5 dark:border-slate-700 dark:bg-primary-dark">
                 <Text className="text-center text-xs text-slate-600">Mitad</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <Text className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-            Método de Pago
-          </Text>
+          <Text className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Método de Pago</Text>
           {activeMethods.length === 0 ? (
             <View className="items-center rounded-2xl bg-amber-50 p-6">
               <Ionicons name="alert-circle-outline" size={28} color="#F59E0B" />
-              <Text className="mt-2 text-center text-sm text-amber-700">
-                No hay métodos de pago configurados
-              </Text>
+              <Text className="mt-2 text-center text-sm text-amber-700">No hay métodos de pago configurados</Text>
             </View>
           ) : (
             <View className="mb-4 gap-1.5">
               {activeMethods.map((method) => {
-                const config =
-                  METHOD_CONFIG[method.tipo] || { icon: 'ellipsis-horizontal', requiereRef: false };
+                const config = METHOD_CONFIG[method.tipo] || { icon: 'ellipsis-horizontal', requiereRef: false };
                 const isActive = String(method.id) === activeMethodId;
                 return (
                   <TouchableOpacity
@@ -222,9 +212,7 @@ export default function OrderPaymentScreen() {
                     <View className="h-9 w-9 items-center justify-center rounded-full bg-[#4DB6AC]/10">
                       <Ionicons name={iconName(config.icon)} size={18} color="#4DB6AC" />
                     </View>
-                    <Text className="flex-1 text-sm font-medium text-slate-900">
-                      {method.nombre}
-                    </Text>
+                    <Text className="flex-1 text-sm font-medium text-slate-900">{method.nombre}</Text>
                     {isActive && <Ionicons name="checkmark-circle" size={20} color="#4DB6AC" />}
                   </TouchableOpacity>
                 );
@@ -239,7 +227,7 @@ export default function OrderPaymentScreen() {
                 value={reference}
                 onChangeText={setReference}
                 placeholder="N° de referencia"
-                className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 dark:bg-primary-dark dark:border-slate-700 dark:text-white"
+                className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-primary-dark dark:text-white"
               />
             </View>
           )}
@@ -253,9 +241,7 @@ export default function OrderPaymentScreen() {
             <TouchableOpacity
               onPress={handleSubmit}
               disabled={mutation.isPending || !activeMethodId}
-              className={`flex-1 items-center rounded-2xl py-3.5 ${
-                !activeMethodId ? 'bg-slate-300' : 'bg-[#4DB6AC]'
-              }`}>
+              className={`flex-1 items-center rounded-2xl py-3.5 ${!activeMethodId ? 'bg-slate-300' : 'bg-[#4DB6AC]'}`}>
               {mutation.isPending ? (
                 <ActivityIndicator color="#fff" />
               ) : (

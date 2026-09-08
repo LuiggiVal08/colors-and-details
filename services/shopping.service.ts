@@ -10,17 +10,15 @@ export interface SaleDetailPayload {
 export interface SalePaymentPayload {
   metodo_pago_id: string;
   monto: string;
-  tasa_id?: string;
+  tasa_id: string;
   referencia_pago?: string;
-  fecha: string;
 }
 
 export interface SalePayload {
-  cliente_id?: string;
-  usuario_id?: string;
-  fecha?: string;
-  total?: string;
-  iva_id?: string;
+  cliente_id: string;
+  usuario_id: string;
+  total: string;
+  iva_id: string;
   observaciones?: string;
   detalles: SaleDetailPayload[];
   pagos: SalePaymentPayload[];
@@ -53,6 +51,11 @@ export interface Sale {
   pagos?: SalePaymentResponse[];
 }
 
+export interface SaleCreateResponse {
+  venta: Sale;
+  message: string;
+}
+
 const shoppingService = {
   getAll: async (page: number = 1, limit: number = 20): Promise<Sale[]> => {
     const { data } = await api.get<Sale[]>('/shopping', { params: { page, limit } });
@@ -64,8 +67,8 @@ const shoppingService = {
     return data;
   },
 
-  create: async (payload: SalePayload): Promise<Sale> => {
-    const { data } = await api.post<Sale>('/shopping', payload);
+  create: async (payload: SalePayload): Promise<SaleCreateResponse> => {
+    const { data } = await api.post<SaleCreateResponse>('/shopping', payload);
     return data;
   },
 

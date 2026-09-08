@@ -8,6 +8,7 @@ import { impactLight } from '@/helpers/haptics';
 interface CardPaymentMethodProps {
   paymentMethod: PaymentMethod;
   onEdit: (paymentMethod: PaymentMethod) => void;
+  onDelete?: (paymentMethod: PaymentMethod) => void;
 }
 
 const getTipoIcon = (tipo: string) => {
@@ -25,10 +26,15 @@ const getTipoIcon = (tipo: string) => {
   }
 };
 
-const CardPaymentMethod = ({ paymentMethod, onEdit }: CardPaymentMethodProps) => {
+const CardPaymentMethod = ({ paymentMethod, onEdit, onDelete }: CardPaymentMethodProps) => {
   const handleEdit = async () => {
     impactLight();
     onEdit(paymentMethod);
+  };
+
+  const handleDelete = () => {
+    impactLight();
+    onDelete?.(paymentMethod);
   };
 
   return (
@@ -36,7 +42,7 @@ const CardPaymentMethod = ({ paymentMethod, onEdit }: CardPaymentMethodProps) =>
       <View className="flex-row items-center justify-between">
         <View className="min-w-0 flex-row items-center gap-4">
           <View className="h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-            <Ionicons name="card" size={24} color="#64748b" />
+            <Ionicons name={getTipoIcon(paymentMethod.tipo)} size={24} color="#64748b" />
           </View>
           <View className="min-w-0 flex-1">
             <Text className="text-base font-semibold text-slate-900" numberOfLines={1} ellipsizeMode="tail">
@@ -47,14 +53,19 @@ const CardPaymentMethod = ({ paymentMethod, onEdit }: CardPaymentMethodProps) =>
                 {paymentMethod.descripcion}
               </Text>
             ) : null}
-            <Text className="text-sm text-slate-500">
-              Comisión: {paymentMethod.comision}%
-            </Text>
+            <Text className="text-sm text-slate-500">Comisión: {paymentMethod.comision}%</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={handleEdit} className="rounded-full p-2" activeOpacity={0.7}>
-          <Ionicons name="pencil" size={20} color="#64748b" />
-        </TouchableOpacity>
+        <View className="flex-row items-center gap-1">
+          <TouchableOpacity onPress={handleEdit} className="rounded-full p-2" activeOpacity={0.7}>
+            <Ionicons name="pencil" size={20} color="#64748b" />
+          </TouchableOpacity>
+          {onDelete ? (
+            <TouchableOpacity onPress={handleDelete} className="rounded-full p-2" activeOpacity={0.7}>
+              <Ionicons name="trash-outline" size={20} color="#EF4444" />
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
 
       <View className="mt-4 flex-row items-center gap-2">

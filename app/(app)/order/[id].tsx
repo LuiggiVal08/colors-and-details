@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, RefreshControl, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, RefreshControl, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,11 +9,15 @@ import ScreenLayout from '@/components/layout/ScreenLayout';
 import orderService from '@/services/order.service';
 import { useAuthStore } from '@/store/auth';
 import { StatusBadge, getStatusLabel } from '@/feature/order/components/StatusBadge';
-import type { OrderStatus, OrderPayment } from '@/types/order';
+import type { OrderStatus, OrderPayment, CreateOrderPaymentDTO } from '@/types/order';
 import { impactLight, selection } from '@/helpers/haptics';
 import Card from '@/components/Card';
 
-const STATUS_OPTIONS: { value: OrderStatus; label: string; icon: 'time-outline' | 'sync-outline' | 'checkmark-circle-outline' | 'close-circle-outline' }[] = [
+const STATUS_OPTIONS: {
+  value: OrderStatus;
+  label: string;
+  icon: 'time-outline' | 'sync-outline' | 'checkmark-circle-outline' | 'close-circle-outline';
+}[] = [
   { value: 'procesado', label: 'En Proceso', icon: 'sync-outline' },
   { value: 'completado', label: 'Completado', icon: 'checkmark-circle-outline' },
   { value: 'cancelado', label: 'Cancelar Pedido', icon: 'close-circle-outline' },
@@ -27,6 +31,7 @@ export default function OrderDetailScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showPaymentDetail, setShowPaymentDetail] = useState<OrderPayment | null>(null);
+  const [refEdit, setRefEdit] = useState('');
   const user = useAuthStore((s) => s.user);
 
   const orderId = Number(id);
@@ -85,6 +90,22 @@ export default function OrderDetailScreen() {
     },
   });
 
+  const updatePaymentMutation = useMutation({
+    mutationFn: ({ paymentId, body }: { paymentId: number; body: CreateOrderPaymentDTO }) =>
+      orderService.updatePayment(paymentId, body),
+    onSuccess: () => {
+      impactLight();
+      setShowPaymentDetail(null);
+      setRefEdit('');
+      queryClient.invalidateQueries({ queryKey: ['order-payments', orderId] });
+      queryClient.invalidateQueries({ queryKey: ['order', orderId] });
+      setSnackbar({ visible: true, message: 'Referencia actualizada' });
+    },
+    onError: () => {
+      setSnackbar({ visible: true, message: 'Error al actualizar el pago' });
+    },
+  });
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await Promise.all([
@@ -105,8 +126,7 @@ export default function OrderDetailScreen() {
     ]);
   };
 
-  const fmt = (n: number) =>
-    n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmt = (n: number) => n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const fmtDate = (iso: string | null) =>
     iso ? new Date(iso).toLocaleDateString('es-VE', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
@@ -132,10 +152,10 @@ export default function OrderDetailScreen() {
           <View className="px-4 py-6">
             <Card className="mb-4">
               <Text className="mb-2 text-xl font-bold text-slate-900">Pedido no encontrado</Text>
-              <Text className="mb-4 text-slate-600">
-                El pedido que buscas no existe o ha sido eliminado.
-              </Text>
-              <TouchableOpacity onPress={() => router.back()} className="w-full items-center rounded-full bg-[#4DB6AC] py-3">
+              <Text className="mb-4 text-slate-600">El pedido que buscas no existe o ha sido eliminado.</Text>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                className="w-full items-center rounded-full bg-[#4DB6AC] py-3">
                 <Text className="font-semibold text-white">Volver</Text>
               </TouchableOpacity>
             </Card>
@@ -169,9 +189,7 @@ export default function OrderDetailScreen() {
                   <Text className="text-2xl font-bold text-slate-900">#{order.id}</Text>
                   <StatusBadge status={order.estado} size="md" />
                 </View>
-                <Text className="mt-1 text-sm text-slate-500">
-                  Creado {fmtDate(order.fecha)}
-                </Text>
+                <Text className="mt-1 text-sm text-slate-500">Creado {fmtDate(order.fecha)}</Text>
               </View>
             </View>
 
@@ -190,53 +208,46 @@ export default function OrderDetailScreen() {
             <View className="mb-3 flex-row gap-3">
               <View className="flex-1 rounded-2xl bg-slate-50 p-3 dark:bg-primary-dark">
                 <Text className="text-xs text-slate-500">Fecha</Text>
-                <Text className="mt-0.5 text-sm font-medium text-slate-900">
-                  {fmtDate(order.fecha)}
-                </Text>
+                <Text className="mt-0.5 text-sm font-medium text-slate-900">{fmtDate(order.fecha)}</Text>
               </View>
               <View className="flex-1 rounded-2xl bg-slate-50 p-3 dark:bg-primary-dark">
                 <Text className="text-xs text-slate-500">Entrega</Text>
-                <Text className="mt-0.5 text-sm font-medium text-slate-900">
-                  {fmtDate(order.fecha_entrega)}
-                </Text>
+                <Text className="mt-0.5 text-sm font-medium text-slate-900">{fmtDate(order.fecha_entrega)}</Text>
               </View>
             </View>
 
             {order.observaciones && (
-              <Text className="mb-3 text-sm italic leading-5 text-slate-500">
-                Nota: {order.observaciones}
-              </Text>
+              <Text className="mb-3 text-sm italic leading-5 text-slate-500">Nota: {order.observaciones}</Text>
             )}
           </Card>
 
           <View className="mb-4 rounded-2xl border border-[#4DB6AC]/30 bg-[#4DB6AC]/5 p-4 dark:bg-primary-dark">
             <View className="flex-row items-center justify-between py-1">
               <Text className="text-sm text-slate-600">Subtotal (sin IVA)</Text>
-              <Text className="text-base font-semibold text-slate-900">Bs. {fmt(order.total)}</Text>
+              <Text className="text-base font-semibold text-slate-900">$ {fmt(order.total)}</Text>
             </View>
             {order.iva_porcentaje > 0 && (
               <View className="flex-row items-center justify-between py-1">
                 <Text className="text-sm text-slate-600">IVA ({order.iva_porcentaje}%)</Text>
                 <Text className="text-sm font-semibold text-slate-900">
-                  Bs. {fmt(order.total * order.iva_porcentaje / 100)}
+                  $ {fmt((order.total * order.iva_porcentaje) / 100)}
                 </Text>
               </View>
             )}
             <View className="flex-row items-center justify-between border-t border-[#4DB6AC]/20 pt-2">
               <Text className="text-sm font-semibold text-slate-700">Total con IVA</Text>
               <Text className="text-lg font-bold text-slate-900">
-                Bs. {fmt(order.total + order.total * order.iva_porcentaje / 100)}
+                $ {fmt(order.total + (order.total * order.iva_porcentaje) / 100)}
               </Text>
             </View>
             <View className="flex-row items-center justify-between py-1">
               <Text className="text-sm text-slate-600">Pagado</Text>
-              <Text className="text-sm font-semibold text-emerald-600">Bs. {fmt(totalPagado)}</Text>
+              <Text className="text-sm font-semibold text-emerald-600">$ {fmt(totalPagado)}</Text>
             </View>
             <View className="mt-1 flex-row items-center justify-between border-t border-[#4DB6AC]/20 pt-2">
               <Text className="text-sm font-semibold text-slate-700">Saldo</Text>
-              <Text
-                className={`text-base font-bold ${pagoCompleto ? 'text-emerald-600' : 'text-rose-600'}`}>
-                {pagoCompleto ? 'Bs. 0,00' : `Bs. ${fmt(saldoPendiente)}`}
+              <Text className={`text-base font-bold ${pagoCompleto ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {pagoCompleto ? '$ 0,00' : `$ ${fmt(saldoPendiente)}`}
               </Text>
             </View>
           </View>
@@ -277,7 +288,7 @@ export default function OrderDetailScreen() {
             </Text>
           </View>
 
-          <View className="mb-4 rounded-2xl border border-slate-100 bg-white dark:bg-primary-dark dark:border-slate-700">
+          <View className="mb-4 rounded-2xl border border-slate-100 bg-white dark:border-slate-700 dark:bg-primary-dark">
             {order.detalles?.map((d, i) => (
               <View
                 key={i}
@@ -289,13 +300,11 @@ export default function OrderDetailScreen() {
                     </Text>
                     <Text className="text-xs text-slate-500">
                       Cantidad: {d.cantidad}
-                      {d.precio_unitario ? ` · Bs. ${fmt(d.precio_unitario)} c/u` : ''}
+                      {d.precio_unitario ? ` · $ ${fmt(d.precio_unitario)} c/u` : ''}
                     </Text>
                   </View>
                   {d.subtotal !== undefined && (
-                    <Text className="text-sm font-semibold text-slate-900">
-                      Bs. {fmt(d.subtotal)}
-                    </Text>
+                    <Text className="text-sm font-semibold text-slate-900">$ {fmt(d.subtotal)}</Text>
                   )}
                 </View>
               </View>
@@ -317,7 +326,7 @@ export default function OrderDetailScreen() {
             )}
           </View>
 
-          <View className="mb-4 rounded-2xl border border-slate-100 bg-white dark:bg-primary-dark dark:border-slate-700">
+          <View className="mb-4 rounded-2xl border border-slate-100 bg-white dark:border-slate-700 dark:bg-primary-dark">
             {!payments || payments.length === 0 ? (
               <View className="items-center py-6">
                 <Ionicons name="card-outline" size={32} color="#CBD5E1" />
@@ -329,6 +338,7 @@ export default function OrderDetailScreen() {
                   key={p.id}
                   onPress={() => {
                     selection();
+                    setRefEdit(p.referencia_pago || '');
                     setShowPaymentDetail(p);
                   }}
                   className={`mx-4 py-3 ${i < payments.length - 1 ? 'border-b border-slate-100' : ''}`}>
@@ -346,9 +356,7 @@ export default function OrderDetailScreen() {
                         {p.referencia_pago ? ` · ${p.referencia_pago}` : ''}
                       </Text>
                     </View>
-                    <Text className="text-sm font-semibold text-emerald-600">
-                      Bs. {fmt(p.monto)}
-                    </Text>
+                    <Text className="text-sm font-semibold text-emerald-600">$ {fmt(p.monto)}</Text>
                   </View>
                 </TouchableOpacity>
               ))
@@ -369,14 +377,10 @@ export default function OrderDetailScreen() {
           {order.estado !== 'cancelado' && (user?.role === 'admin' || user?.role === 'superadmin') && (
             <TouchableOpacity
               onPress={() => {
-                Alert.alert(
-                  'Eliminar Pedido',
-                  '¿Estás seguro? Esta acción no se puede deshacer.',
-                  [
-                    { text: 'Cancelar', style: 'cancel' },
-                    { text: 'Eliminar', style: 'destructive', onPress: () => deleteMutation.mutate() },
-                  ],
-                );
+                Alert.alert('Eliminar Pedido', '¿Estás seguro? Esta acción no se puede deshacer.', [
+                  { text: 'Cancelar', style: 'cancel' },
+                  { text: 'Eliminar', style: 'destructive', onPress: () => deleteMutation.mutate() },
+                ]);
               }}
               disabled={deleteMutation.isPending}
               className="mb-2 items-center rounded-2xl border border-error/30 bg-error/5 py-3.5">
@@ -393,7 +397,7 @@ export default function OrderDetailScreen() {
 
           <TouchableOpacity
             onPress={() => router.back()}
-            className="items-center rounded-2xl border border-slate-200 bg-white py-3.5 dark:bg-primary-dark dark:border-slate-700">
+            className="items-center rounded-2xl border border-slate-200 bg-white py-3.5 dark:border-slate-700 dark:bg-primary-dark">
             <Text className="font-medium text-slate-600">Volver al Listado</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -403,16 +407,14 @@ export default function OrderDetailScreen() {
         <View className="absolute inset-0 z-50 items-center justify-center bg-black/40 px-6">
           <View className="w-full max-w-sm rounded-3xl bg-white p-6 dark:bg-primary-dark">
             <Text className="text-lg font-bold text-slate-900">Cambiar Estado</Text>
-            <Text className="mt-1 text-sm text-slate-500">
-              Actual: {getStatusLabel(order.estado)}
-            </Text>
+            <Text className="mt-1 text-sm text-slate-500">Actual: {getStatusLabel(order.estado)}</Text>
             <View className="mt-4 gap-2">
               {STATUS_OPTIONS.filter((s) => s.value !== order.estado).map((s) => (
                 <TouchableOpacity
                   key={s.value}
                   onPress={() => statusMutation.mutate(s.value)}
                   disabled={statusMutation.isPending}
-                  className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 dark:bg-primary-dark dark:border-slate-700">
+                  className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 dark:border-slate-700 dark:bg-primary-dark">
                   <View className="h-9 w-9 items-center justify-center rounded-full bg-slate-50">
                     <Ionicons name={s.icon} size={18} color="#475569" />
                   </View>
@@ -450,9 +452,7 @@ export default function OrderDetailScreen() {
               </View>
               <View>
                 <Text className="text-xs text-slate-500">Monto</Text>
-                <Text className="text-xl font-bold text-emerald-600">
-                  Bs. {fmt(showPaymentDetail.monto)}
-                </Text>
+                <Text className="text-xl font-bold text-emerald-600">$ {fmt(showPaymentDetail.monto)}</Text>
               </View>
               <View>
                 <Text className="text-xs text-slate-500">Fecha</Text>
@@ -466,15 +466,44 @@ export default function OrderDetailScreen() {
                   })}
                 </Text>
               </View>
-              {showPaymentDetail.referencia_pago && (
-                <View>
-                  <Text className="text-xs text-slate-500">Referencia</Text>
-                  <Text className="text-sm font-medium text-slate-900">
-                    {showPaymentDetail.referencia_pago}
-                  </Text>
-                </View>
-              )}
+              <View>
+                <Text className="text-xs text-slate-500">Referencia</Text>
+                <TextInput
+                  value={refEdit}
+                  onChangeText={setRefEdit}
+                  placeholder="N° de referencia"
+                  placeholderTextColor="#94A3B8"
+                  className="mt-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 dark:border-slate-600 dark:bg-primary-dark dark:text-white"
+                />
+              </View>
             </View>
+            <TouchableOpacity
+              onPress={() =>
+                updatePaymentMutation.mutate({
+                  paymentId: showPaymentDetail.id,
+                  body: {
+                    pedido_id: String(showPaymentDetail.pedido_id),
+                    metodo_pago_id: String(showPaymentDetail.metodo_pago_id),
+                    fecha: showPaymentDetail.fecha,
+                    monto: Number(showPaymentDetail.monto).toFixed(2),
+                    referencia_pago: refEdit.trim() || undefined,
+                  },
+                })
+              }
+              disabled={
+                updatePaymentMutation.isPending || refEdit.trim() === (showPaymentDetail.referencia_pago || '').trim()
+              }
+              className={`mt-4 items-center rounded-2xl py-3 ${
+                updatePaymentMutation.isPending || refEdit.trim() === (showPaymentDetail.referencia_pago || '').trim()
+                  ? 'bg-slate-300'
+                  : 'bg-[#4DB6AC]'
+              }`}>
+              {updatePaymentMutation.isPending ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text className="font-semibold text-white">Guardar Referencia</Text>
+              )}
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setShowPaymentDetail(null)}
               className="mt-5 items-center rounded-2xl bg-[#4DB6AC] py-3">

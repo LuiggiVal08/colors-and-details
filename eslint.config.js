@@ -62,6 +62,8 @@ module.exports = defineConfig([
       'dist/*',
       '.expo/*',
       'node_modules/*',
+      '.agents/*',
+      '.opencode/*',
       'babel.config.js',
       'metro.config.js',
       '**/*.config.js',

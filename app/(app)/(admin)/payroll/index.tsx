@@ -18,8 +18,14 @@ import { Snackbar } from 'react-native-paper';
 import { getSocket } from '@/services/socket';
 
 const generateSchema = z.object({
-  periodo_inicio: z.string().min(1, 'Requerido').regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
-  periodo_fin: z.string().min(1, 'Requerido').regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
+  periodo_inicio: z
+    .string()
+    .min(1, 'Requerido')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
+  periodo_fin: z
+    .string()
+    .min(1, 'Requerido')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
 });
 
 type GenerateFormData = z.infer<typeof generateSchema>;
@@ -36,7 +42,12 @@ export default function PayrollListScreen() {
   const [showGenerate, setShowGenerate] = useState(false);
   const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
 
-  const { data: nominas = [], isLoading, refetch, isRefetching } = useQuery({
+  const {
+    data: nominas = [],
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ['nominas'],
     queryFn: () => nominaService.getAll(),
   });
@@ -51,7 +62,9 @@ export default function PayrollListScreen() {
     };
 
     socket.on('nomina_generada', handler);
-    return () => { socket.off('nomina_generada', handler); };
+    return () => {
+      socket.off('nomina_generada', handler);
+    };
   }, [queryClient]);
 
   const {
@@ -64,10 +77,12 @@ export default function PayrollListScreen() {
     mode: 'onChange',
   });
 
-  const pollRef = useRef<ReturnType<typeof setInterval>>();
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   }, []);
 
   const startPolling = () => {
@@ -127,9 +142,7 @@ export default function PayrollListScreen() {
                   <View className={`rounded-full px-2 py-0.5 ${estado.bg}`}>
                     <Text className="text-xs font-medium capitalize">{estado.label}</Text>
                   </View>
-                  <Text className="text-xs text-slate-500">
-                    {item.total_empleados} empleados
-                  </Text>
+                  <Text className="text-xs text-slate-500">{item.total_empleados} empleados</Text>
                 </View>
                 <Text className="mt-1 text-sm text-slate-600">
                   Bs. {Number(item.total_monto).toLocaleString('es-VE', { minimumFractionDigits: 2 })}
@@ -168,9 +181,7 @@ export default function PayrollListScreen() {
             ListEmptyComponent={
               <View className="mt-20 items-center justify-center">
                 <Ionicons name="document-text-outline" size={64} color="#CBD5E1" />
-                <Text className="mt-4 text-center text-lg font-medium text-slate-600">
-                  No hay nóminas generadas
-                </Text>
+                <Text className="mt-4 text-center text-lg font-medium text-slate-600">No hay nóminas generadas</Text>
                 <Text className="mt-2 text-center text-sm text-slate-500">
                   Genera la primera nómina para un período
                 </Text>
@@ -191,7 +202,11 @@ export default function PayrollListScreen() {
         <KeyboardAvoidingView behavior="padding" className="flex-1">
           <SafeAreaView className="flex-1 bg-slate-50">
             <View className="flex-row items-center justify-between border-b border-slate-200 bg-white p-5 pt-12 dark:border-slate-700 dark:bg-primary-dark">
-              <TouchableOpacity onPress={() => { setShowGenerate(false); reset(); }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowGenerate(false);
+                  reset();
+                }}>
                 <Text className="text-[#4DB6AC]">Cancelar</Text>
               </TouchableOpacity>
               <Text className="text-lg font-bold">Generar Nómina</Text>

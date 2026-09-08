@@ -1,6 +1,11 @@
 import { useState, useMemo, useRef, useImperativeHandle, forwardRef } from 'react';
 import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
-import { BottomSheetModal, BottomSheetScrollView, BottomSheetTextInput, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetTextInput,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@tanstack/react-query';
 import { ActivityIndicator } from 'react-native-paper';
@@ -78,7 +83,9 @@ const SelectCustomerModal = forwardRef<SelectCustomerModalRef, SelectCustomerMod
         keyboardBehavior="extend"
         enablePanDownToClose={false}
         onDismiss={onDismiss}
-        backdropComponent={(props) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />
+        )}
         backgroundStyle={{
           backgroundColor: isDark ? '#1E293B' : '#fff',
           borderTopLeftRadius: 24,
@@ -121,7 +128,6 @@ const SelectCustomerModal = forwardRef<SelectCustomerModalRef, SelectCustomerMod
           ) : (
             <FlashList
               data={results}
-              estimatedItemSize={70}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
               renderItem={({ item }) => (

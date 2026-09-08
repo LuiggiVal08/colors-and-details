@@ -15,6 +15,7 @@ import ScreenLayout from '@/components/layout/ScreenLayout';
 import categoryService from '@/services/category.service';
 import productService from '@/services/product.service';
 import Card from '@/components/Card';
+import { Format } from '@/helpers/Formats';
 
 const productSchema = z.object({
   codigo: z.string().min(1, 'El código es obligatorio'),
@@ -49,6 +50,8 @@ export default function EditProductScreen() {
     control,
     handleSubmit,
     reset,
+    getValues,
+    setValue,
     formState: { errors, isValid },
   } = useForm<ProductForm>({
     resolver: zodResolver(productSchema) as never,
@@ -70,7 +73,7 @@ export default function EditProductScreen() {
         nombre: p.nombre,
         descripcion: p.descripcion ?? '',
         categoria_id: p.categoriaId,
-        precio: p.precio,
+        precio: Format.montoFijo(p.precio) as unknown as ProductForm['precio'],
       });
       setSelectedImage(p.imagen ?? null);
     }
@@ -124,6 +127,11 @@ export default function EditProductScreen() {
     }
 
     updateMutation.mutate(formData);
+  };
+
+  const handlePrecioBlur = () => {
+    const raw = getValues('precio');
+    setValue('precio', Format.montoFijo(raw) as unknown as ProductForm['precio'], { shouldValidate: true });
   };
 
   if (productQuery.isLoading) {
@@ -239,6 +247,8 @@ export default function EditProductScreen() {
               control={control}
               error={errors.precio?.message}
               keyboardType="numeric"
+              onChangeText={Format.monto}
+              onBlur={handlePrecioBlur}
             />
 
             <TouchableOpacity

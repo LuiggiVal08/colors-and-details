@@ -11,7 +11,10 @@ interface ScreenLayoutProps {
 }
 
 const ScreenLayout = ({ children, centerContent = false, scrollEnabled = true, className }: ScreenLayoutProps) => {
-  const dismissGesture = useMemo(() => Gesture.Tap().onEnd(Keyboard.dismiss).runOnJS(true), []);
+  const dismissGesture = useMemo(
+    () => Gesture.Native().onEnd(Keyboard.dismiss).runOnJS(true),
+    []
+  );
 
   const content = (
     <GestureDetector gesture={dismissGesture}>

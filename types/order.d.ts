@@ -57,8 +57,8 @@ export interface CreateOrderDetailDTO {
 
 export interface CreateOrderDTO {
   cliente_id: string;
+  usuario_id: string;
   iva_id: string;
-  fecha: string;
   fecha_entrega?: string;
   total: string;
   observaciones?: string;
@@ -68,6 +68,7 @@ export interface CreateOrderDTO {
 export interface CreateOrderPaymentDTO {
   pedido_id: string;
   metodo_pago_id: string;
+  fecha: string;
   monto: string;
   referencia_pago?: string;
 }

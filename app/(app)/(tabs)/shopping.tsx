@@ -14,6 +14,7 @@ import MiniHeader from '@/components/MiniHeader';
 import { useExchangeRateStore } from '@/store/exchangeRate';
 import { useIVAStore } from '@/store/iva';
 import { useBoxRegisterStore } from '@/store/boxRegister';
+import { useAuthStore } from '@/store/auth';
 import type { CartItem, PaymentEntry } from '@/feature/shopping/types';
 import { impactLight, selection } from '@/helpers/haptics';
 import Card from '@/components/Card';
@@ -21,6 +22,7 @@ import Card from '@/components/Card';
 export default function ShoppingScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
   const [items, setItems] = useState<CartItem[]>([]);
   const [clienteId, setClienteId] = useState<number | undefined>();
   const [clienteNombre, setClienteNombre] = useState<string | undefined>();
@@ -49,16 +51,15 @@ export default function ShoppingScreen() {
   const ivaMonto = ivaPorcentaje ? totalBs * (ivaPorcentaje / 100) : 0;
   const totalConIva = totalBs + ivaMonto;
 
-  const toStr = (n: number) => n.toFixed(2).replace('.', ',');
+  const toStr = (n: number) => n.toFixed(2);
 
   const createSale = useMutation({
     mutationFn: ({ payments, saleNotas }: { payments: PaymentEntry[]; saleNotas?: string }) =>
       shoppingService.create({
-        cliente_id: clienteId ? String(clienteId) : undefined,
-        usuario_id: '',
-        fecha: new Date().toISOString(),
+        cliente_id: String(clienteId),
+        usuario_id: String(user?.id ?? ''),
         total: toStr(totalUSD),
-        iva_id: ivaId ? String(ivaId) : undefined,
+        iva_id: String(ivaId),
         observaciones: saleNotas,
         detalles: items.map((i) => ({
           producto_id: String(i.producto_id),
@@ -68,25 +69,26 @@ export default function ShoppingScreen() {
         })),
         pagos: payments.map((p) => ({
           metodo_pago_id: String(p.metodo_pago_id),
-          monto: toStr(tasa && tasa > 0 ? p.monto / tasa : p.monto),
-          referencia_pago: p.referencia || undefined,
-          tasa_id: tasaId ? String(tasaId) : undefined,
-          fecha: new Date().toISOString(),
+          monto: toStr(p.monto / (tasa || 1)),
+          referencia_pago: p.referencia === 'N/A' ? undefined : p.referencia,
+          tasa_id: String(tasaId),
         })),
       }),
     onSuccess: (result) => {
-      const sale = (result as any)?.venta || result;
+      const sale = result.venta;
       queryClient.invalidateQueries({ queryKey: ['shopping'] });
       queryClient.invalidateQueries({ queryKey: ['products'] });
       setItems([]);
       setClienteId(undefined);
       setClienteNombre(undefined);
-      if (sale?.id) router.push(`/shopping/${sale.id}`);
+      if (sale?.id) router.push(`/ventas/${sale.id}`);
     },
     onError: (error: Error) => {
       const msg =
-        (error as any)?.response?.data?.message ||
-        (error as any)?.response?.data?.error?.message ||
+        (error as { response?: { data?: { message?: string; error?: { message?: string } } } })?.response?.data
+          ?.message ||
+        (error as { response?: { data?: { message?: string; error?: { message?: string } } } })?.response?.data?.error
+          ?.message ||
         error?.message ||
         'Error al crear la venta. Intenta de nuevo.';
       setSnackbar({ visible: true, message: msg });
@@ -138,18 +140,37 @@ export default function ShoppingScreen() {
       setSnackbar({ visible: true, message: 'Agrega al menos un producto' });
       return;
     }
+    if (!clienteId) {
+      setSnackbar({ visible: true, message: 'Selecciona un cliente' });
+      return;
+    }
+    if (!tasa || !tasaId || !ivaId) {
+      setSnackbar({
+        visible: true,
+        message: 'Tasa de cambio o IVA no disponibles. Espera y vuelve a intentar.',
+      });
+      return;
+    }
     if (!activeBox) {
       setShowCajaModal(true);
       return;
     }
     paymentModalRef.current?.present();
-  }, [items.length, activeBox]);
+  }, [items.length, activeBox, clienteId, tasa, tasaId, ivaId]);
 
   const handleConfirmPayment = useCallback(
     (payments: PaymentEntry[], notas: string) => {
+      const sinStock = items.find((i) => i.cantidad > i.stockDisponible);
+      if (sinStock) {
+        setSnackbar({
+          visible: true,
+          message: `Stock insuficiente para "${sinStock.nombre}". Disponible: ${sinStock.stockDisponible}`,
+        });
+        return;
+      }
       createSale.mutate({ payments, saleNotas: notas || undefined });
     },
-    [createSale]
+    [items, createSale]
   );
 
   const fmt = (n: number) => n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -162,8 +183,8 @@ export default function ShoppingScreen() {
           <View className="mb-3 flex-row items-center justify-between">
             <Text className="text-xl font-bold text-slate-900">Nueva Venta</Text>
             <TouchableOpacity
-              onPress={() => router.push('/shopping')}
-              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 dark:bg-primary-dark dark:border-slate-700">
+              onPress={() => router.push('/ventas')}
+              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 dark:border-slate-700 dark:bg-primary-dark">
               <Text className="text-sm text-slate-600">Historial</Text>
             </TouchableOpacity>
           </View>
@@ -201,7 +222,6 @@ export default function ShoppingScreen() {
               <FlashList
                 style={{ flex: 1 }}
                 data={items}
-                estimatedItemSize={76}
                 keyExtractor={(item) => String(item.producto_id)}
                 renderItem={({ item }) => (
                   <Card className="mb-2 rounded-2xl p-3">
@@ -227,9 +247,7 @@ export default function ShoppingScreen() {
                           className="h-7 w-7 items-center justify-center rounded-full bg-slate-100">
                           <Ionicons name="remove" size={14} color="#475569" />
                         </TouchableOpacity>
-                        <Text className="min-w-[24px] text-center font-semibold text-slate-900">
-                          {item.cantidad}
-                        </Text>
+                        <Text className="min-w-[24px] text-center font-semibold text-slate-900">{item.cantidad}</Text>
                         <TouchableOpacity
                           onPress={() => {
                             selection();
@@ -256,7 +274,7 @@ export default function ShoppingScreen() {
           <View className="w-full pb-2">
             {items.length > 0 && (
               <View className="mb-2">
-                <View className="rounded-2xl border border-slate-200 bg-white p-4 dark:bg-primary-dark dark:border-slate-700">
+                <View className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-primary-dark">
                   <View className="flex-row items-center justify-between py-1">
                     <Text className="text-sm text-slate-600">Sub-Total</Text>
                     <Text className="text-sm text-slate-900">Bs. {fmt(totalBs)}</Text>
@@ -280,7 +298,7 @@ export default function ShoppingScreen() {
               </View>
             )}
 
-            <View className="flex-row gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-lg dark:bg-primary-dark dark:border-slate-700">
+            <View className="flex-row gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-lg dark:border-slate-700 dark:bg-primary-dark">
               <TouchableOpacity
                 onPress={() => {
                   impactLight();
@@ -313,11 +331,7 @@ export default function ShoppingScreen() {
         existingIds={items.map((i) => i.producto_id)}
       />
 
-      <SelectCustomerModal
-        ref={customerModalRef}
-        onDismiss={() => {}}
-        onSelect={handleSelectCustomer}
-      />
+      <SelectCustomerModal ref={customerModalRef} onDismiss={() => {}} onSelect={handleSelectCustomer} />
 
       <PaymentModal
         ref={paymentModalRef}

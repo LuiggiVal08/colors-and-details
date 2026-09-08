@@ -15,6 +15,7 @@ import ScreenLayout from '@/components/layout/ScreenLayout';
 import categoryService from '@/services/category.service';
 import productService from '@/services/product.service';
 import Card from '@/components/Card';
+import { Format } from '@/helpers/Formats';
 import { notificationHapatics } from '@/helpers/haptics';
 
 const productSchema = z.object({
@@ -77,6 +78,7 @@ export default function CreateProductScreen() {
     control,
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors, isValid },
   } = useForm<ProductForm>({
     resolver: zodResolver(productSchema) as never,
@@ -117,6 +119,11 @@ export default function CreateProductScreen() {
     }
 
     createProductMutation.mutate(formData);
+  };
+
+  const handlePrecioBlur = () => {
+    const raw = getValues('precio');
+    setValue('precio', Format.montoFijo(raw) as unknown as ProductForm['precio'], { shouldValidate: true });
   };
 
   if (categoriesQuery.isLoading) {
@@ -232,6 +239,8 @@ export default function CreateProductScreen() {
               control={control}
               error={errors.precio?.message}
               keyboardType="numeric"
+              onChangeText={Format.monto}
+              onBlur={handlePrecioBlur}
             />
             <ControlledInput
               name="stock"

@@ -29,7 +29,13 @@ export default function AppLayout() {
 
     const validate = async () => {
       const { user, _hasHydrated } = useAuthStore.getState();
-      if (!_hasHydrated || !user?.token) {
+      if (!_hasHydrated) {
+        setIsValidating(false);
+        return;
+      }
+      if (!user?.token) {
+        disconnectSocket();
+        logout();
         setIsValidating(false);
         return;
       }
@@ -45,15 +51,15 @@ export default function AppLayout() {
     };
 
     validate();
-  }, [hasHydrated]);
+  }, [hasHydrated, logout]);
 
   useEffect(() => {
-    if (hasHydrated) loadTasa();
-  }, [hasHydrated, loadTasa]);
+    if (hasHydrated && user?.token) loadTasa();
+  }, [hasHydrated, loadTasa, user?.token]);
 
   useEffect(() => {
-    if (hasHydrated) loadIva();
-  }, [hasHydrated, loadIva]);
+    if (hasHydrated && user?.token) loadIva();
+  }, [hasHydrated, loadIva, user?.token]);
 
   useEffect(() => {
     if (hasHydrated && user?.token) {
@@ -69,15 +75,21 @@ export default function AppLayout() {
       if (nextState === 'active') {
         const { user, _hasHydrated } = useAuthStore.getState();
         if (!_hasHydrated || !user?.token) return;
-        api.get('/validate').catch(() => {
-          disconnectSocket();
-          logout();
-        });
+        api
+          .get('/validate')
+          .then(() => {
+            const current = useAuthStore.getState();
+            if (current.user?.token) connectSocket(current.user.token);
+          })
+          .catch(() => {
+            disconnectSocket();
+            logout();
+          });
       }
     });
 
     return () => subscription.remove();
-  }, [hasHydrated]);
+  }, [hasHydrated, logout]);
 
   if (!hasHydrated || isValidating) {
     return (

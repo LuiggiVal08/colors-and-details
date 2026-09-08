@@ -288,9 +288,7 @@ export default function BoxControlScreen() {
                         <Ionicons name="cash-outline" size={16} color="#4DB6AC" />
                         <Text className="text-xs font-medium uppercase tracking-wide text-info">Saldo Actual</Text>
                       </View>
-                      <Text className="text-2xl font-bold text-info">
-                        Bs. {fmt(activeControl.caja?.monto ?? box?.monto ?? 0)}
-                      </Text>
+                      <Text className="text-2xl font-bold text-info">Bs. {fmt(saldoEsperado)}</Text>
                       {(totalIngresos > 0 || totalEgresos > 0) && (
                         <View className="mt-2 flex-row justify-between">
                           <Text className="text-xs text-slate-500 dark:text-slate-400">
@@ -330,7 +328,11 @@ export default function BoxControlScreen() {
                       <InfoRow label="Monto Apertura" value={`Bs. ${fmt(activeControl.monto_apertura)}`} />
                       <InfoRow label="Total Ingresos" value={`Bs. ${fmt(totalIngresos)}`} />
                       <InfoRow label="Total Egresos" value={`Bs. ${fmt(totalEgresos)}`} />
-                      <InfoRow label="Saldo Esperado" value={`Bs. ${fmt(saldoEsperado)}`} valueClass="text-info font-bold" />
+                      <InfoRow
+                        label="Saldo Esperado"
+                        value={`Bs. ${fmt(saldoEsperado)}`}
+                        valueClass="text-info font-bold"
+                      />
                       {activeControl.monto_cierre != null && (
                         <InfoRow label="Monto Cierre" value={`Bs. ${fmt(activeControl.monto_cierre)}`} />
                       )}
@@ -493,14 +495,14 @@ export default function BoxControlScreen() {
                 contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
                 <View className="w-full max-w-sm self-center rounded-3xl bg-white p-6 dark:bg-primary-dark">
                   <Text className="text-lg font-bold text-slate-900 dark:text-white">Cerrar Caja</Text>
-                  <Text className="mt-1 text-sm text-slate-500 dark:text-slate-400">Ingresa el monto final en efectivo</Text>
+                  <Text className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Ingresa el monto final en efectivo
+                  </Text>
                   {activeControl && (
                     <View className="mt-3 rounded-xl bg-warning/10 p-3">
                       <View className="flex-row justify-between">
                         <Text className="text-sm text-warning">Saldo esperado</Text>
-                        <Text className="text-sm font-semibold text-warning">
-                          Bs. {fmt(saldoEsperado)}
-                        </Text>
+                        <Text className="text-sm font-semibold text-warning">Bs. {fmt(saldoEsperado)}</Text>
                       </View>
                     </View>
                   )}
@@ -532,7 +534,7 @@ export default function BoxControlScreen() {
                             [
                               { text: 'Revisar', style: 'cancel' },
                               { text: 'Cerrar igual', style: 'destructive', onPress: () => closeMutation.mutate() },
-                            ],
+                            ]
                           );
                         } else {
                           closeMutation.mutate();
@@ -640,7 +642,7 @@ export default function BoxControlScreen() {
                             [
                               { text: 'Cancelar', style: 'cancel' },
                               { text: 'Registrar igual', style: 'destructive', onPress: () => movMutation.mutate() },
-                            ],
+                            ]
                           );
                         } else {
                           movMutation.mutate();

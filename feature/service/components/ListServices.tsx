@@ -9,6 +9,7 @@ interface ListServicesProps {
   servicios: Servicio[];
   onEdit: (servicio: Servicio) => void;
   onPress?: (servicio: Servicio) => void;
+  onDelete?: (servicio: Servicio) => void;
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
   refreshing?: boolean;
   onRefresh?: () => void;
@@ -19,6 +20,7 @@ const ListServices = ({
   servicios,
   onEdit,
   onPress,
+  onDelete,
   onScroll,
   refreshing,
   onRefresh,
@@ -36,7 +38,7 @@ const ListServices = ({
   return (
     <FlashList
       data={servicios}
-      renderItem={({ item }) => <CardService servicio={item} onEdit={onEdit} onPress={onPress} />}
+      renderItem={({ item }) => <CardService servicio={item} onEdit={onEdit} onPress={onPress} onDelete={onDelete} />}
       keyExtractor={(item) => String(item.id)}
       showsVerticalScrollIndicator={true}
       contentContainerStyle={{

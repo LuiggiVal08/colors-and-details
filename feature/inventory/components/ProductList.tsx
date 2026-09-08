@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { RefreshControl, Snackbar } from 'react-native-paper';
+import { Snackbar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { useInventoryStore } from '@/store/inventory';
 import { ProductCard } from '@/feature/inventory/components/ProductCard';

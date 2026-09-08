@@ -1,34 +1,43 @@
-import { useEffect, useState, useRef, useMemo } from 'react';
-import { View, Text, TextInput, TouchableOpacity, RefreshControl } from 'react-native';
+import { useCallback, useEffect, useState, useRef, useMemo } from 'react';
+import { View, Text, TextInput, TouchableOpacity, RefreshControl, Alert } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from '@tanstack/react-query';
-import { ActivityIndicator } from 'react-native-paper';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { ActivityIndicator, Snackbar } from 'react-native-paper';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import Card from '@/components/Card';
 import boxRegisterService from '@/services/boxRegister.service';
 import { useBoxRegisterStore } from '@/store/boxRegister';
 import CreateBoxModal, { type CreateBoxModalRef } from '@/components/CreateBoxModal';
 import ExpandableFAB from '@/components/ExpandableFAB';
+import { impactLight } from '@/helpers/haptics';
+import { apiErrorMessage } from '@/helpers/apiErrorMessage';
 
 function BoxItem({
   item,
   activeBoxId,
+  onDelete,
 }: {
   item: {
     id: number;
     nombre: string;
     descripcion?: string;
     ubicacion?: string;
-    monto: number;
+    monto?: number;
     activo: boolean;
   };
   activeBoxId?: number | null;
+  onDelete?: (box: { id: number; nombre: string }) => void;
 }) {
   const router = useRouter();
   const isActive = item.activo;
   const isMyActiveBox = activeBoxId === item.id;
+
+  const handleDelete = () => {
+    impactLight();
+    onDelete?.({ id: item.id, nombre: item.nombre });
+  };
 
   return (
     <Card
@@ -59,7 +68,14 @@ function BoxItem({
             {item.ubicacion || item.descripcion || 'Sin ubicación'}
           </Text>
         </View>
-        <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+        <View className="flex-row items-center gap-1">
+          {onDelete ? (
+            <TouchableOpacity onPress={handleDelete} className="rounded-full p-2" activeOpacity={0.7}>
+              <Ionicons name="trash-outline" size={18} color="#EF4444" />
+            </TouchableOpacity>
+          ) : null}
+          <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+        </View>
       </View>
       <View className="mt-3 flex-row items-center gap-2">
         <View className="rounded-full bg-info/10 px-3 py-1">
@@ -77,6 +93,7 @@ export default function BoxListScreen() {
   const { activeBox, loadActiveBox } = useBoxRegisterStore();
   const [search, setSearch] = useState('');
   const createModalRef = useRef<CreateBoxModalRef>(null);
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
 
   useEffect(() => {
     loadActiveBox();
@@ -107,6 +124,33 @@ export default function BoxListScreen() {
     await Promise.all([refetch(), loadActiveBox()]);
     setRefreshing(false);
   };
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => boxRegisterService.delete(String(id)),
+    onSuccess: () => {
+      impactLight();
+      refetch();
+      loadActiveBox();
+      setSnackbar({ visible: true, message: 'Caja eliminada' });
+    },
+    onError: (err: unknown) => {
+      setSnackbar({ visible: true, message: apiErrorMessage(err, 'No se pudo eliminar la caja') });
+    },
+  });
+
+  const handleDelete = useCallback(
+    (box: { id: number; nombre: string }) => {
+      Alert.alert(
+        'Eliminar caja',
+        `¿Eliminar "${box.nombre}"?\nSolo se eliminará si no tiene controles o movimientos asociados.`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Eliminar', style: 'destructive', onPress: () => deleteMutation.mutate(box.id) },
+        ]
+      );
+    },
+    [deleteMutation]
+  );
 
   return (
     <>
@@ -190,7 +234,9 @@ export default function BoxListScreen() {
                   </Text>
                 </View>
               }
-              renderItem={({ item }) => <BoxItem item={item} activeBoxId={activeBox?.caja_id} />}
+              renderItem={({ item }) => (
+                <BoxItem item={item} activeBoxId={activeBox?.caja_id} onDelete={handleDelete} />
+              )}
             />
           </View>
         )}
@@ -204,6 +250,12 @@ export default function BoxListScreen() {
       </ScreenLayout>
 
       <CreateBoxModal ref={createModalRef} />
+      <Snackbar
+        visible={snackbar.visible}
+        onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+        className="bg-rose-600">
+        {snackbar.message}
+      </Snackbar>
     </>
   );
 }

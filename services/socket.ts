@@ -1,14 +1,11 @@
 import { io, Socket } from 'socket.io-client';
 import { BASE_URL } from '@/constants';
 import { useAuthStore } from '@/store/auth';
-import { useExchangeRateStore } from '@/store/exchangeRate';
-import { useBoxRegisterStore } from '@/store/boxRegister';
-import { useNotificationStore } from '@/store/notification';
 
 let socket: Socket | null = null;
 
 export const connectSocket = (token: string) => {
-  if (socket?.connected) return;
+  if (socket) return;
 
   socket = io(BASE_URL, {
     auth: { token },
@@ -34,13 +31,15 @@ export const connectSocket = (token: string) => {
     console.info('Socket.IO error de conexión:', err.message);
   });
 
-  socket.on('tasa-dolar:updated', (data: { tasa: number; cambio?: number }) => {
+  socket.on('tasa-dolar:updated', async (data: { tasa: number; cambio?: number }) => {
     console.info('Socket.IO: tasa actualizada', data);
+    const { useExchangeRateStore } = await import('@/store/exchangeRate');
     useExchangeRateStore.getState().setTasa(data.tasa, data.cambio);
   });
 
-  socket.on('nueva_notificacion', (notif: Notification) => {
-    console.info('Socket.IO: nueva notificación', notif.titulo);
+  socket.on('nueva_notificacion', async (notif: Notification) => {
+    console.info('Socket.IO: nueva notificación', notif.mensaje);
+    const { useNotificationStore } = await import('@/store/notification');
     useNotificationStore.getState().addNotification(notif);
   });
 
@@ -52,8 +51,9 @@ export const connectSocket = (token: string) => {
     console.info('Socket.IO: nómina generada');
   });
 
-  socket.on('caja:status-changed', (_data: unknown) => {
+  socket.on('caja:status-changed', async (_data: unknown) => {
     console.info('Socket.IO: estado de caja cambiado');
+    const { useBoxRegisterStore } = await import('@/store/boxRegister');
     useBoxRegisterStore.getState().loadActiveBox();
   });
 };

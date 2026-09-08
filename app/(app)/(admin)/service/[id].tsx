@@ -64,7 +64,7 @@ export default function ServiceDetails() {
       />
     );
 
-  const precioActual = servicio.precios?.[0];
+  const precio = servicio.precio;
 
   return (
     <>
@@ -119,18 +119,10 @@ export default function ServiceDetails() {
               <Ionicons name="calendar" size={20} color="#64748b" />
               <Text className="flex-1 text-base text-slate-700">Día de corte: {servicio.dia_corte}</Text>
             </View>
-            {precioActual ? (
+            {precio ? (
               <View className="mb-4 flex-row items-center gap-3">
                 <Ionicons name="pricetag" size={20} color="#64748b" />
-                <Text className="flex-1 text-base text-slate-700">Precio actual: ${precioActual.precio}</Text>
-              </View>
-            ) : null}
-            {precioActual?.fecha_inicio ? (
-              <View className="mb-4 flex-row items-center gap-3">
-                <Ionicons name="trending-up" size={20} color="#64748b" />
-                <Text className="flex-1 text-base text-slate-700">
-                  Precio vigente desde {new Date(precioActual.fecha_inicio).toLocaleDateString()}
-                </Text>
+                <Text className="flex-1 text-base text-slate-700">Precio actual: ${precio}</Text>
               </View>
             ) : null}
           </Card>

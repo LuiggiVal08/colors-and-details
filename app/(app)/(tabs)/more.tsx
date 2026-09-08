@@ -18,7 +18,6 @@ type IconName =
   | 'help-circle-outline'
   | 'settings-outline'
   | 'bar-chart-outline'
-  | 'cloud-upload-outline'
   | 'sync-outline'
   | 'archive-outline'
   | 'receipt-outline';
@@ -59,12 +58,10 @@ const options: Option[] = [
   { route: '/box-register', name: 'Caja', icon: 'archive-outline', category: 'operations' },
   { route: '/payments-methods/', name: 'Pagos', icon: 'card-outline', category: 'operations' },
   { route: '/inventory', name: 'Inventario', icon: 'cube-outline', category: 'operations' },
-  { route: '/reports', name: 'Reportes', icon: 'bar-chart-outline', category: 'operations' },
   { route: '/service/', name: 'Servicios', icon: 'construct-outline', category: 'config' },
   { route: '/employees/', name: 'Empleados', icon: 'people-outline', category: 'config' },
   { route: '/payroll', name: 'Nómina', icon: 'receipt-outline', category: 'config' },
   { route: '/settings', name: 'Ajustes', icon: 'settings-outline', category: 'config' },
-  { route: '/backup', name: 'Respaldo', icon: 'cloud-upload-outline', category: 'system' },
   { route: '/help', name: 'Ayuda', icon: 'help-circle-outline', category: 'system' },
 ];
 
