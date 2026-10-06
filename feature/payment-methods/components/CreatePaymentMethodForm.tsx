@@ -62,7 +62,7 @@ export const CreatePaymentMethodForm = ({ onClose, onSuccess }: Props) => {
           <Text className="text-[#4DB6AC]">Cancelar</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold">Crear Método de Pago</Text>
-        <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+        <TouchableOpacity onPress={() => handleSubmit(onSubmit)()}>
           <Text className="font-bold text-[#4DB6AC]">Guardar</Text>
         </TouchableOpacity>
       </View>

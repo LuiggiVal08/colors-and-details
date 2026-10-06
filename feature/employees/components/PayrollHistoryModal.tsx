@@ -25,21 +25,17 @@ export const PayrollHistoryModal = ({ nominas, empleadoId, onClose }: Props) => 
   });
 
   const handleDelete = (item: EmployeeNomina) => {
-    Alert.alert(
-      'Eliminar pago',
-      `¿Eliminar pago del período ${item.fecha_inicio} a ${item.fecha_fin}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: () => {
-            deleteMutation.mutate(item.id);
-            setLocalNominas((prev) => prev.filter((n) => n.id !== item.id));
-          },
+    Alert.alert('Eliminar pago', `¿Eliminar pago del período ${item.fecha_inicio} a ${item.fecha_fin}?`, [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Eliminar',
+        style: 'destructive',
+        onPress: () => {
+          deleteMutation.mutate(item.id);
+          setLocalNominas((prev) => prev.filter((n) => n.id !== item.id));
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -78,9 +74,7 @@ export const PayrollHistoryModal = ({ nominas, empleadoId, onClose }: Props) => 
                       USD {Number(item.monto_usd).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </Text>
                   )}
-                  {item.descripcion && (
-                    <Text className="mt-1 text-xs text-slate-400">{item.descripcion}</Text>
-                  )}
+                  {item.descripcion && <Text className="mt-1 text-xs text-slate-400">{item.descripcion}</Text>}
                 </View>
                 <TouchableOpacity onPress={() => handleDelete(item)} className="rounded-full p-2">
                   <Ionicons name="trash-outline" size={20} color="#EF4444" />
@@ -89,9 +83,7 @@ export const PayrollHistoryModal = ({ nominas, empleadoId, onClose }: Props) => 
               {item.tasa && (
                 <View className="mt-2 flex-row items-center gap-1">
                   <Ionicons name="trending-up" size={14} color="#94A3B8" />
-                  <Text className="text-xs text-slate-400">
-                    Tasa: Bs. {Number(item.tasa.tasa).toFixed(2)}
-                  </Text>
+                  <Text className="text-xs text-slate-400">Tasa: Bs. {Number(item.tasa.tasa).toFixed(2)}</Text>
                 </View>
               )}
             </View>

@@ -161,9 +161,7 @@ export default function EmployeeCreate() {
                 )}
               />
               {errors.frecuencia_pago?.message && (
-                <Text className="ml-1 mt-1 text-xs font-medium text-red-500">
-                  {errors.frecuencia_pago.message}
-                </Text>
+                <Text className="ml-1 mt-1 text-xs font-medium text-red-500">{errors.frecuencia_pago.message}</Text>
               )}
             </View>
           </Card>
@@ -173,7 +171,7 @@ export default function EmployeeCreate() {
               <Text className="text-center text-lg font-semibold text-slate-700">Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={!isValid || createMutation.isPending}
               className="flex-1 rounded-2xl bg-[#4DB6AC] py-4 disabled:opacity-50">
               <Text className="text-center text-lg font-semibold text-white">

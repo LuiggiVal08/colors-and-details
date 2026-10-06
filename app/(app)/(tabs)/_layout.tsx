@@ -19,35 +19,35 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Casa',
-          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="shopping"
         options={{
           title: 'Ventas',
-          tabBarIcon: ({ color, size }) => <Ionicons name="cart-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="cart-outline" size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="orders"
         options={{
           title: 'Pedidos',
-          tabBarIcon: ({ color, size }) => <Ionicons name="receipt-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="receipt-outline" size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="customers"
         options={{
           title: 'Clientes',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="more"
         options={{
           title: 'Más',
-          tabBarIcon: ({ color, size }) => <Ionicons name="ellipsis-horizontal" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="ellipsis-horizontal" size={size} color={color as string} />,
         }}
       />
     </Tabs>

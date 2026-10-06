@@ -22,17 +22,11 @@ export const NotificationCard = ({ notification, onPress }: NotificationItemProp
       </View>
       <View className="flex-1">
         <View className="flex-row items-center justify-between">
-          <Text className="flex-1 text-sm font-semibold text-black dark:text-white">
-            {notification.mensaje}
-          </Text>
-          <Text className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-            {formatDate(notification.creado_en)}
-          </Text>
+          <Text className="flex-1 text-sm font-semibold text-black dark:text-white">{notification.mensaje}</Text>
+          <Text className="ml-2 text-xs text-gray-500 dark:text-gray-400">{formatDate(notification.creado_en)}</Text>
         </View>
       </View>
-      {!notification.leido && (
-        <View className="mt-1.5 h-2.5 w-2.5 rounded-full bg-error" />
-      )}
+      {!notification.leido && <View className="mt-1.5 h-2.5 w-2.5 rounded-full bg-error" />}
     </TouchableOpacity>
   );
 };

@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
 import { StatusBar, useColorScheme, View } from 'react-native';
 import '@/global.css';
@@ -33,23 +33,41 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? themeDark : themeLight;
+  const navigationTheme =
+    colorScheme === 'dark'
+      ? {
+          ...DarkTheme,
+          colors: {
+            ...DarkTheme.colors,
+            primary: '#4DB6AC',
+            background: '#121212',
+            card: '#1E1E1E',
+            text: '#FFFFFF',
+          },
+        }
+      : {
+          ...DefaultTheme,
+          colors: {
+            ...DefaultTheme.colors,
+            primary: '#4DB6AC',
+          },
+        };
 
   return (
     <>
-      <StatusBar
-        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
-        backgroundColor={colorScheme === 'dark' ? themeDark.colors.background : themeLight.colors.background}
-      />
+      <StatusBar barStyle="default" />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
           <KeyboardProvider>
             <View className={colorScheme === 'dark' ? 'dark' : ''} style={{ flex: 1 }}>
               <PaperProvider theme={theme}>
                 <QueryClientProvider client={queryClient}>
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(auth)" />
-                    <Stack.Screen name="(app)" />
-                  </Stack>
+                  <ThemeProvider value={navigationTheme}>
+                    <Stack screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name="(auth)" />
+                      <Stack.Screen name="(app)" />
+                    </Stack>
+                  </ThemeProvider>
                 </QueryClientProvider>
               </PaperProvider>
             </View>

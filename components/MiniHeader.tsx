@@ -23,9 +23,7 @@ export default function MiniHeader() {
         </Text>
       </TouchableOpacity>
 
-      {formattedTasa && (
-        <Text className="text-xs text-slate-500 dark:text-slate-400">1 USD = {formattedTasa} Bs</Text>
-      )}
+      {formattedTasa && <Text className="text-xs text-slate-500 dark:text-slate-400">1 USD = {formattedTasa} Bs</Text>}
     </View>
   );
 }

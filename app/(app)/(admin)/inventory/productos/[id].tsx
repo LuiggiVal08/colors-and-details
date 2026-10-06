@@ -67,16 +67,12 @@ export default function ProductDetailScreen() {
         <ScreenLayout>
           <View className="w-full px-4 py-6">
             <View className="rounded-3xl bg-white p-6 shadow-lg shadow-slate-50/20 dark:bg-primary-dark">
-              <Text className="text-xl font-semibold text-slate-900">Producto no encontrado</Text>
-              <Text className="mt-2 text-slate-500">
-                Verifica que el producto exista en el inventario.
-              </Text>
+              <Text className="text-xl font-semibold text-slate-900 dark:text-slate-100">Producto no encontrado</Text>
+              <Text className="mt-2 text-slate-500">Verifica que el producto exista en el inventario.</Text>
               <TouchableOpacity
                 onPress={() => router.back()}
                 className="mt-6 items-center rounded-full bg-[#4DB6AC] px-5 py-3">
-                <Text className="text-center text-base font-semibold text-white">
-                  Volver al inventario
-                </Text>
+                <Text className="text-center text-base font-semibold text-white">Volver al inventario</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -88,8 +84,7 @@ export default function ProductDetailScreen() {
   const isAgotado = product.stock <= 0;
   const isLowStock = !isAgotado && product.stock < 5;
   const precioBs = tasa ? product.precio * tasa : 0;
-  const fmt = (n: number) =>
-    n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmt = (n: number) => n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <>
@@ -143,24 +138,28 @@ export default function ProductDetailScreen() {
 
             <View className="mb-6 flex-row items-start justify-between gap-4">
               <View className="min-w-0 flex-1">
-                <Text className="text-2xl font-semibold text-slate-900">{product.nombre}</Text>
-                <Text className="mt-2 text-sm text-slate-500">Código: {product.codigo}</Text>
-                <Text className="text-sm text-slate-500">Categoría: {product.categoria}</Text>
+                <Text className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{product.nombre}</Text>
+                <Text className="mt-2 text-sm text-slate-500 dark:text-slate-400">Código: {product.codigo}</Text>
+                <Text className="text-sm text-slate-500 dark:text-slate-400">Categoría: {product.categoria}</Text>
                 {product.descripcion ? (
-                  <Text className="mt-2 text-sm italic text-slate-500">{product.descripcion}</Text>
+                  <Text className="mt-2 text-sm italic text-slate-500 dark:text-slate-400">{product.descripcion}</Text>
                 ) : null}
               </View>
               <View
                 className={`rounded-2xl px-4 py-2 ${
-                  isAgotado ? 'bg-rose-100' : isLowStock ? 'bg-amber-100' : 'bg-emerald-100'
+                  isAgotado
+                    ? 'bg-rose-100 dark:bg-rose-500/20'
+                    : isLowStock
+                      ? 'bg-amber-100 dark:bg-amber-500/20'
+                      : 'bg-emerald-100 dark:bg-emerald-500/20'
                 }`}>
                 <Text
                   className={`text-sm font-semibold ${
                     isAgotado
-                      ? 'text-rose-700'
+                      ? 'text-rose-600 dark:text-rose-400'
                       : isLowStock
-                        ? 'text-amber-700'
-                        : 'text-emerald-700'
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-emerald-700 dark:text-emerald-400'
                   }`}>
                   {isAgotado ? 'Agotado' : isLowStock ? 'Stock bajo' : 'En stock'}
                 </Text>
@@ -169,24 +168,26 @@ export default function ProductDetailScreen() {
 
             <View className="gap-3">
               <View className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-                <Text className="text-sm text-slate-500">Precio USD</Text>
-                <Text className="mt-1 text-xl font-semibold text-slate-900">${fmt(product.precio)}</Text>
+                <Text className="text-sm text-slate-500 dark:text-slate-400">Precio USD</Text>
+                <Text className="mt-1 text-xl font-semibold text-slate-900 dark:text-slate-100">${fmt(product.precio)}</Text>
               </View>
               {tasa && (
                 <View className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-                  <Text className="text-sm text-slate-500">Precio Bs.</Text>
-                  <Text className="mt-1 text-xl font-semibold text-slate-900">Bs. {fmt(precioBs)}</Text>
+                  <Text className="text-sm text-slate-500 dark:text-slate-400">Precio Bs.</Text>
+                  <Text className="mt-1 text-xl font-semibold text-slate-900 dark:text-slate-100">
+                    Bs. {fmt(precioBs)}
+                  </Text>
                 </View>
               )}
               <View className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-                <Text className="text-sm text-slate-500">Stock actual</Text>
+                <Text className="text-sm text-slate-500 dark:text-slate-400">Stock actual</Text>
                 <Text
                   className={`mt-1 text-xl font-semibold ${
                     isAgotado
-                      ? 'text-rose-700'
+                      ? 'text-rose-600 dark:text-rose-400'
                       : isLowStock
-                        ? 'text-amber-700'
-                        : 'text-slate-900'
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-slate-900 dark:text-slate-100'
                   }`}>
                   {product.stock} unidades
                 </Text>
@@ -195,7 +196,7 @@ export default function ProductDetailScreen() {
 
             {movements.length > 0 && (
               <View className="mt-6">
-                <Text className="mb-3 text-base font-semibold text-slate-900">
+                <Text className="mb-3 text-base font-semibold text-slate-900 dark:text-slate-100">
                   Últimos movimientos
                 </Text>
                 {movements.map((mov) => (
@@ -211,12 +212,14 @@ export default function ProductDetailScreen() {
                         />
                         <Text
                           className={`text-sm font-medium ${
-                            mov.tipo === 'entrada' ? 'text-emerald-700' : 'text-rose-700'
+                            mov.tipo === 'entrada'
+                              ? 'text-emerald-700 dark:text-emerald-400'
+                              : 'text-rose-700 dark:text-rose-400'
                           }`}>
                           {mov.tipo === 'entrada' ? 'Entrada' : 'Salida'}
                         </Text>
                       </View>
-                      <Text className="mt-0.5 text-xs text-slate-500">
+                      <Text className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                         {new Date(mov.fecha).toLocaleDateString('es-VE', {
                           day: '2-digit',
                           month: 'short',
@@ -224,10 +227,10 @@ export default function ProductDetailScreen() {
                         })}
                       </Text>
                       {mov.motivo ? (
-                        <Text className="mt-0.5 text-xs text-slate-400">{mov.motivo}</Text>
+                        <Text className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">{mov.motivo}</Text>
                       ) : null}
                     </View>
-                    <Text className="text-sm font-semibold text-slate-900">
+                    <Text className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                       {mov.tipo === 'entrada' ? '+' : '-'}
                       {mov.cantidad}
                     </Text>

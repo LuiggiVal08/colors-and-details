@@ -89,7 +89,9 @@ const Card = ({
       accessibilityRole="button"
       android_ripple={{ color: 'rgba(0,0,0,0.06)' }}
       className="overflow-hidden rounded-3xl">
-      <AnimatedView className={`overflow-hidden ${containerClassName}`} style={[{ opacity, transform: [{ scale }] }, style]}>
+      <AnimatedView
+        className={`overflow-hidden ${containerClassName}`}
+        style={[{ opacity, transform: [{ scale }] }, style]}>
         {children}
       </AnimatedView>
     </Pressable>

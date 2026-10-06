@@ -18,7 +18,12 @@ const estadoLabel: Record<string, { label: string; bg: string; icon: string }> =
 export default function PayrollDetailScreen() {
   const { id } = useLocalSearchParams();
 
-  const { data: nomina, isLoading, error, refetch } = useQuery({
+  const {
+    data: nomina,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['nomina', id],
     queryFn: () => nominaService.getById(id as string),
     enabled: !!id,
@@ -82,9 +87,7 @@ export default function PayrollDetailScreen() {
             {nomina.tasa && (
               <View className="mt-3 flex-row items-center gap-1">
                 <Ionicons name="trending-up" size={16} color="#64748B" />
-                <Text className="text-sm text-slate-500">
-                  Tasa: Bs. {Number(nomina.tasa.tasa).toFixed(2)}
-                </Text>
+                <Text className="text-sm text-slate-500">Tasa: Bs. {Number(nomina.tasa.tasa).toFixed(2)}</Text>
               </View>
             )}
           </Card>
@@ -93,9 +96,7 @@ export default function PayrollDetailScreen() {
             <Card className="mb-6">
               <Text className="mb-4 text-xl font-bold text-slate-900">Empleados</Text>
               {nomina.detalles.map((detalle: NominaDetalle) => (
-                <View
-                  key={detalle.id}
-                  className="mb-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <View key={detalle.id} className="mb-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
                   <View className="flex-row items-center justify-between">
                     <Text className="text-base font-semibold text-slate-900">
                       {detalle.empleado.nombre} {detalle.empleado.apellido}

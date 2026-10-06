@@ -93,7 +93,7 @@ export default function AppLayout() {
 
   if (!hasHydrated || isValidating) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View className="items-center justify-center bg-white dark:bg-primary-dark" style={{ flex: 1 }}>
         <ActivityIndicator size="large" color="#4DB6AC" />
       </View>
     );
@@ -114,6 +114,10 @@ export default function AppLayout() {
         animation: 'ios_from_right',
         headerStyle: { backgroundColor: headerBg },
         headerTintColor: headerText,
+        // Clave: con false, el header nativo NO suma el inset de la barra de estado
+        // como padding (topInsetEnabled=false). Con edge-to-edge forzado en RN 0.88,
+        // dejarlo en true (o undefined con topInset!=0) duplica el alto del header.
+        statusBarTranslucent: false,
 
         headerRight: () => (
           <View className="flex-row items-center justify-center gap-2">
@@ -134,7 +138,6 @@ export default function AppLayout() {
       <Stack.Screen name="(admin)" options={{ title: 'Administración', headerShown: false, headerRight: () => null }} />
       <Stack.Screen name="(super)" options={{ title: 'Gestión', headerShown: false, headerRight: () => null }} />
       <Stack.Screen name="help" options={{ title: 'Ayuda', headerRight: () => null }} />
-      <Stack.Screen name="backup" options={{ title: 'Respaldo', headerRight: () => null }} />
     </Stack>
   );
 }

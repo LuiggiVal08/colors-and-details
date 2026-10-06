@@ -63,7 +63,7 @@ const ExpandableFAB: React.FC<ExpandableFABProps> = ({
 
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
-      opacity: withTiming(isExpanded ? 1 : 0, { duration: 350 }),
+      opacity: withTiming(hasMeasured && isExpanded ? 1 : 0, { duration: 350 }),
       transform: [{ translateX: withTiming(isExpanded ? 0 : -10, { duration: 350 }) }],
     };
   });
@@ -88,7 +88,7 @@ const ExpandableFAB: React.FC<ExpandableFABProps> = ({
 
             {/* Texto Animado */}
             <Animated.View
-              style={[animatedTextStyle, styles.textWrapper, { opacity: hasMeasured ? animatedTextStyle.opacity : 0 }]}
+              style={[animatedTextStyle, styles.textWrapper]}
               onLayout={onTextLayout}>
               <Text className="text-base font-bold text-white" numberOfLines={1}>
                 {label}

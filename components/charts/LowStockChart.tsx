@@ -9,9 +9,7 @@ interface LowStockChartProps {
 }
 
 export default function LowStockChart({ data }: LowStockChartProps) {
-  const labels = data.map((item) =>
-    item.product.length > 10 ? `${item.product.slice(0, 8)}..` : item.product
-  );
+  const labels = data.map((item) => (item.product.length > 10 ? `${item.product.slice(0, 8)}..` : item.product));
   const values = data.map((item) => item.stock);
 
   return (

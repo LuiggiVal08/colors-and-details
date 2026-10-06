@@ -23,9 +23,7 @@ function normalizeControl(raw: Record<string, unknown>): ControlCaja {
           updated_at: (caja.updated_at as string) || '',
         } as BoxRegister)
       : undefined,
-    usuario: raw.usuario
-      ? (raw.usuario as { id: number; username: string })
-      : undefined,
+    usuario: raw.usuario ? (raw.usuario as { id: number; username: string }) : undefined,
     monto_apertura: parseFloat(String(raw.monto_apertura || 0)),
     monto_cierre: raw.monto_cierre != null ? parseFloat(String(raw.monto_cierre)) : undefined,
     apertura: (raw.apertura as string) || (raw.fecha_apertura as string) || '',
@@ -83,7 +81,9 @@ const boxRegisterService = {
   },
 
   getControlesByBox: async (cajaId: string): Promise<ControlCaja[]> => {
-    const { data } = await api.get<Record<string, unknown> | Record<string, unknown>[]>(`/box-register-control/by-box/${cajaId}`);
+    const { data } = await api.get<Record<string, unknown> | Record<string, unknown>[]>(
+      `/box-register-control/by-box/${cajaId}`
+    );
     if (Array.isArray(data)) {
       return data.map(normalizeControl);
     }
@@ -109,7 +109,9 @@ const boxRegisterService = {
   },
 
   cierre: async (cajaId: string, montoCierre: number): Promise<ControlCaja> => {
-    const { data } = await api.post<Record<string, unknown>>(`/box-register-control/cierre/${cajaId}`, { monto_cierre: montoCierre });
+    const { data } = await api.post<Record<string, unknown>>(`/box-register-control/cierre/${cajaId}`, {
+      monto_cierre: montoCierre,
+    });
     return normalizeControl(data);
   },
 };

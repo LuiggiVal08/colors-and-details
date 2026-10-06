@@ -31,8 +31,7 @@ export default function ProductList({ page, lowStockOnly }: ProductListProps) {
 
   const productQuery = useQuery({
     queryKey: ['inventory', 'products', query, lowStockOnly, page],
-    queryFn: () =>
-      productService.getAll({ search: query, lowStock: lowStockOnly, page, limit: pageSize }),
+    queryFn: () => productService.getAll({ search: query, lowStock: lowStockOnly, page, limit: pageSize }),
   });
 
   const deleteProductMutation = useMutation({
@@ -64,12 +63,10 @@ export default function ProductList({ page, lowStockOnly }: ProductListProps) {
   const renderEmpty = () => (
     <View className="mx-4 mt-8 items-center justify-center rounded-3xl bg-white p-8 shadow-sm dark:bg-primary-dark">
       <Ionicons name="cube-outline" size={64} color="#CBD5E1" />
-      <Text className="mt-4 text-center text-lg font-medium text-slate-600">
+      <Text className="mt-4 text-center text-lg font-medium text-slate-600 dark:text-slate-300">
         No se encontraron resultados
       </Text>
-      <Text className="mt-2 text-center text-sm text-slate-500">
-        Prueba otra búsqueda o crea un nuevo producto.
-      </Text>
+      <Text className="mt-2 text-center text-sm text-slate-500">Prueba otra búsqueda o crea un nuevo producto.</Text>
     </View>
   );
 
@@ -82,12 +79,7 @@ export default function ProductList({ page, lowStockOnly }: ProductListProps) {
   }
 
   if (productQuery.error) {
-    return (
-      <ErrorRetryCard
-        message="No se pudo cargar los productos."
-        onRetry={handleRefresh}
-      />
-    );
+    return <ErrorRetryCard message="No se pudo cargar los productos." onRetry={handleRefresh} />;
   }
 
   return (
@@ -100,7 +92,7 @@ export default function ProductList({ page, lowStockOnly }: ProductListProps) {
             <ProductCard product={item} onPress={() => handleItemPress(item.id)} />
             <TouchableOpacity
               onPress={() => setDeleteProduct(item)}
-              className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-rose-50">
+              className="absolute right-2 top-2 h-8 w-8 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-500/20">
               <Ionicons name="trash-outline" size={16} color="#E11D48" />
             </TouchableOpacity>
           </View>
@@ -108,18 +100,14 @@ export default function ProductList({ page, lowStockOnly }: ProductListProps) {
         keyExtractor={(item) => item.id}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={{ paddingBottom: 10 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} progressViewOffset={90} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} progressViewOffset={90} />}
       />
 
       <ConfirmModal
         visible={!!deleteProduct}
         title="Eliminar producto"
         message={
-          deleteProduct
-            ? `¿Estás seguro de eliminar "${deleteProduct.nombre}"? Esta acción no se puede deshacer.`
-            : ''
+          deleteProduct ? `¿Estás seguro de eliminar "${deleteProduct.nombre}"? Esta acción no se puede deshacer.` : ''
         }
         confirmText="Eliminar"
         isLoading={deleteProductMutation.isPending}

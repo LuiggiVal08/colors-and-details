@@ -83,7 +83,9 @@ export default function EmployeeManagementScreen() {
     [router]
   );
 
-  const handleRefresh = useCallback(async () => await refetch(), [refetch]);
+  const handleRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
 
   const handleListScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {

@@ -33,7 +33,7 @@ export default function DatePickerInput({ value, onChange, label, error }: DateP
       {label && <Text className="mb-1 text-xs text-slate-500">{label}</Text>}
       <TouchableOpacity
         onPress={() => setShow(true)}
-        className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 dark:bg-primary-dark dark:border-slate-700">
+        className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-primary-dark">
         <Ionicons name="calendar-outline" size={20} color="#4DB6AC" />
         <View className="flex-1">
           <Text className="text-sm font-medium text-slate-900">{toShortDate(value)}</Text>

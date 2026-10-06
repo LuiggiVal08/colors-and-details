@@ -155,26 +155,16 @@ export default function EditProductScreen() {
       <ScreenLayout>
         <ScrollView className="w-full flex-1 p-4">
           <Card className="mb-6">
-            <Text className="mb-4 text-xl font-semibold text-slate-900">Editar producto</Text>
-            <Text className="text-sm text-slate-500">Modifica los datos del producto.</Text>
-            <Text className="mt-1 text-xs text-amber-600">
+            <Text className="mb-4 text-xl font-semibold text-slate-900 dark:text-slate-100">Editar producto</Text>
+            <Text className="text-sm text-slate-500 dark:text-slate-400">Modifica los datos del producto.</Text>
+            <Text className="mt-1 text-xs text-amber-600 dark:text-amber-400">
               El stock se modifica registrando un movimiento de inventario.
             </Text>
           </Card>
 
           <Card>
-            <ControlledInput
-              name="codigo"
-              label="Código"
-              control={control}
-              error={errors.codigo?.message}
-            />
-            <ControlledInput
-              name="nombre"
-              label="Nombre"
-              control={control}
-              error={errors.nombre?.message}
-            />
+            <ControlledInput name="codigo" label="Código" control={control} error={errors.codigo?.message} />
+            <ControlledInput name="nombre" label="Nombre" control={control} error={errors.nombre?.message} />
             <ControlledInput
               name="descripcion"
               label="Descripción"
@@ -184,25 +174,17 @@ export default function EditProductScreen() {
             />
 
             <View className="mb-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-              <Text className="mb-3 text-sm font-semibold text-slate-700">Imagen del producto</Text>
+              <Text className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">Imagen del producto</Text>
               {selectedImage ? (
-                <Image
-                  source={{ uri: selectedImage }}
-                  className="mb-3 h-52 w-full rounded-3xl"
-                  resizeMode="cover"
-                />
+                <Image source={{ uri: selectedImage }} className="mb-3 h-52 w-full rounded-3xl" resizeMode="cover" />
               ) : (
                 <View className="mb-3 flex h-52 w-full items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white dark:border-slate-700 dark:bg-primary-dark">
                   <Ionicons name="image-outline" size={56} color="#94A3B8" />
-                  <Text className="mt-3 text-sm text-slate-500">
-                    Selecciona una imagen para previsualizarla
-                  </Text>
+                  <Text className="mt-3 text-sm text-slate-500">Selecciona una imagen para previsualizarla</Text>
                 </View>
               )}
               <View className="flex-row flex-wrap items-center gap-3">
-                <TouchableOpacity
-                  onPress={pickImage}
-                  className="rounded-full bg-[#4DB6AC] px-5 py-3">
+                <TouchableOpacity onPress={pickImage} className="rounded-full bg-[#4DB6AC] px-5 py-3">
                   <Text className="text-base font-semibold text-white">
                     {selectedImage ? 'Cambiar imagen' : 'Seleccionar imagen'}
                   </Text>
@@ -210,35 +192,29 @@ export default function EditProductScreen() {
                 {selectedImage ? (
                   <TouchableOpacity
                     onPress={() => setSelectedImage(null)}
-                    className="rounded-full border border-slate-300 bg-white px-5 py-3">
-                    <Text className="text-base font-semibold text-slate-900">Quitar</Text>
+                    className="rounded-full border border-slate-300 bg-white px-5 py-3 dark:border-slate-700 dark:bg-primary-dark">
+                    <Text className="text-base font-semibold text-slate-900 dark:text-slate-100">Quitar</Text>
                   </TouchableOpacity>
                 ) : null}
               </View>
             </View>
 
             <View className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-primary-dark">
-              <Text className="mb-2 text-sm font-medium text-slate-700">Categoría</Text>
+              <Text className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-200">Categoría</Text>
               <Controller
                 control={control}
                 name="categoria_id"
                 render={({ field: { onChange, value } }) => (
-                  <View className="rounded-2xl bg-white">
+                  <View className="rounded-2xl bg-white dark:bg-primary-dark">
                     <Picker selectedValue={value} onValueChange={onChange}>
                       {categories.map((category) => (
-                        <Picker.Item
-                          key={category.id}
-                          label={category.nombre}
-                          value={category.id}
-                        />
+                        <Picker.Item key={category.id} label={category.nombre} value={category.id} />
                       ))}
                     </Picker>
                   </View>
                 )}
               />
-              {errors.categoria_id && (
-                <Text className="mt-1 text-xs text-rose-500">{errors.categoria_id.message}</Text>
-              )}
+              {errors.categoria_id && <Text className="mt-1 text-xs text-rose-500">{errors.categoria_id.message}</Text>}
             </View>
 
             <ControlledInput
@@ -252,7 +228,7 @@ export default function EditProductScreen() {
             />
 
             <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={!isValid || updateMutation.isPending}
               className={`mt-4 rounded-full py-3 ${
                 isValid && !updateMutation.isPending ? 'bg-[#4DB6AC]' : 'bg-slate-300'

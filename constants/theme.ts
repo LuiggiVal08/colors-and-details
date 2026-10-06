@@ -1,10 +1,4 @@
-import { MD3LightTheme, MD3DarkTheme, adaptNavigationTheme } from 'react-native-paper';
-import { DefaultTheme as NavigationLightTheme, DarkTheme as NavigationDarkTheme } from '@react-navigation/native';
-
-const { LightTheme: NavigationLight, DarkTheme: NavigationDark } = adaptNavigationTheme({
-  reactNavigationLight: NavigationLightTheme,
-  reactNavigationDark: NavigationDarkTheme,
-});
+import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 
 const themeLight = {
   ...MD3LightTheme,
@@ -32,4 +26,4 @@ const themeDark = {
   },
 };
 
-export { themeLight, themeDark, NavigationLight, NavigationDark };
+export { themeLight, themeDark };

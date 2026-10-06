@@ -78,9 +78,9 @@ export default function CustomerDetails() {
         }}
       />
       <ScreenLayout centerContent={true}>
-      <Card className="mx-4 mb-6">
-            <View className="mb-4 flex-row items-center justify-between">
-              <View className="flex-row items-center gap-4">
+        <Card className="mx-4 mb-6">
+          <View className="mb-4 flex-row items-center justify-between">
+            <View className="flex-row items-center gap-4">
               <View className="h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
                 <Text className="text-3xl font-bold text-slate-700">
                   {formatInitials(client.nombre, client.apellido)}
@@ -170,7 +170,7 @@ export default function CustomerDetails() {
               <Text className="text-xl font-bold text-emerald-700">$0</Text>
             </View>
           </View>
-          </Card>
+        </Card>
       </ScreenLayout>
 
       {/* MODAL DE EDICIÓN */}

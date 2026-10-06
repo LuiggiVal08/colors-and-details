@@ -36,7 +36,7 @@ export default function MovementDetailScreen() {
         <ScreenLayout>
           <View className="w-full px-4 py-6">
             <View className="rounded-3xl bg-white p-6 shadow-lg shadow-slate-50/20 dark:bg-primary-dark">
-              <Text className="text-xl font-semibold text-slate-900">Movimiento no encontrado</Text>
+              <Text className="text-xl font-semibold text-slate-900 dark:text-slate-100">Movimiento no encontrado</Text>
               <TouchableOpacity
                 onPress={() => router.back()}
                 className="mt-6 items-center rounded-full bg-[#4DB6AC] px-5 py-3">
@@ -50,8 +50,7 @@ export default function MovementDetailScreen() {
   }
 
   const isEntrada = movement.tipo === 'entrada';
-  const fmt = (n: number) =>
-    n.toLocaleString('es-VE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const fmt = (n: number) => n.toLocaleString('es-VE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
   return (
     <>
@@ -62,7 +61,7 @@ export default function MovementDetailScreen() {
             <View className="mb-4 flex-row items-center gap-3">
               <View
                 className={`h-12 w-12 items-center justify-center rounded-2xl ${
-                  isEntrada ? 'bg-emerald-100' : 'bg-rose-100'
+                  isEntrada ? 'bg-emerald-100 dark:bg-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/20'
                 }`}>
                 <Ionicons
                   name={isEntrada ? 'arrow-up' : 'arrow-down'}
@@ -71,14 +70,14 @@ export default function MovementDetailScreen() {
                 />
               </View>
               <View className="min-w-0 flex-1">
-                <Text className="text-xl font-semibold text-slate-900">{movement.producto}</Text>
+                <Text className="text-xl font-semibold text-slate-900 dark:text-slate-100">{movement.producto}</Text>
                 <View
                   className={`mt-1 self-start rounded-full px-3 py-1 ${
-                    isEntrada ? 'bg-emerald-100' : 'bg-rose-100'
+                    isEntrada ? 'bg-emerald-100 dark:bg-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/20'
                   }`}>
                   <Text
                     className={`text-xs font-semibold ${
-                      isEntrada ? 'text-emerald-700' : 'text-rose-700'
+                      isEntrada ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'
                     }`}>
                     {isEntrada ? 'Entrada' : 'Salida'}
                   </Text>
@@ -87,19 +86,19 @@ export default function MovementDetailScreen() {
             </View>
 
             <View className="mb-4 flex-row gap-3">
-              <View className="rounded-2xl bg-slate-50 p-4">
-                <Text className="text-xs text-slate-500">Cantidad</Text>
+              <View className="rounded-2xl bg-slate-50 p-4 dark:bg-primary-dark">
+                <Text className="text-xs text-slate-500 dark:text-slate-400">Cantidad</Text>
                 <Text
                   className={`mt-1 text-2xl font-bold ${
-                    isEntrada ? 'text-emerald-700' : 'text-rose-700'
+                    isEntrada ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'
                   }`}>
                   {isEntrada ? '+' : '−'}
                   {fmt(movement.cantidad)}
                 </Text>
               </View>
-              <View className="rounded-2xl bg-slate-50 p-4">
-                <Text className="text-xs text-slate-500">Stock resultante</Text>
-                <Text className="mt-1 text-2xl font-bold text-slate-900">
+              <View className="rounded-2xl bg-slate-50 p-4 dark:bg-primary-dark">
+                <Text className="text-xs text-slate-500 dark:text-slate-400">Stock resultante</Text>
+                <Text className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
                   {fmt(movement.stockActual)}
                 </Text>
               </View>
@@ -107,20 +106,20 @@ export default function MovementDetailScreen() {
 
             {movement.stock_antes !== undefined && movement.stock_despues !== undefined && (
               <View className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-                <Text className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                <Text className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Cambio de stock
                 </Text>
                 <View className="mt-2 flex-row items-center justify-between">
                   <View>
-                    <Text className="text-xs text-slate-500">Antes</Text>
-                    <Text className="text-lg font-semibold text-slate-900">
+                    <Text className="text-xs text-slate-500 dark:text-slate-400">Antes</Text>
+                    <Text className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                       {fmt(movement.stock_antes)}
                     </Text>
                   </View>
                   <Ionicons name="arrow-forward" size={20} color="#94A3B8" />
                   <View className="items-end">
-                    <Text className="text-xs text-slate-500">Después</Text>
-                    <Text className="text-lg font-semibold text-slate-900">
+                    <Text className="text-xs text-slate-500 dark:text-slate-400">Después</Text>
+                    <Text className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                       {fmt(movement.stock_despues)}
                     </Text>
                   </View>
@@ -130,8 +129,8 @@ export default function MovementDetailScreen() {
 
             <View className="gap-3">
               <View className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-                <Text className="text-xs text-slate-500">Fecha y hora</Text>
-                <Text className="mt-1 text-base font-medium text-slate-900">
+                <Text className="text-xs text-slate-500 dark:text-slate-400">Fecha y hora</Text>
+                <Text className="mt-1 text-base font-medium text-slate-900 dark:text-slate-100">
                   {new Date(movement.fecha).toLocaleString('es-VE', {
                     day: '2-digit',
                     month: 'long',
@@ -143,16 +142,16 @@ export default function MovementDetailScreen() {
               </View>
               {movement.motivo && (
                 <View className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-                  <Text className="text-xs text-slate-500">Motivo</Text>
-                  <Text className="mt-1 text-sm text-slate-900">{movement.motivo}</Text>
+                  <Text className="text-xs text-slate-500 dark:text-slate-400">Motivo</Text>
+                  <Text className="mt-1 text-sm text-slate-900 dark:text-slate-100">{movement.motivo}</Text>
                 </View>
               )}
               {movement.usuario_nombre && (
                 <View className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-                  <Text className="text-xs text-slate-500">Registrado por</Text>
+                  <Text className="text-xs text-slate-500 dark:text-slate-400">Registrado por</Text>
                   <View className="mt-1 flex-row items-center gap-2">
                     <Ionicons name="person-circle-outline" size={20} color="#475569" />
-                    <Text className="text-sm font-medium text-slate-900">
+                    <Text className="text-sm font-medium text-slate-900 dark:text-slate-100">
                       {movement.usuario_nombre}
                     </Text>
                   </View>
@@ -160,9 +159,7 @@ export default function MovementDetailScreen() {
               )}
             </View>
 
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="mt-6 items-center rounded-2xl bg-[#4DB6AC] py-3">
+            <TouchableOpacity onPress={() => router.back()} className="mt-6 items-center rounded-2xl bg-[#4DB6AC] py-3">
               <Text className="text-sm font-semibold text-white">Volver al listado</Text>
             </TouchableOpacity>
           </View>

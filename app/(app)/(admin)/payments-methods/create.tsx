@@ -4,7 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Card from '@/components/Card';
 import { Stack, useRouter } from 'expo-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm , Controller } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PaymentMethodFormData, paymentMethodSchema } from '@/schemas/paymentMethodSchema';
 import { ControlledInput } from '@/components/ControlledInput';
@@ -12,7 +12,6 @@ import paymentMethodService from '@/services/paymentMethod.service';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import { Snackbar } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
-
 
 const tipos = [
   { label: 'Efectivo', value: 'efectivo' },
@@ -105,7 +104,7 @@ export default function PaymentMethodCreate() {
             </View>
 
             <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={!isValid}
               className={`mt-4 rounded-full py-3 shadow-sm ${isValid ? 'bg-[#4DB6AC]' : 'bg-slate-300'}`}>
               <Text className="text-center font-semibold text-white">Crear Método</Text>

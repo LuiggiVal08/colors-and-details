@@ -15,7 +15,9 @@ export function FormHeader({ title, onCancel, onSave, saveLabel = 'Guardar', sav
         <TouchableOpacity onPress={onCancel}>
           <Text className="text-[#4DB6AC]">Cancelar</Text>
         </TouchableOpacity>
-      ) : <View />}
+      ) : (
+        <View />
+      )}
       <Text className="text-lg font-bold text-slate-900">{title}</Text>
       {onSave ? (
         <TouchableOpacity onPress={onSave} disabled={saving}>
@@ -23,7 +25,9 @@ export function FormHeader({ title, onCancel, onSave, saveLabel = 'Guardar', sav
             {saving ? 'Guardando...' : saveLabel}
           </Text>
         </TouchableOpacity>
-      ) : <View />}
+      ) : (
+        <View />
+      )}
     </View>
   );
 }

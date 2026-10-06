@@ -13,10 +13,7 @@ export const ProfileHeader = () => {
         <Text className="text-sm text-slate-500 dark:text-slate-400">@{user?.username || ''}</Text>
         <View className="flex flex-row gap-2 py-1">
           <InfoTag text={user?.role || ''} className="bg-slate-700" />
-          <InfoTag
-            text="Activo"
-            className={user?.role === 'admin' ? 'bg-slate-700' : 'bg-green-600'}
-          />
+          <InfoTag text="Activo" className={user?.role === 'admin' ? 'bg-slate-700' : 'bg-green-600'} />
         </View>
       </View>
     </View>

@@ -58,7 +58,7 @@ export const EditClientForm = ({ initialData, onClose, onSuccess }: Props) => {
           <Text className="text-[#4DB6AC]">Cancelar</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold">Editar Cliente</Text>
-        <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+        <TouchableOpacity onPress={() => handleSubmit(onSubmit)()}>
           <Text className="font-bold text-[#4DB6AC]">Guardar</Text>
         </TouchableOpacity>
       </View>
@@ -121,6 +121,8 @@ export const EditClientForm = ({ initialData, onClose, onSuccess }: Props) => {
 const FormSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <View className="mb-6">
     <Text className="mb-2 ml-1 text-xs font-bold uppercase text-slate-400">{title}</Text>
-    <View className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-primary-dark">{children}</View>
+    <View className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-primary-dark">
+      {children}
+    </View>
   </View>
 );

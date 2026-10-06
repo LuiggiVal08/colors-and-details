@@ -80,7 +80,7 @@ export default function OrdersScreen() {
         <View className="w-full flex-1">
           <MiniHeader />
           <View className="mb-3 flex-row items-center gap-2">
-            <View className="flex-1 flex-row items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm dark:bg-primary-dark dark:border-slate-700">
+            <View className="flex-1 flex-row items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm dark:border-slate-700 dark:bg-primary-dark">
               <Ionicons name="search" size={18} color="#94A3B8" />
               <TextInput
                 value={search}
@@ -100,7 +100,7 @@ export default function OrdersScreen() {
                 impactLight();
                 setShowFilterModal(true);
               }}
-              className="flex-row items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 shadow-sm dark:bg-primary-dark dark:border-slate-700">
+              className="flex-row items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 shadow-sm dark:border-slate-700 dark:bg-primary-dark">
               <Ionicons name="funnel-outline" size={16} color="#64748B" />
               <Text className="text-sm font-medium text-slate-700">{LABEL_MAP[filter]}</Text>
             </TouchableOpacity>

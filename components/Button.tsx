@@ -38,9 +38,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={variant === 'primary' || variant === 'danger' ? '#fff' : '#4DB6AC'} />
       ) : (
-        <Text className={`text-center font-semibold ${isDisabled ? 'text-white' : config.text}`}>
-          {children}
-        </Text>
+        <Text className={`text-center font-semibold ${isDisabled ? 'text-white' : config.text}`}>{children}</Text>
       )}
     </TouchableOpacity>
   );

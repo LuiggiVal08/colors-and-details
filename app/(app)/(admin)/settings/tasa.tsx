@@ -76,9 +76,7 @@ export default function TasaScreen() {
                       Bs. {Number(displayTasa).toFixed(2)}
                     </Text>
                     {current?.cambio && (
-                      <Text className="text-right text-xs text-slate-400">
-                        Cambio: {current.cambio}
-                      </Text>
+                      <Text className="text-right text-xs text-slate-400">Cambio: {current.cambio}</Text>
                     )}
                   </View>
                 </View>
@@ -86,7 +84,8 @@ export default function TasaScreen() {
                   <View className="flex-row items-center gap-2">
                     <Ionicons name="calendar-outline" size={14} color="#94A3B8" />
                     <Text className="text-xs text-slate-400">
-                      Actualizado: {new Date(current.fecha).toLocaleDateString('es-VE', {
+                      Actualizado:{' '}
+                      {new Date(current.fecha).toLocaleDateString('es-VE', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
@@ -129,7 +128,10 @@ export default function TasaScreen() {
               />
               <View className="flex-row gap-3">
                 <TouchableOpacity
-                  onPress={() => { setShowForm(false); setNuevaTasa(''); }}
+                  onPress={() => {
+                    setShowForm(false);
+                    setNuevaTasa('');
+                  }}
                   className="flex-1 rounded-2xl bg-slate-200 py-3">
                   <Text className="text-center text-base font-semibold text-slate-600">Cancelar</Text>
                 </TouchableOpacity>
@@ -158,9 +160,7 @@ export default function TasaScreen() {
                   className="mb-2 flex-row items-center justify-between rounded-lg border border-slate-100 p-3 dark:border-slate-700 dark:bg-primary-dark">
                   <View className="flex-1">
                     <View className="flex-row items-center gap-2">
-                      <Text className="text-lg font-bold text-slate-900">
-                        Bs. {Number(item.tasa).toFixed(2)}
-                      </Text>
+                      <Text className="text-lg font-bold text-slate-900">Bs. {Number(item.tasa).toFixed(2)}</Text>
                       {item.activa && (
                         <View className="rounded-full bg-emerald-100 px-2 py-0.5">
                           <Text className="text-xs font-medium text-emerald-700">Activa</Text>
@@ -176,9 +176,7 @@ export default function TasaScreen() {
                         minute: '2-digit',
                       })}
                     </Text>
-                    {item.usuario && (
-                      <Text className="text-xs text-slate-400">Por: {item.usuario.nombre}</Text>
-                    )}
+                    {item.usuario && <Text className="text-xs text-slate-400">Por: {item.usuario.nombre}</Text>}
                   </View>
                 </View>
               ))

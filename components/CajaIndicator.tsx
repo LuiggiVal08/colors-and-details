@@ -24,9 +24,7 @@ export default function CajaIndicator() {
       onPress={() => router.push(`/box-register/${activeBox.caja_id}`)}
       className="flex-row items-center gap-1.5 rounded-full border border-success/20 bg-success/5 px-3 py-1">
       <View className="h-1.5 w-1.5 rounded-full bg-success" />
-      <Text className="text-xs font-medium text-success">
-        {activeBox.caja_nombre || 'Caja'}
-      </Text>
+      <Text className="text-xs font-medium text-success">{activeBox.caja_nombre || 'Caja'}</Text>
       <Text className="text-[10px] text-slate-500 dark:text-slate-400">por {activeBox.usuario_nombre}</Text>
     </TouchableOpacity>
   );

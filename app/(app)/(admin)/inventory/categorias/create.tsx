@@ -61,8 +61,10 @@ export default function CreateCategoryScreen() {
       <ScreenLayout>
         <ScrollView className="w-full flex-1 p-4">
           <Card className="mb-6">
-            <Text className="mb-4 text-xl font-semibold text-slate-900">Nueva categoría</Text>
-            <Text className="text-sm text-slate-500">Agrega una nueva categoría para organizar tus productos.</Text>
+            <Text className="mb-4 text-xl font-semibold text-slate-900 dark:text-slate-100">Nueva categoría</Text>
+            <Text className="text-sm text-slate-500 dark:text-slate-400">
+              Agrega una nueva categoría para organizar tus productos.
+            </Text>
           </Card>
 
           <Card>
@@ -75,7 +77,7 @@ export default function CreateCategoryScreen() {
               multiline
             />
             <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={!isValid || createCategoryMutation.isPending}
               className={`mt-4 rounded-full py-3 ${isValid && !createCategoryMutation.isPending ? 'bg-[#4DB6AC]' : 'bg-slate-300'}`}>
               <Text className="text-center text-base font-semibold text-white">Crear categoría</Text>

@@ -12,8 +12,14 @@ import { useExchangeRateStore } from '@/store/exchangeRate';
 import type { EmployeeDebt } from '@/types/employeeDebt';
 
 const payrollSchema = z.object({
-  fecha_inicio: z.string().min(1, 'Requerido').regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
-  fecha_fin: z.string().min(1, 'Requerido').regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
+  fecha_inicio: z
+    .string()
+    .min(1, 'Requerido')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
+  fecha_fin: z
+    .string()
+    .min(1, 'Requerido')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
   monto: z.string().min(1, 'Requerido'),
   bono: z.string().optional(),
   deduccion: z.string().optional(),
@@ -102,7 +108,7 @@ export const RegisterPayrollModal = ({ empleadoId, onClose, debt }: Props) => {
           <Text className="text-[#4DB6AC]">Cancelar</Text>
         </TouchableOpacity>
         <Text className="text-lg font-bold">Registrar Pago</Text>
-        <TouchableOpacity onPress={handleSubmit(onSubmit)} disabled={createMutation.isPending}>
+        <TouchableOpacity onPress={() => handleSubmit(onSubmit)()} disabled={createMutation.isPending}>
           <Text className="font-bold text-[#4DB6AC]">{createMutation.isPending ? 'Guardando...' : 'Guardar'}</Text>
         </TouchableOpacity>
       </View>
@@ -195,9 +201,7 @@ export const RegisterPayrollModal = ({ empleadoId, onClose, debt }: Props) => {
         {createMutation.isError && (
           <View className="mb-4 rounded-lg bg-red-50 p-3">
             <Text className="text-sm text-red-600">
-              {createMutation.error instanceof Error
-                ? createMutation.error.message
-                : 'Error al guardar el pago'}
+              {createMutation.error instanceof Error ? createMutation.error.message : 'Error al guardar el pago'}
             </Text>
           </View>
         )}

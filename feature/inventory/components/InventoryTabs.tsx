@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { View, useColorScheme } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import type { InventoryTabKey } from '@/feature/inventory/types';
 
@@ -14,12 +14,13 @@ const tabOptions = [
 ] as const;
 
 export const InventoryTabs = ({ value, onValueChange }: InventoryTabsProps) => {
+  const colorScheme = useColorScheme();
   return (
     <View className="w-full">
       <SegmentedButtons
         value={value}
         onValueChange={onValueChange}
-        style={{ backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 20 }}
+        style={{ backgroundColor: colorScheme === 'dark' ? '#1b1b1b' : 'rgba(255,255,255,0.95)', borderRadius: 20 }}
         buttons={tabOptions.map((tab) => ({
           value: tab.value,
           label: tab.label,

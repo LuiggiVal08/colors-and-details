@@ -9,7 +9,17 @@ import LowStockChart from '@/components/charts/LowStockChart';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import Card from '@/components/Card';
 
-function KPICard({ label, value, bgClass, textClass }: { label: string; value: string | number; bgClass: string; textClass: string }) {
+function KPICard({
+  label,
+  value,
+  bgClass,
+  textClass,
+}: {
+  label: string;
+  value: string | number;
+  bgClass: string;
+  textClass: string;
+}) {
   return (
     <View className={`flex-1 rounded-2xl p-4 ${bgClass}`}>
       <Text className="text-sm font-semibold opacity-80">{label}</Text>

@@ -172,7 +172,7 @@ export default function PayrollListScreen() {
             renderItem={renderItem}
             className="w-full max-w-5xl px-4 py-6"
             contentContainerStyle={{ flexGrow: 1, paddingBottom: 120 }}
-            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} />}
             ListHeaderComponent={
               <View className="mb-4">
                 <Text className="text-2xl font-bold text-slate-900">Nóminas Generadas</Text>
@@ -211,7 +211,7 @@ export default function PayrollListScreen() {
               </TouchableOpacity>
               <Text className="text-lg font-bold">Generar Nómina</Text>
               <TouchableOpacity
-                onPress={handleSubmit(onSubmitGenerate)}
+                onPress={() => handleSubmit(onSubmitGenerate)()}
                 disabled={!isValid || generateMutation.isPending}>
                 <Text className="font-bold text-[#4DB6AC]">
                   {generateMutation.isPending ? 'Generando...' : 'Generar'}

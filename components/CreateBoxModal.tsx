@@ -1,6 +1,11 @@
 import { useState, useMemo, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Keyboard, useColorScheme } from 'react-native';
-import { BottomSheetModal, BottomSheetScrollView, BottomSheetTextInput, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetTextInput,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ActivityIndicator, Snackbar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,8 +46,7 @@ const CreateBoxModal = forwardRef<CreateBoxModalRef, CreateBoxModalProps>(({ onC
   }));
 
   const createMutation = useMutation({
-    mutationFn: (payload: Partial<BoxRegister>) =>
-      boxRegisterService.create(payload),
+    mutationFn: (payload: Partial<BoxRegister>) => boxRegisterService.create(payload),
     onSuccess: () => {
       impactLight();
       Keyboard.dismiss();
@@ -78,7 +82,9 @@ const CreateBoxModal = forwardRef<CreateBoxModalRef, CreateBoxModalProps>(({ onC
         keyboardBehavior="extend"
         enablePanDownToClose={false}
         enableDismissOnClose={false}
-        backdropComponent={(props) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />
+        )}
         backgroundStyle={{
           backgroundColor: colorScheme === 'dark' ? '#1E293B' : '#fff',
           borderTopLeftRadius: 24,
@@ -91,9 +97,7 @@ const CreateBoxModal = forwardRef<CreateBoxModalRef, CreateBoxModalProps>(({ onC
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: 24 }}>
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-xl font-bold text-slate-900 dark:text-white">
-              Nueva Caja
-            </Text>
+            <Text className="text-xl font-bold text-slate-900 dark:text-white">Nueva Caja</Text>
             <TouchableOpacity onPress={() => bottomSheetRef.current?.dismiss()}>
               <Ionicons name="close" size={24} color="#64748B" />
             </TouchableOpacity>

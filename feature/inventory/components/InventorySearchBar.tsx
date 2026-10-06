@@ -40,19 +40,19 @@ export const InventorySearchBar = ({
   return (
     <View className="gap-3">
       {tab !== 'movimientos' && (
-        <View className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:bg-primary-dark">
+        <View className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-700 dark:bg-primary-dark">
           <Ionicons name="search" size={20} color="#94A3B8" />
           <TextInput
             value={value}
             onChangeText={onChangeText}
             placeholder={placeholder}
-            className="flex-1 text-base text-slate-900"
+            className="flex-1 text-base text-slate-900 dark:text-slate-100"
             placeholderTextColor="#94A3B8"
             selectionColor="#4DB6AC"
             style={{ minHeight: 42 }}
           />
           {value.length > 0 && (
-            <Text className="text-xs text-slate-400">{value.length} caracteres</Text>
+            <Text className="text-xs text-slate-400 dark:text-slate-500">{value.length} caracteres</Text>
           )}
         </View>
       )}
@@ -60,8 +60,10 @@ export const InventorySearchBar = ({
       {tab === 'productos' && (
         <View className="flex-row items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-primary-dark">
           <View className="flex-1 pr-3">
-            <Text className="text-sm font-medium text-slate-700">Filtro de stock bajo</Text>
-            <Text className="text-xs text-slate-500">Mostrar solo productos con menos de 5 unidades</Text>
+            <Text className="text-sm font-medium text-slate-700 dark:text-slate-200">Filtro de stock bajo</Text>
+            <Text className="text-xs text-slate-500 dark:text-slate-400">
+              Mostrar solo productos con menos de 5 unidades
+            </Text>
           </View>
           <Switch value={lowStock} onValueChange={onLowStockToggle} color="#4DB6AC" />
         </View>
@@ -69,7 +71,7 @@ export const InventorySearchBar = ({
 
       {tab === 'movimientos' && (
         <View className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-primary-dark">
-          <Text className="mb-2 text-sm font-medium text-slate-700">Filtrar por tipo</Text>
+          <Text className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-200">Filtrar por tipo</Text>
           <View className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-primary-dark">
             <Picker selectedValue={movimientoTipo} onValueChange={onMovimientoTipoChange}>
               {tipoOptions.map((option) => (

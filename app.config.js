@@ -15,7 +15,13 @@ export default {
     experiments: {
       tsconfigPaths: true,
     },
-    plugins: ['expo-router', 'expo-secure-store'],
+    plugins: [
+      'expo-router',
+      'expo-secure-store',
+      '@react-native-community/datetimepicker',
+      'expo-sharing',
+      'expo-status-bar',
+    ],
     orientation: 'portrait',
     icon: './assets/logo.png',
     userInterfaceStyle: 'automatic',

@@ -18,7 +18,9 @@ function normalizeMovement(raw: Record<string, unknown>): CashMovement {
 
 const cashMovementService = {
   getByBox: async (boxId: string): Promise<CashMovement[]> => {
-    const { data } = await api.get<Record<string, unknown> | Record<string, unknown>[]>(`/cash-movements/by-box/${boxId}`);
+    const { data } = await api.get<Record<string, unknown> | Record<string, unknown>[]>(
+      `/cash-movements/by-box/${boxId}`
+    );
     if (Array.isArray(data)) {
       return data.map(normalizeMovement);
     }
@@ -28,7 +30,9 @@ const cashMovementService = {
   },
 
   getByControl: async (controlId: string): Promise<CashMovement[]> => {
-    const { data } = await api.get<Record<string, unknown> | Record<string, unknown>[]>(`/cash-movements/by-control/${controlId}`);
+    const { data } = await api.get<Record<string, unknown> | Record<string, unknown>[]>(
+      `/cash-movements/by-control/${controlId}`
+    );
     if (Array.isArray(data)) {
       return data.map(normalizeMovement);
     }

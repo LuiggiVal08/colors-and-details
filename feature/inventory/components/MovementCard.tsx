@@ -31,15 +31,13 @@ export const MovementCard = ({ movement, onPress }: MovementCardProps) => {
   const isEntrada = movement.tipo === 'entrada';
 
   return (
-    <Card
-      className="mx-4 mb-2 rounded-2xl p-4"
-      onPress={handlePress}>
+    <Card className="mx-4 mb-2 rounded-2xl p-4" onPress={handlePress}>
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
           <View className="flex-row items-center gap-2">
             <View
               className={`h-7 w-7 items-center justify-center rounded-full ${
-                isEntrada ? 'bg-emerald-100' : 'bg-rose-100'
+                isEntrada ? 'bg-emerald-100 dark:bg-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/20'
               }`}>
               <Ionicons
                 name={isEntrada ? 'arrow-up' : 'arrow-down'}
@@ -47,19 +45,21 @@ export const MovementCard = ({ movement, onPress }: MovementCardProps) => {
                 color={isEntrada ? '#059669' : '#E11D48'}
               />
             </View>
-            <Text className="truncate text-base font-semibold text-slate-900">
+            <Text className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
               {movement.producto}
             </Text>
           </View>
-          {movement.motivo && <Text className="mt-1 text-sm text-slate-500">{movement.motivo}</Text>}
+          {movement.motivo && (
+            <Text className="mt-1 text-sm text-slate-500 dark:text-slate-400">{movement.motivo}</Text>
+          )}
         </View>
         <View
           className={`rounded-full px-2.5 py-1 ${
-            isEntrada ? 'bg-emerald-100' : 'bg-rose-100'
+            isEntrada ? 'bg-emerald-100 dark:bg-emerald-500/20' : 'bg-rose-100 dark:bg-rose-500/20'
           }`}>
           <Text
             className={`text-xs font-semibold ${
-              isEntrada ? 'text-emerald-700' : 'text-rose-700'
+              isEntrada ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'
             }`}>
             {isEntrada ? '+' : '−'}
             {movement.cantidad}

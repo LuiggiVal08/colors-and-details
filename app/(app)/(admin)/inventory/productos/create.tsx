@@ -132,7 +132,7 @@ export default function CreateProductScreen() {
         <Stack.Screen options={{ title: 'Crear producto' }} />
         <ScreenLayout>
           <View className="w-full items-center justify-center px-4 py-6">
-            <Text className="text-slate-700">Cargando categorías...</Text>
+            <Text className="text-slate-700 dark:text-slate-300">Cargando categorías...</Text>
           </View>
         </ScreenLayout>
       </>
@@ -148,10 +148,8 @@ export default function CreateProductScreen() {
         <ScreenLayout>
           <View className="w-full max-w-3xl px-4 py-6">
             <Card>
-              <Text className="mb-3 text-xl font-semibold text-slate-900">Necesitas una categoría</Text>
-              <Text className="text-slate-600">
-                Crea primero una categoría antes de agregar productos.
-              </Text>
+              <Text className="mb-3 text-xl font-semibold text-slate-900 dark:text-slate-100">Necesitas una categoría</Text>
+              <Text className="text-slate-600 dark:text-slate-300">Crea primero una categoría antes de agregar productos.</Text>
               <TouchableOpacity
                 onPress={() => router.push('/inventory/categorias/create')}
                 className="mt-6 rounded-full bg-[#4DB6AC] px-5 py-3">
@@ -170,8 +168,8 @@ export default function CreateProductScreen() {
       <ScreenLayout>
         <ScrollView className="w-full flex-1 p-4">
           <Card className="mb-6">
-            <Text className="mb-4 text-xl font-semibold text-slate-900">Nuevo producto</Text>
-            <Text className="text-sm text-slate-500">
+            <Text className="mb-4 text-xl font-semibold text-slate-900 dark:text-slate-100">Nuevo producto</Text>
+            <Text className="text-sm text-slate-500 dark:text-slate-400">
               Agrega un producto y mantenlo disponible para movimientos.
             </Text>
           </Card>
@@ -188,7 +186,7 @@ export default function CreateProductScreen() {
             />
 
             <View className="mb-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-primary-dark">
-              <Text className="mb-3 text-sm font-semibold text-slate-700">Imagen del producto</Text>
+              <Text className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">Imagen del producto</Text>
               {selectedImage ? (
                 <Image source={{ uri: selectedImage }} className="mb-3 h-52 w-full rounded-3xl" resizeMode="cover" />
               ) : (
@@ -206,20 +204,20 @@ export default function CreateProductScreen() {
                 {selectedImage ? (
                   <TouchableOpacity
                     onPress={() => setSelectedImage(null)}
-                    className="rounded-full border border-slate-300 bg-white px-5 py-3">
-                    <Text className="text-base font-semibold text-slate-900">Eliminar</Text>
+                    className="rounded-full border border-slate-300 bg-white px-5 py-3 dark:border-slate-700 dark:bg-primary-dark">
+                    <Text className="text-base font-semibold text-slate-900 dark:text-slate-100">Eliminar</Text>
                   </TouchableOpacity>
                 ) : null}
               </View>
             </View>
 
             <View className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-primary-dark">
-              <Text className="mb-2 text-sm font-medium text-slate-700">Categoría</Text>
+              <Text className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-200">Categoría</Text>
               <Controller
                 control={control}
                 name="categoria_id"
                 render={({ field: { onChange, value } }) => (
-                  <View className="rounded-2xl bg-white">
+                  <View className="rounded-2xl bg-white dark:bg-primary-dark">
                     <Picker selectedValue={value} onValueChange={onChange}>
                       {categories.map((category) => (
                         <Picker.Item key={category.id} label={category.nombre} value={category.id} />
@@ -228,9 +226,7 @@ export default function CreateProductScreen() {
                   </View>
                 )}
               />
-              {errors.categoria_id && (
-                <Text className="mt-1 text-xs text-rose-500">{errors.categoria_id.message}</Text>
-              )}
+              {errors.categoria_id && <Text className="mt-1 text-xs text-rose-500">{errors.categoria_id.message}</Text>}
             </View>
 
             <ControlledInput
@@ -251,16 +247,16 @@ export default function CreateProductScreen() {
             />
 
             <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={!isValid || createProductMutation.isPending}
               className={`mt-4 rounded-full py-3 ${
                 isValid && !createProductMutation.isPending ? 'bg-[#4DB6AC]' : 'bg-slate-300'
               }`}>
               {createProductMutation.isPending ? (
                 <ActivityIndicator color="#fff" />
-            ) : (
-              <Text className="text-center text-base font-semibold text-white">Crear producto</Text>
-            )}
+              ) : (
+                <Text className="text-center text-base font-semibold text-white">Crear producto</Text>
+              )}
             </TouchableOpacity>
           </Card>
         </ScrollView>

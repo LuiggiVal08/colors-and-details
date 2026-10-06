@@ -92,7 +92,7 @@ export default function ServiceCreate() {
               />
             </View>
             <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={!isValid}
               className={`mt-4 rounded-full py-3 shadow-sm ${isValid ? 'bg-[#4DB6AC]' : 'bg-slate-300'}`}>
               <Text className="text-center font-semibold text-white">Crear Servicio</Text>

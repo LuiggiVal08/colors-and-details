@@ -13,14 +13,14 @@ export default function SettingsTabs() {
         name="tasa"
         options={{
           title: 'Tasa',
-          tabBarIcon: ({ color, size }) => <Ionicons name="cash-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="cash-outline" size={size} color={color as string} />,
         }}
       />
       <Tabs.Screen
         name="Iva"
         options={{
           title: 'IVA',
-          tabBarIcon: ({ color, size }) => <Ionicons name="receipt-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="receipt-outline" size={size} color={color as string} />,
         }}
       />
     </Tabs>

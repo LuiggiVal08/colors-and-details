@@ -171,7 +171,7 @@ export default function ServicePaymentCreate() {
           </Card>
 
           <TouchableOpacity
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => handleSubmit(onSubmit)()}
             disabled={createMutation.isPending}
             className="flex-row items-center justify-center gap-2 rounded-2xl bg-[#4DB6AC] py-4 disabled:opacity-50">
             <Ionicons name="checkmark-circle" size={20} color="white" />

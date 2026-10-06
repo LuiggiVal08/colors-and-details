@@ -80,7 +80,9 @@ export const SecurityTab = () => {
         <View className="mb-4 flex-row items-center gap-2">
           <Text className="text-lg font-bold text-slate-900 dark:text-white">Cambiar Contraseña</Text>
         </View>
-        <Text className="mb-5 text-sm text-slate-500 dark:text-slate-400">Actualiza tu contraseña para mantener tu cuenta segura</Text>
+        <Text className="mb-5 text-sm text-slate-500 dark:text-slate-400">
+          Actualiza tu contraseña para mantener tu cuenta segura
+        </Text>
 
         <ControlledInput
           name="currentPassword"

@@ -80,8 +80,10 @@ export default function AdminInventoryScreen() {
           </View>
           <View className="mx-4 mb-4">
             <View className="min-w-0 flex-1">
-              <Text className="text-xl font-semibold text-slate-900">{tabLabels[selectedTab]}</Text>
-              <Text className="text-sm text-slate-500">
+              <Text className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                {tabLabels[selectedTab]}
+              </Text>
+              <Text className="text-sm text-slate-500 dark:text-slate-400">
                 Lista actualizada de {tabLabels[selectedTab].toLowerCase()}.
               </Text>
             </View>
@@ -89,12 +91,8 @@ export default function AdminInventoryScreen() {
         </View>
 
         {selectedTab === 'categorias' && <CategoryList page={page} />}
-        {selectedTab === 'productos' && (
-          <ProductList page={page} lowStockOnly={lowStockOnly} />
-        )}
-        {selectedTab === 'movimientos' && (
-          <MovementList page={page} movimientoTipo={movimientoTipo} />
-        )}
+        {selectedTab === 'productos' && <ProductList page={page} lowStockOnly={lowStockOnly} />}
+        {selectedTab === 'movimientos' && <MovementList page={page} movimientoTipo={movimientoTipo} />}
       </View>
 
       <ExpandableFAB

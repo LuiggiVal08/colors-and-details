@@ -76,26 +76,22 @@ export default function EmployeeDetails() {
   };
 
   const handleDelete = () => {
-    Alert.alert(
-      'Eliminar Empleado',
-      `¿Estás seguro de eliminar a ${employee.nombre} ${employee.apellido}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await employeeService.delete(id as string);
-              queryClient.invalidateQueries({ queryKey: ['employees'] });
-              router.back();
-            } catch {
-              Alert.alert('Error', 'No se pudo eliminar el empleado. Verifica que no tenga pagos o usuarios asociados.');
-            }
-          },
+    Alert.alert('Eliminar Empleado', `¿Estás seguro de eliminar a ${employee.nombre} ${employee.apellido}?`, [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Eliminar',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await employeeService.delete(id as string);
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
+            router.back();
+          } catch {
+            Alert.alert('Error', 'No se pudo eliminar el empleado. Verifica que no tenga pagos o usuarios asociados.');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleEmail = () => {
@@ -208,7 +204,12 @@ export default function EmployeeDetails() {
               <View className="flex-row items-center gap-3">
                 <Ionicons name="repeat-outline" size={20} color="#64748B" />
                 <Text className="flex-1 text-base text-slate-700">
-                  Frecuencia: {employee.frecuencia_pago === 'mensual' ? 'Mensual' : employee.frecuencia_pago === 'quincenal' ? 'Quincenal' : 'Semanal'}
+                  Frecuencia:{' '}
+                  {employee.frecuencia_pago === 'mensual'
+                    ? 'Mensual'
+                    : employee.frecuencia_pago === 'quincenal'
+                      ? 'Quincenal'
+                      : 'Semanal'}
                 </Text>
               </View>
             </View>

@@ -27,8 +27,7 @@ export default function MovementList({ page, movimientoTipo }: MovementListProps
 
   const movementQuery = useQuery({
     queryKey: ['inventory', 'movements', query, movimientoTipo, page],
-    queryFn: () =>
-      productMovementService.getAll({ search: query, tipo: movimientoTipo, page, limit: pageSize }),
+    queryFn: () => productMovementService.getAll({ search: query, tipo: movimientoTipo, page, limit: pageSize }),
   });
 
   const handleRefresh = useCallback(async () => {
@@ -40,12 +39,10 @@ export default function MovementList({ page, movimientoTipo }: MovementListProps
   const renderEmpty = () => (
     <View className="mx-4 mt-8 items-center justify-center rounded-3xl bg-white p-8 shadow-sm dark:bg-primary-dark">
       <Ionicons name="cube-outline" size={64} color="#CBD5E1" />
-      <Text className="mt-4 text-center text-lg font-medium text-slate-600">
+      <Text className="mt-4 text-center text-lg font-medium text-slate-600 dark:text-slate-300">
         No se encontraron resultados
       </Text>
-      <Text className="mt-2 text-center text-sm text-slate-500">
-        Prueba otra búsqueda o crea un nuevo movimiento.
-      </Text>
+      <Text className="mt-2 text-center text-sm text-slate-500">Prueba otra búsqueda o crea un nuevo movimiento.</Text>
     </View>
   );
 
@@ -58,12 +55,7 @@ export default function MovementList({ page, movimientoTipo }: MovementListProps
   }
 
   if (movementQuery.error) {
-    return (
-      <ErrorRetryCard
-        message="No se pudo cargar los movimientos."
-        onRetry={handleRefresh}
-      />
-    );
+    return <ErrorRetryCard message="No se pudo cargar los movimientos." onRetry={handleRefresh} />;
   }
 
   return (
@@ -80,9 +72,7 @@ export default function MovementList({ page, movimientoTipo }: MovementListProps
         keyExtractor={(item) => item.id}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={{ paddingBottom: 10 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} progressViewOffset={90} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} progressViewOffset={90} />}
       />
 
       <Snackbar

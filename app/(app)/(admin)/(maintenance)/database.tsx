@@ -7,9 +7,7 @@ export default function DatabaseScreen() {
     <ScreenLayout>
       <Card className="w-full max-w-3xl p-8">
         <Text className="mb-4 text-3xl font-bold text-slate-900">Base de datos</Text>
-        <Text className="text-slate-600">
-          Pantalla protegida de mantenimiento para la base de datos.
-        </Text>
+        <Text className="text-slate-600">Pantalla protegida de mantenimiento para la base de datos.</Text>
       </Card>
     </ScreenLayout>
   );

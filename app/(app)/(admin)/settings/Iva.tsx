@@ -120,7 +120,11 @@ export default function IvaScreen() {
               />
               <View className="flex-row gap-3">
                 <TouchableOpacity
-                  onPress={() => { setShowForm(false); setPorcentaje(''); setObservacion(''); }}
+                  onPress={() => {
+                    setShowForm(false);
+                    setPorcentaje('');
+                    setObservacion('');
+                  }}
                   className="flex-1 rounded-2xl bg-slate-200 py-3">
                   <Text className="text-center text-base font-semibold text-slate-600">Cancelar</Text>
                 </TouchableOpacity>
@@ -165,12 +169,8 @@ export default function IvaScreen() {
                         minute: '2-digit',
                       })}
                     </Text>
-                    {item.observacion && (
-                      <Text className="mt-1 text-xs text-slate-400">{item.observacion}</Text>
-                    )}
-                    {item.usuario && (
-                      <Text className="text-xs text-slate-400">Por: {item.usuario.nombre}</Text>
-                    )}
+                    {item.observacion && <Text className="mt-1 text-xs text-slate-400">{item.observacion}</Text>}
+                    {item.usuario && <Text className="text-xs text-slate-400">Por: {item.usuario.nombre}</Text>}
                   </View>
                 </View>
               ))

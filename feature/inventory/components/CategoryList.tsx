@@ -70,7 +70,7 @@ export default function CategoryList({ page }: CategoryListProps) {
   const renderEmpty = () => (
     <View className="mx-4 mt-8 items-center justify-center rounded-3xl bg-white p-8 shadow-sm dark:bg-primary-dark">
       <Ionicons name="cube-outline" size={64} color="#CBD5E1" />
-      <Text className="mt-4 text-center text-lg font-medium text-slate-600">
+      <Text className="mt-4 text-center text-lg font-medium text-slate-600 dark:text-slate-300">
         No se encontraron resultados
       </Text>
       <Text className="mt-2 text-center text-sm text-slate-500">
@@ -88,12 +88,7 @@ export default function CategoryList({ page }: CategoryListProps) {
   }
 
   if (categoryQuery.error) {
-    return (
-      <ErrorRetryCard
-        message="No se pudo cargar las categorías."
-        onRetry={handleRefresh}
-      />
-    );
+    return <ErrorRetryCard message="No se pudo cargar las categorías." onRetry={handleRefresh} />;
   }
 
   return (
@@ -101,23 +96,15 @@ export default function CategoryList({ page }: CategoryListProps) {
       <FlashList
         style={{ width: '100%' }}
         data={categoryQuery.data ?? []}
-        renderItem={({ item }) => (
-          <CategoryCard
-            category={item}
-            onEdit={handleEdit}
-            onDelete={handleDeleteCategory}
-          />
-        )}
+        renderItem={({ item }) => <CategoryCard category={item} onEdit={handleEdit} onDelete={handleDeleteCategory} />}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={{ paddingBottom: 10 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} progressViewOffset={90} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} progressViewOffset={90} />}
       />
 
       {editCategory && (
-        <View className="absolute inset-0 z-50 bg-white">
+        <View className="absolute inset-0 z-50 bg-white dark:bg-primary-dark">
           <FormEditCategory
             category={editCategory}
             onClose={() => setEditCategory(null)}

@@ -1,5 +1,10 @@
 import api from './api';
-import type { CreateProductPayload, ProductApiItem, ProductItem, UpdateProductPayload } from '@/feature/inventory/types';
+import type {
+  CreateProductPayload,
+  ProductApiItem,
+  ProductItem,
+  UpdateProductPayload,
+} from '@/feature/inventory/types';
 
 interface GetAllParams {
   search?: string;

@@ -57,15 +57,54 @@ export default function CustomerCreate() {
           <Card className="mb-6">
             <Text className="mb-6 text-2xl font-bold text-slate-900">Nuevo Cliente</Text>
 
-            <ControlledInput name="nombre" label="Nombre" control={control} error={errors.nombre?.message} onChangeText={Format.name} />
-            <ControlledInput name="apellido" label="Apellido" control={control} error={errors.apellido?.message} onChangeText={Format.name} />
-            <ControlledInput name="cedula" label="Cédula" control={control} error={errors.cedula?.message} keyboardType="numeric" onChangeText={Format.dni} />
-            <ControlledInput name="telefono" label="Teléfono" control={control} error={errors.telefono?.message} keyboardType="phone-pad" onChangeText={Format.phone} />
-            <ControlledInput name="email" label="Correo Electrónico" control={control} error={errors.email?.message} keyboardType="email-address" onChangeText={Format.email} />
-            <ControlledInput name="direccion" label="Dirección" control={control} error={errors.direccion?.message} multiline />
+            <ControlledInput
+              name="nombre"
+              label="Nombre"
+              control={control}
+              error={errors.nombre?.message}
+              onChangeText={Format.name}
+            />
+            <ControlledInput
+              name="apellido"
+              label="Apellido"
+              control={control}
+              error={errors.apellido?.message}
+              onChangeText={Format.name}
+            />
+            <ControlledInput
+              name="cedula"
+              label="Cédula"
+              control={control}
+              error={errors.cedula?.message}
+              keyboardType="numeric"
+              onChangeText={Format.dni}
+            />
+            <ControlledInput
+              name="telefono"
+              label="Teléfono"
+              control={control}
+              error={errors.telefono?.message}
+              keyboardType="phone-pad"
+              onChangeText={Format.phone}
+            />
+            <ControlledInput
+              name="email"
+              label="Correo Electrónico"
+              control={control}
+              error={errors.email?.message}
+              keyboardType="email-address"
+              onChangeText={Format.email}
+            />
+            <ControlledInput
+              name="direccion"
+              label="Dirección"
+              control={control}
+              error={errors.direccion?.message}
+              multiline
+            />
 
             <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={!isValid}
               className={`mt-4 rounded-full py-3 ${isValid ? 'bg-[#4DB6AC]' : 'bg-slate-300'}`}>
               <Text className="text-center font-semibold text-white">Crear Cliente</Text>

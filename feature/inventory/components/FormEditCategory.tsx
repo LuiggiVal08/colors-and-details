@@ -48,31 +48,22 @@ const FormEditCategory = ({ category, onClose, onSuccess }: Props) => {
     updateMutation.mutate(data);
   };
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-primary-dark">
       <Stack.Screen options={{ title: 'Editar Categoría' }} />
       <View className="flex-row items-center justify-between border-b border-slate-200 bg-white px-5 py-4 dark:border-slate-700 dark:bg-primary-dark">
         <TouchableOpacity onPress={onClose}>
-          <Text className="text-slate-600">Cancelar</Text>
+          <Text className="text-slate-600 dark:text-slate-300">Cancelar</Text>
         </TouchableOpacity>
-        <Text className="text-lg font-bold text-slate-900">Editar Categoría</Text>
-        <TouchableOpacity onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
-          <Text className={`font-bold ${isSubmitting ? 'text-slate-400' : 'text-[#4DB6AC]'}`}>
-            Guardar
-          </Text>
+        <Text className="text-lg font-bold text-slate-900 dark:text-slate-100">Editar Categoría</Text>
+        <TouchableOpacity onPress={() => handleSubmit(onSubmit)()} disabled={isSubmitting}>
+          <Text className={`font-bold ${isSubmitting ? 'text-slate-400' : 'text-[#4DB6AC]'}`}>Guardar</Text>
         </TouchableOpacity>
       </View>
       <ScrollView className="p-4">
         <View className="mb-6">
-          <Text className="mb-2 ml-1 text-xs font-bold uppercase tracking-wide text-slate-400">
-            Información
-          </Text>
+          <Text className="mb-2 ml-1 text-xs font-bold uppercase tracking-wide text-slate-400">Información</Text>
           <View className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-primary-dark">
-            <ControlledInput
-              name="nombre"
-              label="Nombre"
-              control={control}
-              error={errors.nombre?.message}
-            />
+            <ControlledInput name="nombre" label="Nombre" control={control} error={errors.nombre?.message} />
             <ControlledInput
               name="descripcion"
               label="Descripción"

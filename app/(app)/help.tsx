@@ -52,7 +52,9 @@ export default function HelpScreen() {
         <View className="space-y-5">
           <View className="flex gap-4">
             {developers.map((developer) => (
-              <View key={developer.name} className="rounded-[32px] bg-white p-6 shadow-lg shadow-slate-200/80 dark:bg-primary-dark">
+              <View
+                key={developer.name}
+                className="rounded-[32px] bg-white p-6 shadow-lg shadow-slate-200/80 dark:bg-primary-dark">
                 <View className="flex-row items-center gap-4">
                   <View className="h-24 w-24 items-center justify-center rounded-full bg-slate-100">
                     <Text className="text-xl font-semibold text-slate-700">

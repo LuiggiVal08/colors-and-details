@@ -10,14 +10,7 @@ interface SkeletonLoaderProps {
   className?: string;
 }
 
-const SkeletonLoader = ({
-  count = 3,
-  style,
-  itemStyle,
-  variant = 'card',
-  height,
-  className,
-}: SkeletonLoaderProps) => {
+const SkeletonLoader = ({ count = 3, style, itemStyle, variant = 'card', height, className }: SkeletonLoaderProps) => {
   const opacity = useRef(new Animated.Value(0.6)).current;
 
   useEffect(() => {
@@ -59,7 +52,7 @@ const SkeletonLoader = ({
               backgroundColor: '#E2E8F0',
               borderRadius: 16,
               marginBottom: 12,
-              height: variant === 'text' ? 18 : height ?? 110,
+              height: variant === 'text' ? 18 : (height ?? 110),
               width: '100%',
             },
             itemStyle,

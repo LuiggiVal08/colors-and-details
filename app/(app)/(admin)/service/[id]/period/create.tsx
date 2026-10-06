@@ -137,7 +137,7 @@ export default function ServicePeriodCreate() {
                 <Text className="text-center text-base font-semibold text-slate-600">Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={handleSubmit(onSubmit)}
+                onPress={() => handleSubmit(onSubmit)()}
                 disabled={createMutation.isPending}
                 className="flex-1 rounded-2xl bg-[#4DB6AC] py-3 disabled:opacity-50">
                 <Text className="text-center text-base font-semibold text-white">
