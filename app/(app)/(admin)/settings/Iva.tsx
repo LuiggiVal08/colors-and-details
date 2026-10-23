@@ -9,6 +9,8 @@ import ScreenLayout from '@/components/layout/ScreenLayout';
 import Card from '@/components/Card';
 import { Ionicons } from '@expo/vector-icons';
 import { Snackbar, TextInput } from 'react-native-paper';
+import { apiErrorMessage } from '@/helpers/apiErrorMessage';
+import type { AxiosError } from 'axios';
 
 export default function IvaScreen() {
   const queryClient = useQueryClient();
@@ -38,13 +40,20 @@ export default function IvaScreen() {
       setObservacion('');
       setSnackbar({ visible: true, message: 'IVA actualizado correctamente' });
     },
-    onError: () => {
-      setSnackbar({ visible: true, message: 'Error al actualizar IVA' });
+    onError: (error) => {
+      const message = apiErrorMessage(error, 'Error al actualizar IVA');
+      const axiosError = error as AxiosError;
+      console.error('No se pudo actualizar el IVA', {
+        message,
+        status: axiosError.response?.status,
+        response: axiosError.response?.data,
+      });
+      setSnackbar({ visible: true, message });
     },
   });
 
   const handleSubmit = () => {
-    const val = parseFloat(porcentaje);
+    const val = parseFloat(porcentaje.replace(',', '.'));
     if (isNaN(val) || val < 0) {
       setSnackbar({ visible: true, message: 'Ingrese un porcentaje válido' });
       return;
@@ -105,7 +114,7 @@ export default function IvaScreen() {
                 label="Porcentaje"
                 value={porcentaje}
                 onChangeText={setPorcentaje}
-                keyboardType="decimal-pad"
+                keyboardType="numbers-and-punctuation"
                 mode="outlined"
                 className="mb-3 bg-white"
                 placeholder="Ej: 16"

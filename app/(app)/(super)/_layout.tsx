@@ -2,11 +2,13 @@ import { Stack, Redirect } from 'expo-router';
 import { useColorScheme } from 'react-native';
 import { useAuthStore } from '@/store/auth';
 import { themeDark } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SuperAdminLayout() {
   const user = useAuthStore((state) => state.user);
   const isSuper = user?.role === 'superadmin';
   const colorScheme = useColorScheme();
+  const topInset = useSafeAreaInsets().top;
 
   if (!isSuper) {
     return <Redirect href="/shopping" />;
@@ -22,9 +24,9 @@ export default function SuperAdminLayout() {
         animation: 'ios_from_right',
         headerStyle: { backgroundColor: headerBg },
         headerTintColor: headerText,
-        // statusBarTranslucent:false => header nativo con topInsetEnabled=false
-        // (alto normal). Con true, edge-to-edge duplica el alto del header.
-        statusBarTranslucent: false,
+        unstable_nativeProps: {
+          headerConfig: { disableTopInsetApplication: topInset === 0 },
+        },
       }}
     />
   );

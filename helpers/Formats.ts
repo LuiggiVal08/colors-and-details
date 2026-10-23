@@ -120,7 +120,7 @@ export class Format {
   };
 
   static montoFijo = (value: string | number | null | undefined) => {
-    const num = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
+    const num = typeof value === 'number' ? value : parseFloat(String(value ?? '').replace(',', '.'));
     if (!Number.isFinite(num)) return '0.00';
     return num.toFixed(2);
   };

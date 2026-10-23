@@ -55,7 +55,7 @@ export default function RootLayout() {
 
   return (
     <>
-      <StatusBar barStyle="default" />
+      <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <BottomSheetModalProvider>
           <KeyboardProvider>

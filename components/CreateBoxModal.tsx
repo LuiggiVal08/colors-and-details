@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import boxRegisterService from '@/services/boxRegister.service';
 import type { BoxRegister } from '@/types/boxRegister';
 import { impactLight } from '@/helpers/haptics';
+import { parseDecimal } from '@/helpers/decimal';
 
 interface CreateBoxModalProps {
   onCreated?: () => void;
@@ -70,7 +71,7 @@ const CreateBoxModal = forwardRef<CreateBoxModalRef, CreateBoxModalProps>(({ onC
       nombre: nombre.trim(),
       ubicacion: ubicacion.trim() || undefined,
       descripcion: ubicacion.trim() || undefined,
-      monto_inicial: parseFloat(montoInicial) || 0,
+      monto_inicial: parseDecimal(montoInicial),
     });
   }, [nombre, ubicacion, montoInicial, createMutation]);
 
@@ -135,7 +136,7 @@ const CreateBoxModal = forwardRef<CreateBoxModalRef, CreateBoxModalProps>(({ onC
               value={montoInicial}
               onChangeText={setMontoInicial}
               placeholder="0.00"
-              keyboardType="decimal-pad"
+              keyboardType="numbers-and-punctuation"
               className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 dark:border-slate-600 dark:bg-primary-dark dark:text-white"
             />
           </View>

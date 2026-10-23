@@ -67,16 +67,20 @@ export default function SaleDetailScreen() {
       text += line('--- Productos ---');
       sale.detalles?.forEach((d) => {
         text += line(
-          `  ${d.producto_nombre || `Prod #${d.producto_id}`} x${d.cantidad}  $ ${(d.subtotal || 0).toLocaleString('es-VE')}`
+          `  ${d.producto_nombre || `Prod #${d.producto_id}`} x${d.cantidad}  $ ${Number(d.subtotal || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
         );
       });
       text += line('');
-      text += line(`TOTAL: $ ${((sale.total as number) || 0).toLocaleString('es-VE')}`);
+      text += line(
+        `TOTAL: $ ${Number(sale.total || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      );
       text += line('');
       if (sale.pagos && sale.pagos.length > 0) {
         text += line('--- Pagos ---');
         sale.pagos.forEach((p) => {
-          text += line(`  ${p.metodo_pago_nombre || 'Pago'}: $ ${(p.monto || 0).toLocaleString('es-VE')}`);
+          text += line(
+            `  ${p.metodo_pago_nombre || 'Pago'}: $ ${Number(p.monto || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          );
           if (p.referencia_pago) text += line(`    Ref: ${p.referencia_pago}`);
         });
       }
@@ -164,14 +168,24 @@ export default function SaleDetailScreen() {
                   </Text>
                   <Text className="text-sm text-slate-500">x{detalle.cantidad}</Text>
                 </View>
-                <Text className="font-medium text-slate-900">$ {(detalle.subtotal || 0).toLocaleString('es-VE')}</Text>
+                <Text className="font-medium text-slate-900">
+                  ${' '}
+                  {Number(detalle.subtotal || 0).toLocaleString('es-VE', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </Text>
               </View>
             ))}
 
             <View className="mt-4 flex-row items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
               <Text className="text-lg font-bold text-slate-900">Total</Text>
               <Text className="text-2xl font-bold text-slate-900">
-                $ {((sale.total as number) || 0).toLocaleString('es-VE')}
+                ${' '}
+                {Number(sale.total || 0).toLocaleString('es-VE', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </Text>
             </View>
           </Card>
@@ -189,7 +203,13 @@ export default function SaleDetailScreen() {
                     </View>
                     <Text className="text-slate-600">{pago.metodo_pago_nombre || `Pago #${pago.metodo_pago_id}`}</Text>
                   </View>
-                  <Text className="font-medium text-slate-900">Bs. {(pago.monto || 0).toLocaleString('es-VE')}</Text>
+                  <Text className="font-medium text-slate-900">
+                    ${' '}
+                    {Number(pago.monto || 0).toLocaleString('es-VE', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </Text>
                 </View>
               ))}
             </Card>

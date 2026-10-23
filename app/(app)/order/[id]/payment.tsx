@@ -7,8 +7,11 @@ import { ActivityIndicator, Snackbar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import orderService from '@/services/order.service';
+import { parseDecimal, toDecimalString } from '@/helpers/decimal';
 import paymentMethodService from '@/services/paymentMethod.service';
 import { impactLight, selection } from '@/helpers/haptics';
+import { useExchangeRateStore } from '@/store/exchangeRate';
+import { calculatePayment, paymentMedium, toUsd } from '@/helpers/payment';
 
 const METHOD_CONFIG: Record<string, { icon: string; requiereRef: boolean }> = {
   efectivo: { icon: 'cash', requiereRef: false },
@@ -21,6 +24,8 @@ const METHOD_CONFIG: Record<string, { icon: string; requiereRef: boolean }> = {
 const iconName = (icon: string) =>
   icon as 'cash' | 'card' | 'swap-horizontal' | 'phone-portrait' | 'ellipsis-horizontal';
 
+const supportsUsd = (tipo: string): boolean => !['tarjeta', 'transferencia'].includes(tipo.toLowerCase());
+
 export default function OrderPaymentScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -30,6 +35,7 @@ export default function OrderPaymentScreen() {
   const [activeMethodId, setActiveMethodId] = useState<string | null>(null);
   const [amountText, setAmountText] = useState('');
   const [reference, setReference] = useState('');
+  const [currency, setCurrency] = useState<'USD' | 'VES'>('USD');
   const [partialMode, setPartialMode] = useState(false);
 
   const { data: order } = useQuery({
@@ -48,10 +54,13 @@ export default function OrderPaymentScreen() {
     queryKey: ['payment-methods', 'active'],
     queryFn: () => paymentMethodService.getAll(1, 50),
   });
+  const tasa = useExchangeRateStore((state) => state.tasa);
 
   const totalConIva = (order?.total ?? 0) + (order?.total ?? 0) * ((order?.iva_porcentaje ?? 0) / 100);
-  const totalPagado = payments?.reduce((sum, p) => sum + p.monto, 0) ?? 0;
+  const totalPagado =
+    payments?.reduce((sum, p) => sum + (p.monto_usd ?? toUsd(p.monto, p.moneda ?? 'USD', tasa || 1)), 0) ?? 0;
   const saldoPendiente = useMemo(() => Math.max(0, totalConIva - totalPagado), [totalConIva, totalPagado]);
+  const saldoPendienteBs = saldoPendiente * (tasa || 0);
 
   const activeMethods = methods?.filter((m) => m.activo !== false) || [];
   const activeMethod = useMemo(() => {
@@ -61,15 +70,28 @@ export default function OrderPaymentScreen() {
   const activeConfig = activeMethod
     ? METHOD_CONFIG[activeMethod.tipo] || { icon: 'ellipsis-horizontal', requiereRef: false }
     : null;
+  const currentChange = useMemo(() => {
+    if (!activeMethod || activeMethod.tipo !== 'efectivo') return { usd: 0, bs: 0 };
+    const amount = parseDecimal(amountText);
+    const calculation = calculatePayment(amount, currency, saldoPendiente, activeMethod.tipo, tasa || 1);
+    return { usd: calculation.changeUsdAmount, bs: calculation.changeBs };
+  }, [activeMethod, amountText, currency, saldoPendiente, tasa]);
 
   const mutation = useMutation({
     mutationFn: () => {
-      const montoNum = parseFloat(amountText) || 0;
+      const montoNum = parseDecimal(amountText);
+      const calculation = calculatePayment(montoNum, currency, saldoPendiente, activeMethod!.tipo, tasa || 1);
       return orderService.createPayment({
         pedido_id: String(orderId),
         metodo_pago_id: String(activeMethod!.id),
         fecha: new Date().toISOString(),
-        monto: montoNum.toFixed(2),
+        monto: toDecimalString(montoNum.toFixed(2)),
+        moneda: currency,
+        monto_recibido: toDecimalString(montoNum.toFixed(2)),
+        monto_usd: toDecimalString(calculation.appliedUsd.toFixed(2)),
+        vuelto_usd: toDecimalString(calculation.changeUsdAmount.toFixed(2)),
+        vuelto_bs: toDecimalString(calculation.changeBs.toFixed(2)),
+        medio_pago: paymentMedium(activeMethod!.tipo),
         referencia_pago: reference.trim() || undefined,
       });
     },
@@ -89,22 +111,32 @@ export default function OrderPaymentScreen() {
   const handleSelectMethod = (methodId: string) => {
     impactLight();
     setActiveMethodId(methodId);
-    setAmountText(partialMode ? '' : saldoPendiente.toFixed(2));
+    const method = methods?.find((item) => String(item.id) === methodId);
+    const nextCurrency = method && supportsUsd(method.tipo) ? currency : 'VES';
+    setCurrency(nextCurrency);
+    const pendingInCurrency = nextCurrency === 'VES' && tasa ? saldoPendiente * tasa : saldoPendiente;
+    setAmountText(partialMode ? '' : pendingInCurrency.toFixed(2));
   };
 
   const handleTogglePartial = () => {
     selection();
     setPartialMode((v) => !v);
-    setAmountText(partialMode ? saldoPendiente.toFixed(2) : '');
+    const pendingInCurrency = currency === 'VES' && tasa ? saldoPendiente * tasa : saldoPendiente;
+    setAmountText(partialMode ? pendingInCurrency.toFixed(2) : '');
   };
 
   const handleSubmit = () => {
-    const amount = parseFloat(amountText) || 0;
+    const amount = parseDecimal(amountText);
     if (amount <= 0) {
       setSnackbar({ visible: true, message: 'Ingresa un monto válido' });
       return;
     }
-    if (amount > saldoPendiente) {
+    if (!activeMethod) {
+      setSnackbar({ visible: true, message: 'Selecciona un método de pago' });
+      return;
+    }
+    const calculation = calculatePayment(amount, currency, saldoPendiente, activeMethod.tipo, tasa || 1);
+    if (activeMethod.tipo !== 'efectivo' && calculation.appliedUsd > saldoPendiente + 0.01) {
       setSnackbar({
         visible: true,
         message: 'El monto no puede ser mayor al saldo pendiente',
@@ -113,6 +145,10 @@ export default function OrderPaymentScreen() {
     }
     if (activeConfig?.requiereRef && !reference.trim()) {
       setSnackbar({ visible: true, message: 'Este método requiere referencia' });
+      return;
+    }
+    if (!supportsUsd(activeMethod.tipo) && currency !== 'VES') {
+      setSnackbar({ visible: true, message: 'Este método solo admite pagos en VES' });
       return;
     }
     mutation.mutate();
@@ -150,13 +186,26 @@ export default function OrderPaymentScreen() {
             </View>
             <View className="mt-1 flex-row items-center justify-between border-t border-[#4DB6AC]/20 pt-1">
               <Text className="text-sm font-semibold text-slate-700">Saldo Pendiente</Text>
-              <Text className="text-xl font-bold text-rose-600">${fmt(saldoPendiente)}</Text>
+              <View className="items-end">
+                <Text className="text-xl font-bold text-rose-600">${fmt(saldoPendiente)}</Text>
+                <Text className="text-sm font-semibold text-rose-600">Bs. {fmt(saldoPendienteBs)}</Text>
+              </View>
             </View>
+            {(currentChange.usd > 0 || currentChange.bs > 0) && (
+              <View className="mt-2 flex-row items-center justify-between border-t border-[#4DB6AC]/20 pt-2">
+                <Text className="text-sm font-semibold text-emerald-700">Vuelto</Text>
+                <Text className="text-base font-bold text-emerald-700">
+                  {currentChange.usd > 0 ? `$ ${fmt(currentChange.usd)}` : ''}
+                  {currentChange.usd > 0 && currentChange.bs > 0 ? ' · ' : ''}
+                  {currentChange.bs > 0 ? `Bs. ${fmt(currentChange.bs)}` : ''}
+                </Text>
+              </View>
+            )}
           </View>
 
           <View className="mb-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-primary-dark">
             <View className="flex-row items-center justify-between">
-              <Text className="text-sm font-semibold text-slate-700">Monto a pagar</Text>
+              <Text className="text-sm font-semibold text-slate-700">Monto recibido ({currency})</Text>
               <TouchableOpacity
                 onPress={handleTogglePartial}
                 className={`rounded-full px-3 py-1 ${partialMode ? 'bg-amber-100' : 'bg-slate-100'}`}>
@@ -166,23 +215,27 @@ export default function OrderPaymentScreen() {
               </TouchableOpacity>
             </View>
             <View className="mt-2 flex-row items-center rounded-xl border border-slate-300 bg-slate-50 px-3 dark:border-slate-700 dark:bg-primary-dark">
-              <Text className="text-base text-slate-500">$ </Text>
+              <Text className="text-base text-slate-500">{currency === 'USD' ? '$ ' : 'Bs. '}</Text>
               <TextInput
                 value={amountText}
                 onChangeText={setAmountText}
-                keyboardType="decimal-pad"
+                keyboardType="numbers-and-punctuation"
                 placeholder="0.00"
                 className="flex-1 py-3 text-base text-slate-900"
               />
             </View>
             <View className="mt-1 flex-row gap-2">
               <TouchableOpacity
-                onPress={() => setAmountText(saldoPendiente.toFixed(2))}
+                onPress={() =>
+                  setAmountText((currency === 'VES' && tasa ? saldoPendiente * tasa : saldoPendiente).toFixed(2))
+                }
                 className="flex-1 rounded-lg border border-slate-200 bg-white py-1.5 dark:border-slate-700 dark:bg-primary-dark">
                 <Text className="text-center text-xs text-slate-600">Todo</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => setAmountText((saldoPendiente / 2).toFixed(2))}
+                onPress={() =>
+                  setAmountText(((currency === 'VES' && tasa ? saldoPendiente * tasa : saldoPendiente) / 2).toFixed(2))
+                }
                 className="flex-1 rounded-lg border border-slate-200 bg-white py-1.5 dark:border-slate-700 dark:bg-primary-dark">
                 <Text className="text-center text-xs text-slate-600">Mitad</Text>
               </TouchableOpacity>
@@ -229,6 +282,28 @@ export default function OrderPaymentScreen() {
                 placeholder="N° de referencia"
                 className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-primary-dark dark:text-white"
               />
+            </View>
+          )}
+
+          {activeMethodId && activeMethod && supportsUsd(activeMethod.tipo) && (
+            <View className="mb-4">
+              <Text className="mb-2 text-xs text-slate-600">Moneda recibida</Text>
+              <View className="flex-row gap-2">
+                {(['USD', 'VES'] as const).map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    onPress={() => {
+                      setCurrency(option);
+                      const pendingInCurrency = option === 'VES' && tasa ? saldoPendiente * tasa : saldoPendiente;
+                      setAmountText(partialMode ? '' : pendingInCurrency.toFixed(2));
+                    }}
+                    className={`rounded-xl border px-4 py-2 ${
+                      currency === option ? 'border-[#4DB6AC] bg-[#4DB6AC]/10' : 'border-slate-300 bg-white'
+                    }`}>
+                    <Text className="text-sm font-medium text-slate-700">{option}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           )}
 

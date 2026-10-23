@@ -11,6 +11,8 @@ import { useIVAStore } from '@/store/iva';
 import { useBoxRegisterStore } from '@/store/boxRegister';
 import { useNotificationStore } from '@/store/notification';
 import { themeDark } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 export default function AppLayout() {
   const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
@@ -23,6 +25,7 @@ export default function AppLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const [isValidating, setIsValidating] = useState(true);
+  const topInset = useSafeAreaInsets().top;
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -114,10 +117,13 @@ export default function AppLayout() {
         animation: 'ios_from_right',
         headerStyle: { backgroundColor: headerBg },
         headerTintColor: headerText,
-        // Clave: con false, el header nativo NO suma el inset de la barra de estado
-        // como padding (topInsetEnabled=false). Con edge-to-edge forzado en RN 0.88,
-        // dejarlo en true (o undefined con topInset!=0) duplica el alto del header.
-        statusBarTranslucent: false,
+        // Android: si la ventana ya desplaza el contenido bajo la barra de estado
+        // (insets.top === 0), el header nativo NO debe sumar su propio padding de
+        // inset o queda un doble espacio. Con edge-to-edge real (insets.top > 0),
+        // el header sí debe cubrir la franja de la barra de estado.
+        unstable_nativeProps: {
+          headerConfig: { disableTopInsetApplication: topInset === 0 },
+        },
 
         headerRight: () => (
           <View className="flex-row items-center justify-center gap-2">

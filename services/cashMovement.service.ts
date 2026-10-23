@@ -7,7 +7,15 @@ function normalizeMovement(raw: Record<string, unknown>): CashMovement {
     control_id: Number(raw.control_id || raw.control_caja_id),
     control_caja_id: raw.control_caja_id != null ? Number(raw.control_caja_id) : undefined,
     tipo: (raw.tipo as 'ingreso' | 'egreso') || 'ingreso',
-    monto: parseFloat(String(raw.monto || 0)),
+    monto: parseFloat(String(raw.monto || 0).replace(',', '.')),
+    monto_usd: raw.monto_usd != null ? parseFloat(String(raw.monto_usd).replace(',', '.')) : undefined,
+    moneda: raw.moneda === 'USD' ? 'USD' : 'VES',
+    medio_pago: ['efectivo', 'digital', 'otros'].includes(String(raw.medio_pago))
+      ? (raw.medio_pago as CashMovement['medio_pago'])
+      : undefined,
+    caja_id: raw.caja_id != null ? Number(raw.caja_id) : undefined,
+    metodo_pago_id: raw.metodo_pago_id != null ? Number(raw.metodo_pago_id) : undefined,
+    referencia: raw.referencia as string | undefined,
     descripcion: (raw.descripcion as string) || '',
     created_at: (raw.created_at as string) || (raw.fecha as string) || '',
     fecha: (raw.fecha as string) || (raw.created_at as string) || undefined,

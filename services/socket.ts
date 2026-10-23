@@ -31,7 +31,7 @@ export const connectSocket = (token: string) => {
     console.info('Socket.IO error de conexión:', err.message);
   });
 
-  socket.on('tasa-dolar:updated', async (data: { tasa: number; cambio?: number }) => {
+  socket.on('tasa-dolar:updated', async (data: { tasa: number | string; cambio?: number | string }) => {
     console.info('Socket.IO: tasa actualizada', data);
     const { useExchangeRateStore } = await import('@/store/exchangeRate');
     useExchangeRateStore.getState().setTasa(data.tasa, data.cambio);

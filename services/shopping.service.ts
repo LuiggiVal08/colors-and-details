@@ -11,7 +11,13 @@ export interface SalePaymentPayload {
   metodo_pago_id: string;
   monto: string;
   tasa_id: string;
+  moneda: 'USD' | 'VES';
+  monto_recibido: string;
   referencia_pago?: string;
+  monto_usd?: string;
+  medio_pago?: 'efectivo' | 'digital' | 'otros';
+  vuelto_usd?: string;
+  vuelto_bs?: string;
 }
 
 export interface SalePayload {
@@ -36,6 +42,9 @@ export interface SalePaymentResponse {
   metodo_pago_id: number;
   metodo_pago_nombre?: string;
   monto: number;
+  moneda?: 'USD' | 'VES';
+  monto_recibido?: number;
+  vuelto?: number;
   referencia_pago?: string | null;
   tasa_id?: number | null;
 }

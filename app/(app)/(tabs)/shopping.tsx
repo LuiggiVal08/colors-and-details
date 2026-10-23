@@ -17,6 +17,7 @@ import { useBoxRegisterStore } from '@/store/boxRegister';
 import { useAuthStore } from '@/store/auth';
 import type { CartItem, PaymentEntry } from '@/feature/shopping/types';
 import { impactLight, selection } from '@/helpers/haptics';
+import { toDecimalString } from '@/helpers/decimal';
 import Card from '@/components/Card';
 
 export default function ShoppingScreen() {
@@ -51,16 +52,15 @@ export default function ShoppingScreen() {
   const ivaMonto = ivaPorcentaje ? totalBs * (ivaPorcentaje / 100) : 0;
   const totalConIva = totalBs + ivaMonto;
 
-  const toStr = (n: number) => n.toFixed(2);
+  const toStr = (n: number) => toDecimalString(n.toFixed(2));
 
   const createSale = useMutation({
-    mutationFn: ({ payments, saleNotas }: { payments: PaymentEntry[]; saleNotas?: string }) =>
+    mutationFn: ({ payments }: { payments: PaymentEntry[] }) =>
       shoppingService.create({
         cliente_id: String(clienteId),
         usuario_id: String(user?.id ?? ''),
         total: toStr(totalUSD),
         iva_id: String(ivaId),
-        observaciones: saleNotas,
         detalles: items.map((i) => ({
           producto_id: String(i.producto_id),
           cantidad: String(i.cantidad),
@@ -69,7 +69,13 @@ export default function ShoppingScreen() {
         })),
         pagos: payments.map((p) => ({
           metodo_pago_id: String(p.metodo_pago_id),
-          monto: toStr(p.monto / (tasa || 1)),
+          monto: toStr(p.monto),
+          monto_recibido: toStr(p.montoRecibido ?? p.monto),
+          monto_usd: toStr(p.montoUsd ?? (p.moneda === 'USD' ? p.monto : p.monto / (tasa || 1))),
+          medio_pago: p.medioPago,
+          vuelto_usd: toStr(p.vueltoUsd ?? 0),
+          vuelto_bs: toStr(p.vueltoBs ?? 0),
+          moneda: p.moneda,
           referencia_pago: p.referencia === 'N/A' ? undefined : p.referencia,
           tasa_id: String(tasaId),
         })),
@@ -158,8 +164,10 @@ export default function ShoppingScreen() {
     paymentModalRef.current?.present();
   }, [items.length, activeBox, clienteId, tasa, tasaId, ivaId]);
 
+  const handlePaymentDismiss = useCallback(() => {}, []);
+
   const handleConfirmPayment = useCallback(
-    (payments: PaymentEntry[], notas: string) => {
+    (payments: PaymentEntry[]) => {
       const sinStock = items.find((i) => i.cantidad > i.stockDisponible);
       if (sinStock) {
         setSnackbar({
@@ -168,7 +176,7 @@ export default function ShoppingScreen() {
         });
         return;
       }
-      createSale.mutate({ payments, saleNotas: notas || undefined });
+      createSale.mutate({ payments });
     },
     [items, createSale]
   );
@@ -326,7 +334,7 @@ export default function ShoppingScreen() {
 
       <SelectProductModal
         ref={productModalRef}
-        onDismiss={() => {}}
+        onDismiss={handlePaymentDismiss}
         onSelect={handleAddItem}
         existingIds={items.map((i) => i.producto_id)}
       />
@@ -339,6 +347,7 @@ export default function ShoppingScreen() {
         totalBs={totalConIva}
         totalSinIva={totalBs}
         ivaMonto={ivaMonto}
+        tasa={tasa ?? 0}
         onConfirm={handleConfirmPayment}
         isProcessing={createSale.isPending}
       />

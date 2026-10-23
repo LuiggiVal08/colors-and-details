@@ -20,8 +20,11 @@ const exchangeRateService = {
     return data;
   },
 
-  create: async (tasa: number): Promise<ExchangeRate> => {
-    const { data } = await api.post<ExchangeRate>('/exchange-rate', { tasa });
+  create: async (tasa: string, usuarioId: number): Promise<ExchangeRate> => {
+    const { data } = await api.post<ExchangeRate>('/exchange-rate', {
+      usuario_id: String(usuarioId),
+      tasa: tasa.trim().replace('.', ','),
+    });
     return data;
   },
 };

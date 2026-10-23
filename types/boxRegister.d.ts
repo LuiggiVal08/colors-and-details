@@ -3,6 +3,7 @@ export interface BoxRegister {
   nombre: string;
   monto_inicial: number;
   monto?: number;
+  monto_usd?: number;
   descripcion?: string;
   ubicacion?: string;
   empresa_id?: number;
@@ -21,6 +22,7 @@ export interface ControlCaja {
   caja?: BoxRegister;
   usuario?: { id: number; username: string };
   monto_apertura: number;
+  monto_apertura_usd?: number;
   monto_cierre?: number;
   apertura: string;
   cierre?: string;
@@ -33,6 +35,12 @@ export interface CashMovement {
   control_caja_id?: number;
   tipo: 'ingreso' | 'egreso';
   monto: number;
+  monto_usd?: number;
+  moneda?: 'VES' | 'USD';
+  medio_pago?: 'efectivo' | 'digital' | 'otros';
+  caja_id?: number;
+  metodo_pago_id?: number;
+  referencia?: string;
   descripcion: string;
   created_at: string;
   fecha?: string;
@@ -42,8 +50,14 @@ export interface CashMovement {
 
 export interface CreateCashMovementDTO {
   caja_id: string;
+  control_caja_id?: string;
   tipo: 'ingreso' | 'egreso';
   monto: string;
+  monto_usd?: string;
+  moneda?: 'VES' | 'USD';
+  medio_pago?: 'efectivo' | 'digital' | 'otros';
+  metodo_pago_id?: string;
+  referencia?: string;
   descripcion: string;
 }
 
@@ -51,4 +65,7 @@ export interface ControlSummary {
   total_ingresos: number;
   total_egresos: number;
   saldo_esperado: number;
+  total_ingresos_usd?: number;
+  total_egresos_usd?: number;
+  saldo_esperado_usd?: number;
 }

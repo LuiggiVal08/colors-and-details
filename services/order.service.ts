@@ -79,6 +79,16 @@ function normalizePayment(rawParam: Record<string, unknown>): OrderPayment {
     monto: Number(raw.monto),
     fecha: raw.fecha as string,
     referencia_pago: raw.referencia_pago as string | undefined,
+    moneda: raw.moneda === 'USD' ? 'USD' : raw.moneda === 'VES' ? 'VES' : undefined,
+    monto_recibido: raw.monto_recibido !== undefined ? Number(raw.monto_recibido) : undefined,
+    monto_usd: raw.monto_usd !== undefined ? Number(raw.monto_usd) : undefined,
+    vuelto: raw.vuelto !== undefined ? Number(raw.vuelto) : undefined,
+    vuelto_usd: raw.vuelto_usd !== undefined ? Number(raw.vuelto_usd) : undefined,
+    vuelto_bs: raw.vuelto_bs !== undefined ? Number(raw.vuelto_bs) : undefined,
+    medio_pago: ['efectivo', 'digital', 'otros'].includes(String(raw.medio_pago))
+      ? (raw.medio_pago as OrderPayment['medio_pago'])
+      : undefined,
+    tasa_id: raw.tasa_id ? Number(raw.tasa_id) : undefined,
     usuario_id: raw.usuario_id ? Number(raw.usuario_id) : undefined,
   };
 }

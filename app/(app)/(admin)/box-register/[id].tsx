@@ -15,6 +15,7 @@ import { useBoxRegisterStore } from '@/store/boxRegister';
 
 import EditBoxModal, { type EditBoxModalRef } from '@/components/EditBoxModal';
 import { impactLight, selection } from '@/helpers/haptics';
+import { parseDecimal } from '@/helpers/decimal';
 
 export default function BoxControlScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -74,7 +75,7 @@ export default function BoxControlScreen() {
   });
 
   const closeMutation = useMutation({
-    mutationFn: () => boxRegisterService.cierre(id!, parseFloat(cierreMonto) || 0),
+    mutationFn: () => boxRegisterService.cierre(id!, parseDecimal(cierreMonto)),
     onSuccess: async () => {
       impactLight();
       setShowCloseModal(false);
@@ -92,8 +93,11 @@ export default function BoxControlScreen() {
     mutationFn: () =>
       cashMovementService.create({
         caja_id: id!,
+        control_caja_id: activeControl?.id ? String(activeControl.id) : undefined,
         tipo: movTipo,
         monto: movMonto,
+        moneda: 'VES',
+        medio_pago: 'otros',
         descripcion: movDesc,
       }),
     onSuccess: async () => {
@@ -139,18 +143,41 @@ export default function BoxControlScreen() {
 
   const totalIngresos = useMemo(() => {
     if (!movimientos) return 0;
-    return movimientos.filter((m) => m.tipo === 'ingreso').reduce((sum, m) => sum + m.monto, 0);
+    return movimientos
+      .filter((m) => m.tipo === 'ingreso' && (m.moneda ?? 'VES') === 'VES')
+      .reduce((sum, m) => sum + m.monto, 0);
   }, [movimientos]);
 
   const totalEgresos = useMemo(() => {
     if (!movimientos) return 0;
-    return movimientos.filter((m) => m.tipo === 'egreso').reduce((sum, m) => sum + m.monto, 0);
+    return movimientos
+      .filter((m) => m.tipo === 'egreso' && (m.moneda ?? 'VES') === 'VES')
+      .reduce((sum, m) => sum + m.monto, 0);
   }, [movimientos]);
+
+  const totalIngresosUsd = useMemo(
+    () =>
+      movimientos
+        ?.filter((m) => m.tipo === 'ingreso' && m.moneda === 'USD')
+        .reduce((sum, m) => sum + (m.monto_usd ?? m.monto), 0) ?? 0,
+    [movimientos]
+  );
+  const totalEgresosUsd = useMemo(
+    () =>
+      movimientos
+        ?.filter((m) => m.tipo === 'egreso' && m.moneda === 'USD')
+        .reduce((sum, m) => sum + (m.monto_usd ?? m.monto), 0) ?? 0,
+    [movimientos]
+  );
 
   const saldoEsperado = useMemo(() => {
     const apertura = activeControl?.monto_apertura ?? 0;
     return apertura + totalIngresos - totalEgresos;
   }, [activeControl?.monto_apertura, totalIngresos, totalEgresos]);
+  const saldoEsperadoUsd = useMemo(
+    () => (activeControl?.monto_apertura_usd ?? 0) + totalIngresosUsd - totalEgresosUsd,
+    [activeControl?.monto_apertura_usd, totalIngresosUsd, totalEgresosUsd]
+  );
 
   const ubicacion = box?.ubicacion || box?.descripcion || '—';
 
@@ -289,6 +316,7 @@ export default function BoxControlScreen() {
                         <Text className="text-xs font-medium uppercase tracking-wide text-info">Saldo Actual</Text>
                       </View>
                       <Text className="text-2xl font-bold text-info">Bs. {fmt(saldoEsperado)}</Text>
+                      <Text className="text-lg font-semibold text-info">$ {fmt(saldoEsperadoUsd)}</Text>
                       {(totalIngresos > 0 || totalEgresos > 0) && (
                         <View className="mt-2 flex-row justify-between">
                           <Text className="text-xs text-slate-500 dark:text-slate-400">
@@ -325,12 +353,18 @@ export default function BoxControlScreen() {
                   {activeControl && (
                     <>
                       <View className="my-2 border-t border-slate-100 dark:border-slate-700" />
-                      <InfoRow label="Monto Apertura" value={`Bs. ${fmt(activeControl.monto_apertura)}`} />
-                      <InfoRow label="Total Ingresos" value={`Bs. ${fmt(totalIngresos)}`} />
-                      <InfoRow label="Total Egresos" value={`Bs. ${fmt(totalEgresos)}`} />
+                      <InfoRow
+                        label="Monto Apertura"
+                        value={`Bs. ${fmt(activeControl.monto_apertura)} · $ ${fmt(activeControl.monto_apertura_usd ?? 0)}`}
+                      />
+                      <InfoRow
+                        label="Total Ingresos"
+                        value={`Bs. ${fmt(totalIngresos)} · $ ${fmt(totalIngresosUsd)}`}
+                      />
+                      <InfoRow label="Total Egresos" value={`Bs. ${fmt(totalEgresos)} · $ ${fmt(totalEgresosUsd)}`} />
                       <InfoRow
                         label="Saldo Esperado"
-                        value={`Bs. ${fmt(saldoEsperado)}`}
+                        value={`Bs. ${fmt(saldoEsperado)} · $ ${fmt(saldoEsperadoUsd)}`}
                         valueClass="text-info font-bold"
                       />
                       {activeControl.monto_cierre != null && (
@@ -511,7 +545,7 @@ export default function BoxControlScreen() {
                       value={cierreMonto}
                       onChangeText={setCierreMonto}
                       placeholder="Monto de cierre"
-                      keyboardType="decimal-pad"
+                      keyboardType="numbers-and-punctuation"
                       className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 dark:border-slate-600 dark:bg-primary-dark dark:text-white"
                     />
                   </View>
@@ -526,7 +560,7 @@ export default function BoxControlScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => {
-                        const monto = parseFloat(cierreMonto) || 0;
+                        const monto = parseDecimal(cierreMonto);
                         if (Math.abs(monto - saldoEsperado) > 0.01) {
                           Alert.alert(
                             'Monto no cuadra',
@@ -608,7 +642,7 @@ export default function BoxControlScreen() {
                       value={movMonto}
                       onChangeText={setMovMonto}
                       placeholder="Monto"
-                      keyboardType="decimal-pad"
+                      keyboardType="numbers-and-punctuation"
                       className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 dark:border-slate-600 dark:bg-primary-dark dark:text-white"
                     />
                   </View>
@@ -634,7 +668,7 @@ export default function BoxControlScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => {
-                        const monto = parseFloat(movMonto) || 0;
+                        const monto = parseDecimal(movMonto);
                         if (movTipo === 'egreso' && monto > saldoEsperado) {
                           Alert.alert(
                             'Saldo insuficiente',

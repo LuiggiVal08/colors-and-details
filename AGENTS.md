@@ -44,5 +44,7 @@
 - `GestureHandlerRootView` + `BottomSheetModalProvider` at root `_layout.tsx`
 - `BottomSheetModalProvider` removed from `PaymentModal.tsx`
 - `@gorhom/bottom-sheet` v5.2.14, `react-native-gesture-handler` ~2.28.0
+- Para pantallas con listas desplazables, no envolver `ScreenLayout` ni sus listas en `GestureDetector` para cerrar el teclado, porque el gesto puede capturar el arrastre e impedir el scroll.
+- Los campos decimales conservan la entrada del usuario y aceptan coma o punto; usa `helpers/decimal.ts` para validar con `parseDecimal` y enviar textos decimales con coma mediante `toDecimalString`.
 - NativeWind v4.2.3 / `react-native-css-interop` v0.2.3: `BottomSheet` (non-modal) crashes with `Cannot read property 'displayName' of undefined` due to `maybeHijackSafeAreaProvider` — only `BottomSheetModal` works
 - Box register screens at `(app)/(admin)/box-register/` (admin/superadmin via admin layout guard)

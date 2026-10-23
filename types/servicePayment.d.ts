@@ -9,8 +9,8 @@ export interface ServicePayment {
 }
 
 export interface CreateServicePaymentDTO {
-  service_period_id: number;
-  amount: number;
+  periodo_id: number;
+  monto: number;
   descripcion?: string;
   metodo_pago_id?: number;
 }

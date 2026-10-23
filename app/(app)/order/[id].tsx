@@ -486,6 +486,8 @@ export default function OrderDetailScreen() {
                     metodo_pago_id: String(showPaymentDetail.metodo_pago_id),
                     fecha: showPaymentDetail.fecha,
                     monto: Number(showPaymentDetail.monto).toFixed(2),
+                    moneda: showPaymentDetail.moneda ?? 'USD',
+                    monto_recibido: Number(showPaymentDetail.monto_recibido ?? showPaymentDetail.monto).toFixed(2),
                     referencia_pago: refEdit.trim() || undefined,
                   },
                 })

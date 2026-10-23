@@ -2,11 +2,13 @@ import { Stack, Redirect } from 'expo-router';
 import { useColorScheme } from 'react-native';
 import { useAuthStore } from '@/store/auth';
 import { themeDark } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AdminLayout() {
   const user = useAuthStore((state) => state.user);
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
   const colorScheme = useColorScheme();
+  const topInset = useSafeAreaInsets().top;
 
   if (!isAdmin) {
     return <Redirect href="/(tabs)" />;
@@ -22,9 +24,9 @@ export default function AdminLayout() {
         animation: 'ios_from_right',
         headerStyle: { backgroundColor: headerBg },
         headerTintColor: headerText,
-        // statusBarTranslucent:false => header nativo con topInsetEnabled=false
-        // (alto normal). Con true, edge-to-edge duplica el alto del header.
-        statusBarTranslucent: false,
+        unstable_nativeProps: {
+          headerConfig: { disableTopInsetApplication: topInset === 0 },
+        },
       }}
     />
   );

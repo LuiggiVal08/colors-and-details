@@ -34,7 +34,12 @@ export const useAuthStore = create<AuthState>()(
       setHasHydrated: (state) => set({ _hasHydrated: state }),
       login: (user) => set({ user }),
       logout: async () => {
-        set({ user: null });
+        let hadUser = false;
+        set((state) => {
+          hadUser = state.user !== null;
+          return state.user === null ? state : { user: null };
+        });
+        if (!hadUser) return;
         const { disconnectSocket } = await import('@/services/socket');
         disconnectSocket();
       },

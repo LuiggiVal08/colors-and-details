@@ -7,6 +7,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import servicePeriodService from '@/services/servicePeriod.service';
+import { parseDecimal } from '@/helpers/decimal';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import Card from '@/components/Card';
 import { Snackbar, TextInput } from 'react-native-paper';
@@ -51,7 +52,7 @@ export default function ServicePeriodCreate() {
   });
 
   const onSubmit = (form: PeriodForm) => {
-    const amount = parseFloat(form.monto);
+    const amount = parseDecimal(form.monto);
     const anio = parseInt(year, 10);
     if (isNaN(amount) || amount <= 0) {
       setSnackbar({ visible: true, message: 'Ingrese un monto valido' });
@@ -122,7 +123,7 @@ export default function ServicePeriodCreate() {
                   label="Monto ($)"
                   value={value}
                   onChangeText={onChange}
-                  keyboardType="decimal-pad"
+                  keyboardType="numbers-and-punctuation"
                   mode="outlined"
                   className="mb-4 bg-white"
                   placeholder="0.00"

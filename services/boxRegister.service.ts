@@ -13,8 +13,9 @@ function normalizeControl(raw: Record<string, unknown>): ControlCaja {
       ? ({
           id: Number(caja.id),
           nombre: (caja.nombre as string) || '',
-          monto_inicial: parseFloat(String(caja.monto_inicial || 0)),
-          monto: caja.monto != null ? parseFloat(String(caja.monto)) : undefined,
+          monto_inicial: parseFloat(String(caja.monto_inicial || 0).replace(',', '.')),
+          monto: caja.monto != null ? parseFloat(String(caja.monto).replace(',', '.')) : undefined,
+          monto_usd: caja.monto_usd != null ? parseFloat(String(caja.monto_usd).replace(',', '.')) : undefined,
           descripcion: caja.descripcion as string | undefined,
           ubicacion: caja.ubicacion as string | undefined,
           empresa_id: caja.empresa_id != null ? Number(caja.empresa_id) : undefined,
@@ -24,8 +25,10 @@ function normalizeControl(raw: Record<string, unknown>): ControlCaja {
         } as BoxRegister)
       : undefined,
     usuario: raw.usuario ? (raw.usuario as { id: number; username: string }) : undefined,
-    monto_apertura: parseFloat(String(raw.monto_apertura || 0)),
-    monto_cierre: raw.monto_cierre != null ? parseFloat(String(raw.monto_cierre)) : undefined,
+    monto_apertura: parseFloat(String(raw.monto_apertura || 0).replace(',', '.')),
+    monto_apertura_usd:
+      raw.monto_apertura_usd != null ? parseFloat(String(raw.monto_apertura_usd).replace(',', '.')) : undefined,
+    monto_cierre: raw.monto_cierre != null ? parseFloat(String(raw.monto_cierre).replace(',', '.')) : undefined,
     apertura: (raw.apertura as string) || (raw.fecha_apertura as string) || '',
     cierre: (raw.cierre as string) || (raw.fecha_cierre as string) || undefined,
     activo: (raw.estado as string) === 'abierto',
@@ -37,8 +40,9 @@ function normalizeBox(raw: Record<string, unknown>): BoxRegister {
   return {
     id: Number(raw.id),
     nombre: (raw.nombre as string) || '',
-    monto_inicial: parseFloat(String(raw.monto_inicial || 0)),
-    monto: raw.monto != null ? parseFloat(String(raw.monto)) : undefined,
+    monto_inicial: parseFloat(String(raw.monto_inicial || 0).replace(',', '.')),
+    monto: raw.monto != null ? parseFloat(String(raw.monto).replace(',', '.')) : undefined,
+    monto_usd: raw.monto_usd != null ? parseFloat(String(raw.monto_usd).replace(',', '.')) : undefined,
     descripcion: raw.descripcion as string | undefined,
     ubicacion: raw.ubicacion as string | undefined,
     empresa_id: raw.empresa_id != null ? Number(raw.empresa_id) : undefined,
@@ -100,6 +104,9 @@ const boxRegisterService = {
       total_ingresos: parseFloat(String((data as Record<string, unknown>).total_ingresos || 0)),
       total_egresos: parseFloat(String((data as Record<string, unknown>).total_egresos || 0)),
       saldo_esperado: parseFloat(String((data as Record<string, unknown>).saldo_esperado || 0)),
+      total_ingresos_usd: parseFloat(String((data as Record<string, unknown>).total_ingresos_usd || 0)),
+      total_egresos_usd: parseFloat(String((data as Record<string, unknown>).total_egresos_usd || 0)),
+      saldo_esperado_usd: parseFloat(String((data as Record<string, unknown>).saldo_esperado_usd || 0)),
     };
   },
 

@@ -41,6 +41,14 @@ export interface OrderPayment {
   metodo_pago_id: number;
   metodo_pago_nombre: string;
   monto: number;
+  moneda?: 'USD' | 'VES';
+  monto_recibido?: number;
+  monto_usd?: number;
+  vuelto?: number;
+  vuelto_usd?: number;
+  vuelto_bs?: number;
+  medio_pago?: 'efectivo' | 'digital' | 'otros';
+  tasa_id?: number;
   fecha: string;
   referencia_pago?: string;
   usuario_id?: number;
@@ -70,6 +78,12 @@ export interface CreateOrderPaymentDTO {
   metodo_pago_id: string;
   fecha: string;
   monto: string;
+  moneda: 'USD' | 'VES';
+  monto_recibido?: string;
+  monto_usd?: string;
+  vuelto_usd?: string;
+  vuelto_bs?: string;
+  medio_pago?: 'efectivo' | 'digital' | 'otros';
   referencia_pago?: string;
 }
 

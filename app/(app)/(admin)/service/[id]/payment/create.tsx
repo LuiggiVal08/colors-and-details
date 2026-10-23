@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import servicePeriodService from '@/services/servicePeriod.service';
 import servicePaymentService from '@/services/servicePayment.service';
+import { parseDecimal } from '@/helpers/decimal';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import Card from '@/components/Card';
 import { ControlledInput } from '@/components/ControlledInput';
@@ -48,7 +49,7 @@ export default function ServicePaymentCreate() {
   const periods = Array.isArray(periodsRaw) ? periodsRaw : [];
 
   const createMutation = useMutation({
-    mutationFn: (data: { service_period_id: number; amount: number; descripcion?: string }) =>
+    mutationFn: (data: { periodo_id: number; monto: number; descripcion?: string }) =>
       servicePaymentService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['service-periods'] });
@@ -67,7 +68,7 @@ export default function ServicePaymentCreate() {
       setSnackbar({ visible: true, message: 'Seleccione un período' });
       return;
     }
-    const amount = parseFloat(form.monto);
+    const amount = parseDecimal(form.monto);
     if (isNaN(amount) || amount <= 0) {
       setSnackbar({ visible: true, message: 'Ingrese un monto válido' });
       return;
@@ -84,8 +85,8 @@ export default function ServicePaymentCreate() {
             text: 'Continuar',
             onPress: () =>
               createMutation.mutate({
-                service_period_id: selectedPeriodId,
-                amount,
+                periodo_id: selectedPeriodId,
+                monto: amount,
                 descripcion: form.descripcion || undefined,
               }),
           },
@@ -95,8 +96,8 @@ export default function ServicePaymentCreate() {
     }
 
     createMutation.mutate({
-      service_period_id: selectedPeriodId,
-      amount,
+      periodo_id: selectedPeriodId,
+      monto: amount,
       descripcion: form.descripcion || undefined,
     });
   };
@@ -149,7 +150,7 @@ export default function ServicePaymentCreate() {
               name="monto"
               label="Monto"
               placeholder="0.00"
-              keyboardType="decimal-pad"
+              keyboardType="numbers-and-punctuation"
               error={errors.monto?.message}
             />
             <Controller

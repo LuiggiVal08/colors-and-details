@@ -19,12 +19,13 @@ import type { CartItem } from '@/feature/shopping/types';
 import Card from '@/components/Card';
 import DatePickerInput from '@/components/DatePickerInput';
 import { impactLight, selection } from '@/helpers/haptics';
+import { toDecimalString } from '@/helpers/decimal';
 
 function fmtLocale(n: number): string {
   return n.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-const toStr = (n: number) => n.toFixed(2);
+const toStr = (n: number) => toDecimalString(n.toFixed(2));
 
 const toISODate = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;

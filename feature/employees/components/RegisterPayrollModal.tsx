@@ -142,7 +142,7 @@ export const RegisterPayrollModal = ({ empleadoId, onClose, debt }: Props) => {
               label="Monto (Bs.)"
               control={control}
               error={errors.monto?.message}
-              keyboardType="numeric"
+              keyboardType="numbers-and-punctuation"
               placeholder="0,00"
               onChangeText={handleMontoChange}
             />
@@ -151,7 +151,7 @@ export const RegisterPayrollModal = ({ empleadoId, onClose, debt }: Props) => {
               label="Bono (Bs.)"
               control={control}
               error={errors.bono?.message}
-              keyboardType="numeric"
+              keyboardType="numbers-and-punctuation"
               placeholder="0,00"
             />
             <ControlledInput
@@ -159,7 +159,7 @@ export const RegisterPayrollModal = ({ empleadoId, onClose, debt }: Props) => {
               label="Deducción (Bs.)"
               control={control}
               error={errors.deduccion?.message}
-              keyboardType="numeric"
+              keyboardType="numbers-and-punctuation"
               placeholder="0,00"
             />
             {neto > 0 && (
@@ -177,7 +177,7 @@ export const RegisterPayrollModal = ({ empleadoId, onClose, debt }: Props) => {
               label="Monto USD (opcional)"
               control={control}
               error={errors.monto_usd?.message}
-              keyboardType="numeric"
+              keyboardType="numbers-and-punctuation"
               placeholder="Calculado automáticamente"
             />
           </View>

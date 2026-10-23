@@ -9,9 +9,13 @@ import ScreenLayout from '@/components/layout/ScreenLayout';
 import Card from '@/components/Card';
 import { Ionicons } from '@expo/vector-icons';
 import { Snackbar, TextInput } from 'react-native-paper';
+import { apiErrorMessage } from '@/helpers/apiErrorMessage';
+import type { AxiosError } from 'axios';
+import { useAuthStore } from '@/store/auth';
 
 export default function TasaScreen() {
   const queryClient = useQueryClient();
+  const user = useAuthStore((s) => s.user);
   const storeTasa = useExchangeRateStore((s) => s.tasa);
   const [showForm, setShowForm] = useState(false);
   const [nuevaTasa, setNuevaTasa] = useState('');
@@ -28,7 +32,12 @@ export default function TasaScreen() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (tasa: number) => exchangeRateService.create(tasa),
+    mutationFn: (tasa: string) => {
+      if (!user?.id) {
+        throw new Error('No se pudo identificar al usuario actual');
+      }
+      return exchangeRateService.create(tasa, user.id);
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['exchange-rate'] });
       useExchangeRateStore.getState().setTasa(data.tasa, data.cambio);
@@ -36,18 +45,28 @@ export default function TasaScreen() {
       setNuevaTasa('');
       setSnackbar({ visible: true, message: 'Tasa actualizada correctamente' });
     },
-    onError: () => {
-      setSnackbar({ visible: true, message: 'Error al actualizar tasa' });
+    onError: (error) => {
+      const message = apiErrorMessage(error, 'Error al actualizar tasa');
+      const axiosError = error as AxiosError;
+      console.error('No se pudo actualizar la tasa de cambio', {
+        message,
+        status: axiosError.response?.status,
+        response: JSON.stringify(axiosError.response?.data),
+        url: axiosError.config?.url,
+        payload: JSON.stringify(axiosError.config?.data),
+      });
+      setSnackbar({ visible: true, message });
     },
   });
 
   const handleSubmit = () => {
-    const val = parseFloat(nuevaTasa);
+    const normalized = nuevaTasa.trim().replace(',', '.');
+    const val = parseFloat(normalized);
     if (isNaN(val) || val <= 0) {
       setSnackbar({ visible: true, message: 'Ingrese una tasa válida (> 0)' });
       return;
     }
-    createMutation.mutate(val);
+    createMutation.mutate(nuevaTasa.trim());
   };
 
   const displayTasa = current?.tasa ?? storeTasa;
@@ -121,7 +140,7 @@ export default function TasaScreen() {
                 label="Tasa (Bs. por 1 USD)"
                 value={nuevaTasa}
                 onChangeText={setNuevaTasa}
-                keyboardType="decimal-pad"
+                keyboardType="numbers-and-punctuation"
                 mode="outlined"
                 className="mb-4 bg-white"
                 placeholder="Ej: 50.25"

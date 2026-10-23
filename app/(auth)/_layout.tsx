@@ -1,9 +1,11 @@
 import { Stack } from 'expo-router';
 import { useColorScheme } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AuthLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const topInset = useSafeAreaInsets().top;
 
   return (
     <Stack
@@ -11,9 +13,9 @@ export default function AuthLayout() {
         headerShown: false,
         headerStyle: { backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF' },
         headerTintColor: isDark ? '#FFFFFF' : '#000000',
-        // statusBarTranslucent:false => header nativo con topInsetEnabled=false
-        // (alto normal). Con true, edge-to-edge duplica el alto del header.
-        statusBarTranslucent: false,
+        unstable_nativeProps: {
+          headerConfig: { disableTopInsetApplication: topInset === 0 },
+        },
       }}>
       <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="help" options={{ headerShown: true, title: 'Ayuda', animation: 'ios_from_right' }} />

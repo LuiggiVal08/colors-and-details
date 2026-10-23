@@ -48,8 +48,11 @@ api.interceptors.response.use(
   (error) => {
     // Si el backend dice que no estamos autorizados (token vencido)
     if (error.response?.status === 401) {
-      disconnectSocket();
-      useAuthStore.getState().logout();
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser) {
+        disconnectSocket();
+        void useAuthStore.getState().logout();
+      }
     }
 
     return Promise.reject(error);

@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import exchangeRateService from '@/services/exchangeRate.service';
 
+const toNumber = (value: number | string | undefined) => {
+  if (value === undefined) return undefined;
+  return Number(String(value).replace(',', '.'));
+};
+
 interface ExchangeRateState {
   tasaId: number | null;
   tasa: number | null;
@@ -9,7 +14,7 @@ interface ExchangeRateState {
   loading: boolean;
   error: string | null;
   load: () => Promise<void>;
-  setTasa: (tasa: number, cambio?: number) => void;
+  setTasa: (tasa: number | string, cambio?: number | string) => void;
 }
 
 export const useExchangeRateStore = create<ExchangeRateState>((set) => ({
@@ -24,13 +29,23 @@ export const useExchangeRateStore = create<ExchangeRateState>((set) => ({
     set({ loading: true, error: null });
     try {
       const data = await exchangeRateService.getActual();
-      set({ tasaId: data.id, tasa: data.tasa, cambio: data.cambio, fecha: data.fecha, loading: false });
+      set({
+        tasaId: data.id,
+        tasa: toNumber(data.tasa) ?? null,
+        cambio: toNumber(data.cambio),
+        fecha: data.fecha,
+        loading: false,
+      });
     } catch {
       set({ loading: false, error: 'No se pudo obtener la tasa' });
     }
   },
 
-  setTasa: (tasa: number, cambio?: number) => {
-    set({ tasa, cambio, fecha: new Date().toISOString() });
+  setTasa: (tasa: number | string, cambio?: number | string) => {
+    set({
+      tasa: toNumber(tasa) ?? null,
+      cambio: toNumber(cambio),
+      fecha: new Date().toISOString(),
+    });
   },
 }));
