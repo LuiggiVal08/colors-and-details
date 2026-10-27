@@ -1,6 +1,6 @@
 import { Controller, Control, FieldValues, Path } from 'react-hook-form';
 import { View } from 'react-native';
-import { HelperText, TextInput, TextInputProps } from 'react-native-paper';
+import { HelperText, TextInput, TextInputProps, useTheme } from 'react-native-paper';
 
 interface ControlledInputProps<T extends FieldValues> extends Omit<TextInputProps, 'error'> {
   name: Path<T>;
@@ -22,11 +22,15 @@ export const ControlledInput = <T extends FieldValues>({
   outlineStyle,
   ...props
 }: ControlledInputProps<T>) => {
+  const { colors, dark } = useTheme();
+  const readOnlyBackgroundColor = dark ? '#334155' : '#f8fafc';
+  const inputBackgroundColor = dark ? colors.surface : '#ffffff';
+
   const inputOutlineStyle = [
     {
       borderRadius: 12,
-      backgroundColor: readOnly ? '#f8fafc' : '#ffffff',
-      borderColor: readOnly ? '#cbd5e1' : undefined,
+      backgroundColor: readOnly ? readOnlyBackgroundColor : inputBackgroundColor,
+      borderColor: readOnly ? (dark ? '#64748b' : '#cbd5e1') : undefined,
     },
     outlineStyle,
   ];
@@ -47,8 +51,10 @@ export const ControlledInput = <T extends FieldValues>({
             onChangeText={(text) => onChange(onChangeText ? onChangeText(text) : text)}
             error={!!error}
             editable={!readOnly}
+            textColor={colors.onSurface}
+            placeholderTextColor={colors.onSurfaceVariant}
             outlineStyle={inputOutlineStyle}
-            style={[style, readOnly ? { backgroundColor: '#f8fafc' } : undefined]}
+            style={[{ backgroundColor: readOnly ? readOnlyBackgroundColor : inputBackgroundColor }, style]}
             {...props}
           />
         )}

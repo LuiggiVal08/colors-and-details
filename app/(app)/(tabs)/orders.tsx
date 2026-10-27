@@ -87,7 +87,7 @@ export default function OrdersScreen() {
                 onChangeText={setSearch}
                 placeholder="Buscar por ID o cliente..."
                 placeholderTextColor="#94A3B8"
-                className="flex-1 text-sm text-slate-900"
+                className="flex-1 text-sm text-slate-900 dark:text-white"
               />
               {search.length > 0 && (
                 <TouchableOpacity onPress={() => setSearch('')}>

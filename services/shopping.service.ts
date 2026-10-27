@@ -65,15 +65,37 @@ export interface SaleCreateResponse {
   message: string;
 }
 
+function normalizeSale(raw: Record<string, unknown>): Sale {
+  const cliente = raw.cliente as Record<string, unknown> | undefined;
+  const nombreRelacionado = [cliente?.nombre, cliente?.apellido]
+    .filter((name): name is string => typeof name === 'string' && name.trim().length > 0)
+    .join(' ');
+  const nombre =
+    typeof raw.cliente_nombre === 'string' && raw.cliente_nombre.trim().length > 0
+      ? raw.cliente_nombre
+      : nombreRelacionado;
+
+  return {
+    id: Number(raw.id),
+    cliente_id: raw.cliente_id !== undefined && raw.cliente_id !== null ? Number(raw.cliente_id) : undefined,
+    cliente_nombre: nombre.trim() || undefined,
+    total: Number(raw.total),
+    fecha: String(raw.fecha ?? ''),
+    observaciones: typeof raw.observaciones === 'string' ? raw.observaciones : undefined,
+    detalles: Array.isArray(raw.detalles) ? (raw.detalles as SaleDetailResponse[]) : undefined,
+    pagos: Array.isArray(raw.pagos) ? (raw.pagos as SalePaymentResponse[]) : undefined,
+  };
+}
+
 const shoppingService = {
   getAll: async (page: number = 1, limit: number = 20): Promise<Sale[]> => {
-    const { data } = await api.get<Sale[]>('/shopping', { params: { page, limit } });
-    return data;
+    const { data } = await api.get<Record<string, unknown>[]>('/shopping', { params: { page, limit } });
+    return data.map(normalizeSale);
   },
 
   getById: async (id: number): Promise<Sale> => {
-    const { data } = await api.get<Sale>(`/shopping/${id}`);
-    return data;
+    const { data } = await api.get<Record<string, unknown>>(`/shopping/${id}`);
+    return normalizeSale(data);
   },
 
   create: async (payload: SalePayload): Promise<SaleCreateResponse> => {

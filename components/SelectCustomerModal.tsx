@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useImperativeHandle, forwardRef } from 'react';
+import { useState, useMemo, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
 import {
   BottomSheetModal,
@@ -27,27 +27,11 @@ export interface SelectCustomerModalRef {
 const SelectCustomerModal = forwardRef<SelectCustomerModalRef, SelectCustomerModalProps>(
   ({ onDismiss, onSelect }, ref) => {
     const colorScheme = useColorScheme();
+    const [searchText, setSearchText] = useState('');
     const [search, setSearch] = useState('');
 
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ['50%', '95%'], []);
-
-    useImperativeHandle(ref, () => ({
-      present: () => {
-        setSearch('');
-        bottomSheetRef.current?.present();
-      },
-      dismiss: () => {
-        bottomSheetRef.current?.dismiss();
-      },
-    }));
-
-    const { data: clients, isLoading } = useQuery({
-      queryKey: ['customers', 'search', search],
-      queryFn: () => clientService.search(search, 1, 30),
-      enabled: search.length > 0,
-    });
-
     const debouncedSearch = useMemo(
       () =>
         debounce((value: string) => {
@@ -55,6 +39,38 @@ const SelectCustomerModal = forwardRef<SelectCustomerModalRef, SelectCustomerMod
         }, 400),
       []
     );
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        present: () => {
+          debouncedSearch.cancel();
+          setSearchText('');
+          setSearch('');
+          bottomSheetRef.current?.present();
+        },
+        dismiss: () => {
+          debouncedSearch.cancel();
+          bottomSheetRef.current?.dismiss();
+        },
+      }),
+      [debouncedSearch]
+    );
+
+    const { data: clients, isLoading } = useQuery({
+      queryKey: ['customers', 'search', search],
+      queryFn: () => clientService.search(search, 1, 30),
+      enabled: search.length > 0,
+    });
+
+    useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
+
+    const handleDismiss = () => {
+      debouncedSearch.cancel();
+      setSearchText('');
+      setSearch('');
+      onDismiss();
+    };
 
     const results = useMemo(() => {
       if (search.length === 0) return [];
@@ -82,7 +98,7 @@ const SelectCustomerModal = forwardRef<SelectCustomerModalRef, SelectCustomerMod
         snapPoints={snapPoints}
         keyboardBehavior="extend"
         enablePanDownToClose={false}
-        onDismiss={onDismiss}
+        onDismiss={handleDismiss}
         backdropComponent={(props) => (
           <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior="close" />
         )}
@@ -114,7 +130,11 @@ const SelectCustomerModal = forwardRef<SelectCustomerModalRef, SelectCustomerMod
           <View className="mb-4 flex-row items-center rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 dark:border-slate-700 dark:bg-primary-dark">
             <Ionicons name="search" size={20} color="#94A3B8" />
             <BottomSheetTextInput
-              onChangeText={debouncedSearch}
+              value={searchText}
+              onChangeText={(value) => {
+                setSearchText(value);
+                debouncedSearch(value);
+              }}
               placeholder="Buscar por nombre o cédula..."
               className="ml-3 flex-1 text-base text-slate-900 dark:text-white"
               autoCapitalize="none"

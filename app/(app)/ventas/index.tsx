@@ -8,6 +8,7 @@ import ScreenLayout from '@/components/layout/ScreenLayout';
 import shoppingService from '@/services/shopping.service';
 import Card from '@/components/Card';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import { parseDate } from '@/helpers/date';
 
 export default function SaleHistoryScreen() {
   const router = useRouter();
@@ -36,7 +37,8 @@ export default function SaleHistoryScreen() {
               value={search}
               onChangeText={setSearch}
               placeholder="Buscar por cliente..."
-              className="ml-3 flex-1 text-base text-slate-900"
+              placeholderTextColor="#94A3B8"
+              className="ml-3 flex-1 text-base text-slate-900 dark:text-white"
             />
             {search ? (
               <TouchableOpacity onPress={() => setSearch('')}>
@@ -57,12 +59,12 @@ export default function SaleHistoryScreen() {
                     <View className="min-w-0 flex-1">
                       <View className="flex-row items-center gap-2">
                         <View className="h-2 w-2 rounded-full bg-emerald-500" />
-                        <Text className="font-semibold text-slate-900">
+                        <Text className="font-semibold text-slate-900 dark:text-white">
                           {item.cliente_nombre || 'Cliente Genérico'}
                         </Text>
                       </View>
-                      <Text className="text-sm text-slate-500">
-                        {new Date(item.fecha).toLocaleDateString('es-VE', {
+                      <Text className="text-sm text-slate-500 dark:text-slate-400">
+                        {parseDate(item.fecha).toLocaleDateString('es-VE', {
                           day: '2-digit',
                           month: 'short',
                           year: 'numeric',
@@ -71,7 +73,7 @@ export default function SaleHistoryScreen() {
                         })}
                       </Text>
                     </View>
-                    <Text className="text-lg font-bold text-slate-900">
+                    <Text className="text-lg font-bold text-slate-900 dark:text-white">
                       $
                       {(Number(item.total) || 0).toLocaleString('es-VE', {
                         minimumFractionDigits: 2,
@@ -83,7 +85,7 @@ export default function SaleHistoryScreen() {
               )}
               ListEmptyComponent={
                 <View className="py-12">
-                  <Text className="text-center text-slate-500">No hay ventas registradas</Text>
+                  <Text className="text-center text-slate-500 dark:text-slate-400">No hay ventas registradas</Text>
                 </View>
               }
             />

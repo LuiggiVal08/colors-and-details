@@ -11,6 +11,7 @@ import shoppingService from '@/services/shopping.service';
 import { impactLight } from '@/helpers/haptics';
 import Card from '@/components/Card';
 import SkeletonLoader from '@/components/SkeletonLoader';
+import { parseDate } from '@/helpers/date';
 
 export default function SaleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -60,7 +61,7 @@ export default function SaleDetailScreen() {
       text += line('╚══════════════════════════════╝');
       text += line('');
       text += line(`Venta #${sale.id}`);
-      text += line(`Fecha: ${new Date(sale.fecha).toLocaleString('es-VE')}`);
+      text += line(`Fecha: ${parseDate(sale.fecha).toLocaleString('es-VE')}`);
       text += line(`Cliente: ${sale.cliente_nombre || 'Cliente Genérico'}`);
       if (sale.observaciones) text += line(`Nota: ${sale.observaciones}`);
       text += line('');
@@ -130,7 +131,7 @@ export default function SaleDetailScreen() {
               <View>
                 <Text className="text-2xl font-bold text-slate-900">Venta #{sale.id}</Text>
                 <Text className="mt-1 text-sm text-slate-500">
-                  {new Date(sale.fecha).toLocaleDateString('es-VE', {
+                  {parseDate(sale.fecha).toLocaleDateString('es-VE', {
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric',
