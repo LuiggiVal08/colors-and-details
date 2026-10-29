@@ -1,5 +1,5 @@
 import os from 'os';
-import 'dotenv/config';
+// import 'dotenv/config';
 
 // Función para detectar la IP local automáticamente
 const getLocalIp = () => {
