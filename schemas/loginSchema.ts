@@ -7,8 +7,7 @@ export const loginSchema = z.object({
     .trim()
     .min(3, 'El usuario debe tener al menos 3 caracteres')
     .max(25, 'El usuario no puede exceder los 25 caracteres')
-    // Corregido: 0-9 para aceptar todos los números
-    .regex(/^[a-zA-Z0-9_]+$/, 'El usuario solo puede contener letras, números y guiones bajos'),
+    .regex(/^[a-zA-Z0-9_.-]+$/, 'El usuario solo puede contener letras, números, puntos, guiones y guiones bajos'),
 
   password: z
     .string()

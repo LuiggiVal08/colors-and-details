@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T15:37:07-04:00",
+  "title": "Design System: Colores y Detalles",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Turquesa de acción",
+        "canonical": "#4DB6AC",
+        "tonalRamp": ["#010E0D", "#002825", "#004540", "#00635C", "#138D84", "#56B0A7", "#99D1CA", "#DDF4F1"]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Naranja de apoyo",
+        "canonical": "#FF9800",
+        "tonalRamp": ["#150800", "#341B00", "#563000", "#7B4700", "#AF6600", "#E08608", "#F4B67B", "#FFEAD8"]
+      },
+      "status-coral": {
+        "role": "tertiary",
+        "displayName": "Coral de estado",
+        "canonical": "#FF5C93",
+        "tonalRamp": ["#1B0209", "#44001D", "#6F0033", "#9E004B", "#D22F6F", "#F66593", "#FFA7BD", "#FFE8ED"]
+      },
+      "danger-rose": {
+        "role": "tertiary",
+        "displayName": "Rosa destructivo",
+        "canonical": "#F43F5E",
+        "tonalRamp": ["#1D0104", "#460010", "#72001F", "#A10030", "#DC224B", "#FF6073", "#FFA9AD", "#FFE8E9"]
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Blanco de superficie",
+        "canonical": "#FFFFFF",
+        "tonalRamp": ["#0B0B0B", "#222222", "#3A3A3A", "#555555", "#7A7A7A", "#9E9E9E", "#C4C4C4", "#EEEEEE"]
+      },
+      "surface-light-muted": {
+        "role": "neutral",
+        "displayName": "Superficie clara tenue",
+        "canonical": "#F5F5F5",
+        "tonalRamp": ["#0B0B0B", "#222222", "#3A3A3A", "#555555", "#7A7A7A", "#9E9E9E", "#C4C4C4", "#EEEEEE"]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Fondo carbón",
+        "canonical": "#121212",
+        "tonalRamp": ["#0B0B0B", "#222222", "#3A3A3A", "#555555", "#7A7A7A", "#9E9E9E", "#C4C4C4", "#EEEEEE"]
+      },
+      "surface-dark-raised": {
+        "role": "neutral",
+        "displayName": "Superficie carbón elevada",
+        "canonical": "#1E1E1E",
+        "tonalRamp": ["#0B0B0B", "#222222", "#3A3A3A", "#555555", "#7A7A7A", "#9E9E9E", "#C4C4C4", "#EEEEEE"]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Tinta oscura",
+        "canonical": "#1B1B1B",
+        "tonalRamp": ["#0B0B0B", "#222222", "#3A3A3A", "#555555", "#7A7A7A", "#9E9E9E", "#C4C4C4", "#EEEEEE"]
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-default",
+        "value": "shadow-lg shadow-slate-200/80",
+        "purpose": "Sombra principal de las tarjetas en el tema claro."
+      },
+      {
+        "name": "card-elevated",
+        "value": "shadow-2xl shadow-slate-300/90",
+        "purpose": "Variante de tarjeta con mayor elevación."
+      },
+      {
+        "name": "card-outlined",
+        "value": "shadow-sm",
+        "purpose": "Sombra ligera de la variante delineada."
+      }
+    ],
+    "motion": [
+      {
+        "name": "card-entry",
+        "value": "opacity 0→1 over 220ms",
+        "purpose": "Entrada de las tarjetas."
+      },
+      {
+        "name": "card-press",
+        "value": "scale 1→0.95→1, spring",
+        "purpose": "Feedback de presión de tarjetas interactivas."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal; cápsula turquesa con texto blanco.",
+      "html": "<button class=\"ds-button ds-primary\">Guardar</button>",
+      "css": ".ds-button{min-height:44px;border:0;border-radius:9999px;padding:0 20px;font:600 16px system-ui;cursor:pointer}.ds-primary{background:#4DB6AC;color:#fff}.ds-primary:hover{background:#138D84}.ds-primary:focus-visible{outline:2px solid #00635C;outline-offset:2px}.ds-primary:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción secundaria de superficie clara con borde tenue.",
+      "html": "<button class=\"ds-button ds-secondary\">Cancelar</button>",
+      "css": ".ds-button{min-height:44px;border-radius:9999px;padding:0 20px;font:600 16px system-ui;cursor:pointer}.ds-secondary{border:1px solid #E2E8F0;background:#fff;color:#475569}.ds-secondary:hover{background:#F5F5F5}.ds-secondary:focus-visible{outline:2px solid #4DB6AC;outline-offset:2px}.ds-secondary:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Botón destructivo",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Acción destructiva en rosa con texto blanco.",
+      "html": "<button class=\"ds-button ds-danger\">Eliminar</button>",
+      "css": ".ds-button{min-height:44px;border:0;border-radius:9999px;padding:0 20px;font:600 16px system-ui;cursor:pointer}.ds-danger{background:#F43F5E;color:#fff}.ds-danger:hover{background:#DC224B}.ds-danger:focus-visible{outline:2px solid #A10030;outline-offset:2px}.ds-danger:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Botón de texto",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Acción secundaria sin superficie, en turquesa.",
+      "html": "<button class=\"ds-button ds-text\">Ver detalles</button>",
+      "css": ".ds-button{min-height:44px;border:0;border-radius:9999px;padding:0 16px;font:600 16px system-ui;cursor:pointer}.ds-text{background:transparent;color:#4DB6AC}.ds-text:hover{background:rgba(77,182,172,.1)}.ds-text:focus-visible{outline:2px solid #4DB6AC;outline-offset:2px}.ds-text:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Campo de fecha",
+      "kind": "input",
+      "refersTo": "date-field",
+      "description": "Control de fecha delineado con icono y fondo claro.",
+      "html": "<button class=\"ds-date\" aria-label=\"Fecha: 29 de octubre de 2026\"><svg class=\"ds-date-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"17\" rx=\"2\"/><path d=\"M16 2v4M8 2v4M3 10h18\"/></svg><span>29/10/2026</span><svg class=\"ds-date-arrow\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></button>",
+      "css": ".ds-date{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:12px;border:1px solid #E2E8F0;border-radius:16px;background:#fff;color:#0F172A;font:500 14px system-ui;text-align:left;cursor:pointer}.ds-date-icon,.ds-date-arrow{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ds-date-icon{color:#4DB6AC}.ds-date-arrow{width:16px;height:16px;margin-left:auto;color:#94A3B8}.ds-date:hover{border-color:#4DB6AC}.ds-date:focus-visible{outline:2px solid #4DB6AC;outline-offset:2px}"
+    },
+    {
+      "name": "Tarjeta",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "Contenedor claro redondeado con sombra; las variantes admiten elevación y delineado.",
+      "html": "<article class=\"ds-card\"><strong>Resumen de ventas</strong><p>Información operativa</p></article>",
+      "css": ".ds-card{padding:24px;border-radius:24px;background:#fff;color:#0F172A;box-shadow:0 10px 15px -3px rgba(226,232,240,.8),0 4px 6px -4px rgba(226,232,240,.8);font:500 16px system-ui}.ds-card p{margin:8px 0 0;color:#64748B;font-size:14px}"
+    },
+    {
+      "name": "Navegación por pestañas",
+      "kind": "nav",
+      "refersTo": "tab-navigation",
+      "description": "Cinco destinos con turquesa activo y gris azulado inactivo.",
+      "html": "<nav class=\"ds-tabs\"><span class=\"ds-tab ds-active\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m3 10 9-7 9 7M5.5 9v12h13V9M9 21v-7h6v7\"/></svg><small>Casa</small></span><span class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 4h2l2.5 12h11L21 8H6M9 20h.01M18 20h.01\"/></svg><small>Ventas</small></span><span class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 3h12v18l-3-2-3 2-3-2-3 2V3ZM9 8h6M9 12h6\"/></svg><small>Pedidos</small></span><span class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21a8 8 0 0 1 16 0\"/></svg><small>Clientes</small></span><span class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"5\" cy=\"12\" r=\"1\"/><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/></svg><small>Más</small></span></nav>",
+      "css": ".ds-tabs{display:flex;justify-content:space-around;gap:4px;padding:10px 4px;border-top:1px solid #E2E8F0;background:#fff;font:500 12px system-ui}.ds-tab{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:44px;color:#94A3B8}.ds-tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ds-tab small{font-size:12px}.ds-tab.ds-active{color:#4DB6AC}"
+    },
+    {
+      "name": "Métrica pastel",
+      "kind": "custom",
+      "description": "Tarjeta compacta de dashboard; el color suave distingue la categoría de la métrica.",
+      "html": "<article class=\"ds-metric\"><span>Pedidos</span><strong>24</strong></article>",
+      "css": ".ds-metric{display:flex;flex:1;flex-direction:column;gap:8px;padding:16px;border-radius:16px;background:#FEF9C3;color:#A16207;font:600 14px system-ui}.ds-metric strong{font-size:24px;font-weight:700}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Operación clara, color con propósito",
+    "overview": "La interfaz combina superficies claras y neutrales con un acento turquesa para las acciones principales. Los colores de estado y los acentos pastel ayudan a diferenciar avisos y métricas sin desplazar la información operativa. El tema oscuro usa fondos carbón y superficies elevadas más claras.\n\nLa aplicación comparte componentes de React Native Paper y una navegación de pestañas entre plataformas; la apariencia responde al tema del sistema y los controles nativos, como el selector de fecha, conservan su comportamiento por plataforma. El logo de la marca combina turquesa y magenta. El fondo geométrico en tonos rosados y azules, con una capa oscura superpuesta, forma parte del `ScreenLayout` actual.",
+    "keyCharacteristics": [
+      "Base clara con blanco y grises suaves; el modo oscuro dispone de superficies propias.",
+      "Turquesa para acciones y selección; coral y rosa para estados y acciones destructivas.",
+      "Componentes reutilizables con esquinas redondeadas, tarjetas con profundidad y controles nativos.",
+      "Métricas con acentos pastel y fondo geométrico suministrado como recurso de marca."
+    ],
+    "rules": [
+      {
+        "name": "The Color-Follows-Role Rule",
+        "body": "Conserva la distinción existente entre el turquesa de acción, los colores de estado y el rosa del botón destructivo; no los fusiones bajo un único token.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "**Do** Usa los tokens del tema y de Tailwind para acciones, estados y superficies antes de añadir un color nuevo.",
+      "**Do** Conserva el cambio entre temas claro y oscuro que responde al sistema.",
+      "**Do** Reutiliza las variantes existentes de Button, Card y los campos Paper cuando el patrón corresponda.",
+      "**Do** Deja que los selectores y controles específicos de plataforma mantengan su comportamiento nativo."
+    ],
+    "donts": [
+      "**Don't** Mezcles el coral de estado y el rosa del botón destructivo: el código los define por separado.",
+      "**Don't** Sustituyas el logo ni el fondo geométrico por recursos inventados.",
+      "**Don't** Supongas una navegación o un sistema de componentes distinto por plataforma que la implementación actual no muestra.",
+      "**Don't** Impongas una fuente de marca o una escala tipográfica global que el código no define."
+    ]
+  }
+}

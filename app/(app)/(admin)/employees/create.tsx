@@ -138,7 +138,7 @@ export default function EmployeeCreate() {
                 name="salario_base"
                 label="Salario Base"
                 placeholder="Ingresa el salario base"
-                keyboardType="numeric"
+                keyboardType="decimal-pad"
                 error={errors.salario_base?.message}
               />
             </View>

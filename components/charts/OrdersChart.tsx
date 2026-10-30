@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { View, Text, LayoutChangeEvent } from 'react-native';
+import { View, Text, LayoutChangeEvent, useColorScheme } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import type { OrdersByMonthItem } from '@/services/analytics.service';
+import { getChartConfig } from '@/components/charts/chartConfig';
 
 interface OrdersChartProps {
   data: OrdersByMonthItem[];
 }
-// 80,132
-// 610,370
+
 export default function OrdersChart({ data }: OrdersChartProps) {
+  const isDark = useColorScheme() === 'dark';
   const [width, setWidth] = useState(0);
 
   const labels = data.map((item) => item.month);
@@ -19,10 +20,10 @@ export default function OrdersChart({ data }: OrdersChartProps) {
       onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}
       className="mb-4 rounded-2xl bg-white p-4 dark:bg-primary-dark">
       <View className="mb-3 flex-row items-center gap-2">
-        <View className="rounded-md bg-purple-200 px-2 py-1">
-          <Text className="text-xs font-bold text-purple-800">#</Text>
+        <View className="rounded-md bg-purple-200 px-2 py-1 dark:bg-purple-950">
+          <Text className="text-xs font-bold text-purple-800 dark:text-purple-200">#</Text>
         </View>
-        <Text className="text-base font-semibold text-slate-800">Número de Pedidos</Text>
+        <Text className="text-base font-semibold text-slate-800 dark:text-slate-100">Pedidos por mes</Text>
       </View>
 
       {width > 0 && (
@@ -35,18 +36,9 @@ export default function OrdersChart({ data }: OrdersChartProps) {
           height={220}
           yAxisSuffix=""
           chartConfig={{
-            backgroundGradientFrom: '#ffffff',
-            backgroundGradientTo: '#ffffff',
-            color: () => '#8B5CF6',
+            ...getChartConfig(isDark),
+            color: (opacity = 1) => `rgba(139, 92, 246, ${opacity})`,
             strokeWidth: 3,
-            propsForBackgroundLines: {
-              strokeDasharray: '3,3',
-              stroke: '#E2E8F0',
-            },
-            propsForLabels: {
-              fill: '#94A3B8',
-              fontSize: 10,
-            },
             propsForDots: {
               fill: '#8B5CF6',
               r: '4',

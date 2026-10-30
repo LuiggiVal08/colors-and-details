@@ -1,7 +1,51 @@
 import type { PaymentEntry } from '@/feature/shopping/types';
+import type { ComponentProps } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 
 export type Currency = 'USD' | 'VES';
 export type PaymentMedium = 'efectivo' | 'digital' | 'otros';
+type PaymentIcon = ComponentProps<typeof Ionicons>['name'];
+
+export const normalizeCurrency = (value: unknown): Currency | undefined => {
+  const currency =
+    value && typeof value === 'object'
+      ? ((value as Record<string, unknown>).codigo ??
+        (value as Record<string, unknown>).code ??
+        (value as Record<string, unknown>).nombre ??
+        (value as Record<string, unknown>).name)
+      : value;
+
+  if (typeof currency !== 'string') return undefined;
+
+  const normalized = currency
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z$]/g, '');
+
+  if (['USD', 'US$', 'DOLAR', 'DOLARES'].includes(normalized)) return 'USD';
+  if (['VES', 'BS', 'BSS', 'BOLIVAR', 'BOLIVARES'].includes(normalized)) return 'VES';
+
+  return undefined;
+};
+
+export const getPaymentMethodIcon = (tipo?: string, nombre?: string): PaymentIcon => {
+  const normalized = `${tipo ?? ''} ${nombre ?? ''}`
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  if (normalized.includes('efectivo') || normalized.includes('cash')) return 'cash-outline';
+  if (normalized.includes('tarjeta') || normalized.includes('card')) return 'card-outline';
+  if (normalized.includes('transfer')) return 'swap-horizontal-outline';
+  if (normalized.includes('digital') || normalized.includes('movil') || normalized.includes('mobile')) {
+    return 'phone-portrait-outline';
+  }
+
+  return 'ellipsis-horizontal-outline';
+};
 
 export const isCashPayment = (tipo: string): boolean => tipo.toLowerCase() === 'efectivo';
 

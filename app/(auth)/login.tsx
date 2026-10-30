@@ -67,11 +67,30 @@ export default function LoginScreen() {
   });
 
   useEffect(() => {
-    (async () => {
-      const username = await AsyncStorage.getItem(LINKED_USERNAME_KEY);
-      if (username) setLinkedUsername(username);
-      setIsLoadingStorage(false);
-    })();
+    let isMounted = true;
+
+    const loadLinkedUsername = async () => {
+      try {
+        const username = await AsyncStorage.getItem(LINKED_USERNAME_KEY);
+        if (isMounted && username) setLinkedUsername(username);
+      } catch (error) {
+        console.error('No se pudo cargar el usuario vinculado para acceso biométrico', error);
+        if (isMounted) {
+          setLinkedUsername(null);
+          setSnackbar({
+            visible: true,
+            message: 'No pudimos cargar el acceso biométrico. Inicia sesión con tu usuario y contraseña.',
+          });
+        }
+      } finally {
+        if (isMounted) setIsLoadingStorage(false);
+      }
+    };
+
+    void loadLinkedUsername();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleUnlink = async () => {
@@ -91,7 +110,23 @@ export default function LoginScreen() {
     }
   };
 
-  if (!hasHydrated || isLoadingStorage) return <ActivityIndicator size="large" color="#4DB6AC" />;
+  if (!hasHydrated || isLoadingStorage) {
+    return (
+      <ScreenLayout centerContent className="px-4">
+        <Card className="w-full max-w-md items-center p-8">
+          <Logo />
+          <View
+            accessible
+            accessibilityRole="progressbar"
+            accessibilityLabel="Cargando el inicio de sesión"
+            className="mt-4 items-center gap-3">
+            <ActivityIndicator size="large" color="#4DB6AC" />
+            <Text className="text-sm text-slate-600 dark:text-slate-300">Preparando el acceso...</Text>
+          </View>
+        </Card>
+      </ScreenLayout>
+    );
+  }
   if (user) return <Redirect href="/(tabs)" />;
 
   return (
@@ -165,27 +200,44 @@ interface BiometricLoginViewProps {
   onUnlink: () => void;
 }
 // --- Sub-componente: Vista Biométrica ---
-const BiometricLoginView = ({ username, onBiometricPress, onPasswordPress, onUnlink }: BiometricLoginViewProps) => (
-  <View className=" items-center justify-center">
-    <View className=" my-8 items-center justify-center ">
-      <Text className="text-base text-slate-600">Iniciar sesión como </Text>
-      <Text className="text-3xl font-semibold text-slate-800">{maskUsername(username)}</Text>
+const BiometricLoginView = ({ username, onBiometricPress, onPasswordPress, onUnlink }: BiometricLoginViewProps) => {
+  const isDark = useColorScheme() === 'dark';
+
+  return (
+    <View className="items-center justify-center">
+      <View className="my-8 items-center justify-center">
+        <Text className={`text-base ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Iniciar sesión como</Text>
+        <Text className={`text-3xl font-semibold ${isDark ? 'text-white' : 'text-slate-800'}`}>
+          {maskUsername(username)}
+        </Text>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Iniciar sesión con biometría"
+          accessibilityHint="Confirma tu identidad con el método biométrico configurado en este dispositivo."
+          className="my-4 h-16 w-16 items-center justify-center rounded-full bg-[#4DB6AC] shadow-lg"
+          onPress={onBiometricPress}>
+          <Ionicons name="finger-print" size={40} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" onPress={onPasswordPress} className="min-h-12 justify-center px-3">
+          <Text className="text-base font-bold text-teal-700 underline dark:text-teal-300">
+            Ingresa con tu contraseña
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity
-        className="my-4 h-16 w-16 items-center justify-center rounded-full bg-[#4DB6AC] shadow-lg"
-        onPress={onBiometricPress}>
-        <Ionicons name="finger-print" size={40} color="#fff" />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onPasswordPress}>
-        <Text className="text-base font-bold text-[#4DB6AC] underline">Ingresa con tu contraseña</Text>
+        accessibilityRole="button"
+        accessibilityLabel="Desvincular este dispositivo"
+        onPress={onUnlink}
+        className={`mt-4 min-h-12 flex-row items-center gap-2 rounded-lg px-3 py-2 ${
+          isDark ? 'bg-slate-800' : 'bg-slate-100'
+        }`}>
+        <Ionicons name="log-out-outline" size={20} color="#4DB6AC" />
+        <Text className={`text-base ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>Desvincular dispositivo</Text>
       </TouchableOpacity>
     </View>
-
-    <TouchableOpacity onPress={onUnlink} className="mt-4 flex flex-row items-center gap-2 rounded-lg bg-slate-100 p-2">
-      <Ionicons name="log-out-outline" size={20} color="#4DB6AC" />
-      <Text className="text-base text-slate-400 ">Desvincular dispositivo</Text>
-    </TouchableOpacity>
-  </View>
-);
+  );
+};
 
 interface LinkedPasswordFormProps {
   username: string;
@@ -206,7 +258,7 @@ const LinkedPasswordModal = ({ visible, onDismiss, username, onSubmit, isLoading
         visible={visible}
         onDismiss={onDismiss}
         contentContainerStyle={{
-          backgroundColor: colorScheme === 'dark' ? '#1E293B' : '#fff',
+          backgroundColor: colorScheme === 'dark' ? '#1E1E1E' : '#fff',
           padding: 25,
           margin: 20,
           borderRadius: 20,
@@ -323,7 +375,7 @@ const LoginForm = ({ onSubmit, isLoading }: LoginFormProps) => {
         <Text>Iniciar Sesión</Text>
       </Button>
       <TouchableOpacity onPress={() => router.push('/rescue')} className="mx-auto mt-6">
-        <Text className="text-sm text-slate-400 underline">¿Olvidaste tu contraseña?</Text>
+        <Text className="text-sm text-slate-600 underline dark:text-slate-300">¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
     </View>
   );

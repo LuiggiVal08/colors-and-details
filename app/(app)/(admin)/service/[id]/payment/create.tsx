@@ -150,7 +150,7 @@ export default function ServicePaymentCreate() {
               name="monto"
               label="Monto"
               placeholder="0.00"
-              keyboardType="numbers-and-punctuation"
+              keyboardType="decimal-pad"
               error={errors.monto?.message}
             />
             <Controller

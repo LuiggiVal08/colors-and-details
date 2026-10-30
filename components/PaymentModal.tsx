@@ -327,7 +327,7 @@ const PaymentModal = memo(
                       <BottomSheetTextInput
                         value={amountText}
                         onChangeText={setAmountText}
-                        keyboardType="numbers-and-punctuation"
+                        keyboardType="decimal-pad"
                         className="flex-1 py-2.5 text-base text-slate-900"
                       />
                     </View>

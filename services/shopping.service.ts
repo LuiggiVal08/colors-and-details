@@ -1,4 +1,5 @@
 import api from './api';
+import { normalizeCurrency } from '@/helpers/payment';
 
 export interface SaleDetailPayload {
   producto_id: string;
@@ -41,10 +42,12 @@ export interface SalePaymentResponse {
   id?: number;
   metodo_pago_id: number;
   metodo_pago_nombre?: string;
+  metodo_pago_tipo?: string;
   monto: number;
   moneda?: 'USD' | 'VES';
   monto_recibido?: number;
   vuelto?: number;
+  medio_pago?: 'efectivo' | 'digital' | 'otros';
   referencia_pago?: string | null;
   tasa_id?: number | null;
 }
@@ -74,6 +77,47 @@ function normalizeSale(raw: Record<string, unknown>): Sale {
     typeof raw.cliente_nombre === 'string' && raw.cliente_nombre.trim().length > 0
       ? raw.cliente_nombre
       : nombreRelacionado;
+  const pagos = Array.isArray(raw.pagos)
+    ? raw.pagos.map((payment) => {
+        const pago = payment as Record<string, unknown>;
+        const metodoRelacion = pago.metodo_pago ?? pago.metodo;
+        const metodo =
+          metodoRelacion && typeof metodoRelacion === 'object'
+            ? (metodoRelacion as Record<string, unknown>)
+            : undefined;
+        const moneda = normalizeCurrency(pago.moneda ?? pago.moneda_pago ?? pago.currency);
+        const metodoTipo =
+          typeof pago.metodo_pago_tipo === 'string'
+            ? pago.metodo_pago_tipo
+            : typeof metodo?.tipo === 'string'
+              ? metodo.tipo
+              : typeof pago.medio_pago === 'string'
+                ? pago.medio_pago
+                : undefined;
+        const medioPago = ['efectivo', 'digital', 'otros'].includes(String(pago.medio_pago))
+          ? (pago.medio_pago as SalePaymentResponse['medio_pago'])
+          : undefined;
+
+        return {
+          id: pago.id !== undefined ? Number(pago.id) : undefined,
+          metodo_pago_id: Number(pago.metodo_pago_id),
+          metodo_pago_nombre:
+            typeof pago.metodo_pago_nombre === 'string'
+              ? pago.metodo_pago_nombre
+              : typeof metodo?.nombre === 'string'
+                ? metodo.nombre
+                : undefined,
+          metodo_pago_tipo: metodoTipo,
+          monto: Number(pago.monto),
+          moneda,
+          monto_recibido: pago.monto_recibido !== undefined ? Number(pago.monto_recibido) : undefined,
+          vuelto: pago.vuelto !== undefined ? Number(pago.vuelto) : undefined,
+          medio_pago: medioPago,
+          referencia_pago: typeof pago.referencia_pago === 'string' ? pago.referencia_pago : undefined,
+          tasa_id: pago.tasa_id !== undefined && pago.tasa_id !== null ? Number(pago.tasa_id) : undefined,
+        };
+      })
+    : undefined;
 
   return {
     id: Number(raw.id),
@@ -83,7 +127,7 @@ function normalizeSale(raw: Record<string, unknown>): Sale {
     fecha: String(raw.fecha ?? ''),
     observaciones: typeof raw.observaciones === 'string' ? raw.observaciones : undefined,
     detalles: Array.isArray(raw.detalles) ? (raw.detalles as SaleDetailResponse[]) : undefined,
-    pagos: Array.isArray(raw.pagos) ? (raw.pagos as SalePaymentResponse[]) : undefined,
+    pagos,
   };
 }
 

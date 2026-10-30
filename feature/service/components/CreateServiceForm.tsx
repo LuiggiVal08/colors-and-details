@@ -74,7 +74,7 @@ export const CreateServiceForm = ({ onClose, onSuccess }: Props) => {
               label="Precio ($)"
               control={control}
               error={errors.precio?.message}
-              keyboardType="numeric"
+              keyboardType="decimal-pad"
             />
             <ControlledInput
               name="dia_corte"

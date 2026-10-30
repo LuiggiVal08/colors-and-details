@@ -12,6 +12,7 @@ import { StatusBadge, getStatusLabel } from '@/feature/order/components/StatusBa
 import type { OrderStatus, OrderPayment, CreateOrderPaymentDTO } from '@/types/order';
 import { impactLight, selection } from '@/helpers/haptics';
 import Card from '@/components/Card';
+import { getPaymentMethodIcon } from '@/helpers/payment';
 
 const STATUS_OPTIONS: {
   value: OrderStatus;
@@ -344,9 +345,16 @@ export default function OrderDetailScreen() {
                   className={`mx-4 py-3 ${i < payments.length - 1 ? 'border-b border-slate-100' : ''}`}>
                   <View className="flex-row items-center justify-between">
                     <View className="min-w-0 flex-1">
-                      <Text className="text-sm font-medium text-slate-900">
-                        {p.metodo_pago_nombre || `Pago #${p.metodo_pago_id}`}
-                      </Text>
+                      <View className="flex-row items-center gap-2">
+                        <Ionicons
+                          name={getPaymentMethodIcon(p.metodo_pago_tipo ?? p.medio_pago, p.metodo_pago_nombre)}
+                          size={16}
+                          color="#4DB6AC"
+                        />
+                        <Text className="text-sm font-medium text-slate-900">
+                          {p.metodo_pago_nombre || `Pago #${p.metodo_pago_id}`}
+                        </Text>
+                      </View>
                       <Text className="text-xs text-slate-500">
                         {new Date(p.fecha).toLocaleDateString('es-VE', {
                           day: '2-digit',
@@ -356,7 +364,9 @@ export default function OrderDetailScreen() {
                         {p.referencia_pago ? ` · ${p.referencia_pago}` : ''}
                       </Text>
                     </View>
-                    <Text className="text-sm font-semibold text-emerald-600">$ {fmt(p.monto)}</Text>
+                    <Text className="text-sm font-semibold text-emerald-600">
+                      {p.moneda === 'VES' ? 'Bs.' : '$'} {fmt(p.monto)}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               ))
@@ -446,13 +456,25 @@ export default function OrderDetailScreen() {
             <View className="mt-4 gap-3">
               <View>
                 <Text className="text-xs text-slate-500">Método</Text>
-                <Text className="text-base font-semibold text-slate-900">
-                  {showPaymentDetail.metodo_pago_nombre || `Método #${showPaymentDetail.metodo_pago_id}`}
-                </Text>
+                <View className="flex-row items-center gap-2">
+                  <Ionicons
+                    name={getPaymentMethodIcon(
+                      showPaymentDetail.metodo_pago_tipo ?? showPaymentDetail.medio_pago,
+                      showPaymentDetail.metodo_pago_nombre
+                    )}
+                    size={18}
+                    color="#4DB6AC"
+                  />
+                  <Text className="text-base font-semibold text-slate-900">
+                    {showPaymentDetail.metodo_pago_nombre || `Método #${showPaymentDetail.metodo_pago_id}`}
+                  </Text>
+                </View>
               </View>
               <View>
                 <Text className="text-xs text-slate-500">Monto</Text>
-                <Text className="text-xl font-bold text-emerald-600">$ {fmt(showPaymentDetail.monto)}</Text>
+                <Text className="text-xl font-bold text-emerald-600">
+                  {showPaymentDetail.moneda === 'VES' ? 'Bs.' : '$'} {fmt(showPaymentDetail.monto)}
+                </Text>
               </View>
               <View>
                 <Text className="text-xs text-slate-500">Fecha</Text>

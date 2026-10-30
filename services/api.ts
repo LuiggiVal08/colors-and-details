@@ -38,7 +38,6 @@ api.interceptors.response.use(
           ...currentUser,
           token: newToken,
         });
-        disconnectSocket();
         connectSocket(newToken);
       }
     }

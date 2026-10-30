@@ -88,7 +88,7 @@ export const EditServiceForm = ({ initialData, onClose, onSuccess }: Props) => {
               label="Precio ($)"
               control={control}
               error={errors.precio?.message}
-              keyboardType="numbers-and-punctuation"
+              keyboardType="decimal-pad"
             />
             <ControlledInput
               name="dia_corte"

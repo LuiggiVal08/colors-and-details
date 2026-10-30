@@ -40,6 +40,7 @@ export interface OrderPayment {
   pedido_id: number;
   metodo_pago_id: number;
   metodo_pago_nombre: string;
+  metodo_pago_tipo?: string;
   monto: number;
   moneda?: 'USD' | 'VES';
   monto_recibido?: number;

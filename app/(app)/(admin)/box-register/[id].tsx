@@ -545,7 +545,7 @@ export default function BoxControlScreen() {
                       value={cierreMonto}
                       onChangeText={setCierreMonto}
                       placeholder="Monto de cierre"
-                      keyboardType="numbers-and-punctuation"
+                      keyboardType="decimal-pad"
                       className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 dark:border-slate-600 dark:bg-primary-dark dark:text-white"
                     />
                   </View>
@@ -642,7 +642,7 @@ export default function BoxControlScreen() {
                       value={movMonto}
                       onChangeText={setMovMonto}
                       placeholder="Monto"
-                      keyboardType="numbers-and-punctuation"
+                      keyboardType="decimal-pad"
                       className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 dark:border-slate-600 dark:bg-primary-dark dark:text-white"
                     />
                   </View>

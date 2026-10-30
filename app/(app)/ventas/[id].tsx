@@ -12,6 +12,7 @@ import { impactLight } from '@/helpers/haptics';
 import Card from '@/components/Card';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import { parseDate } from '@/helpers/date';
+import { getPaymentMethodIcon } from '@/helpers/payment';
 
 export default function SaleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -39,16 +40,6 @@ export default function SaleDetailScreen() {
       </>
     );
   }
-
-  const getPaymentIcon = (nombre?: string) => {
-    if (!nombre) return 'cash-outline';
-    const lower = nombre.toLowerCase();
-    if (lower.includes('efectivo')) return 'cash-outline';
-    if (lower.includes('tarjeta')) return 'card-outline';
-    if (lower.includes('transfer')) return 'swap-horizontal-outline';
-    if (lower.includes('digital')) return 'phone-portrait-outline';
-    return 'ellipsis-horizontal-outline';
-  };
 
   const handleShare = async () => {
     if (!sale) return;
@@ -80,7 +71,7 @@ export default function SaleDetailScreen() {
         text += line('--- Pagos ---');
         sale.pagos.forEach((p) => {
           text += line(
-            `  ${p.metodo_pago_nombre || 'Pago'}: $ ${Number(p.monto || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            `  ${p.metodo_pago_nombre || 'Pago'}: ${p.moneda === 'VES' ? 'Bs.' : '$'} ${Number(p.monto || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
           );
           if (p.referencia_pago) text += line(`    Ref: ${p.referencia_pago}`);
         });
@@ -200,12 +191,16 @@ export default function SaleDetailScreen() {
                   className="flex-row items-center justify-between border-b border-slate-100 py-2 dark:border-slate-700">
                   <View className="flex-row items-center gap-2">
                     <View className="h-7 w-7 items-center justify-center rounded-full bg-[#4DB6AC]/10">
-                      <Ionicons name={getPaymentIcon(pago.metodo_pago_nombre)} size={14} color="#4DB6AC" />
+                      <Ionicons
+                        name={getPaymentMethodIcon(pago.metodo_pago_tipo ?? pago.medio_pago, pago.metodo_pago_nombre)}
+                        size={14}
+                        color="#4DB6AC"
+                      />
                     </View>
                     <Text className="text-slate-600">{pago.metodo_pago_nombre || `Pago #${pago.metodo_pago_id}`}</Text>
                   </View>
                   <Text className="font-medium text-slate-900">
-                    ${' '}
+                    {pago.moneda === 'VES' ? 'Bs.' : '$'}{' '}
                     {Number(pago.monto || 0).toLocaleString('es-VE', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,

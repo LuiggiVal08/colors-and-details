@@ -118,7 +118,7 @@ export const EditEmployeeForm = ({ initialData, onClose, onSuccess }: Props) => 
             label="Salario Base"
             control={control}
             error={errors.salario_base?.message}
-            keyboardType="numeric"
+            keyboardType="decimal-pad"
           />
           <View className="mb-2">
             <Text className="mb-2 text-sm font-medium text-slate-700">Frecuencia de Pago</Text>

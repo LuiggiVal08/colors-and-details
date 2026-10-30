@@ -1,4 +1,5 @@
 import api from './api';
+import { normalizeCurrency } from '@/helpers/payment';
 import type {
   CreateOrderDTO,
   CreateOrderPaymentDTO,
@@ -70,16 +71,31 @@ function normalizeDetail(raw: Record<string, unknown>): OrderDetail {
 
 function normalizePayment(rawParam: Record<string, unknown>): OrderPayment {
   const raw = (rawParam.data as Record<string, unknown> | undefined) ?? rawParam;
-  const metodo = raw.metodo as Record<string, unknown> | undefined;
+  const metodoRelacion = raw.metodo ?? raw.metodo_pago;
+  const metodo =
+    metodoRelacion && typeof metodoRelacion === 'object' ? (metodoRelacion as Record<string, unknown>) : undefined;
+  const metodoNombre =
+    typeof raw.metodo_pago_nombre === 'string'
+      ? raw.metodo_pago_nombre
+      : typeof metodo?.nombre === 'string'
+        ? metodo.nombre
+        : '';
+  const metodoTipo =
+    typeof raw.metodo_pago_tipo === 'string'
+      ? raw.metodo_pago_tipo
+      : typeof metodo?.tipo === 'string'
+        ? metodo.tipo
+        : undefined;
   return {
     id: Number(raw.id),
     pedido_id: Number(raw.pedido_id),
     metodo_pago_id: Number(raw.metodo_pago_id),
-    metodo_pago_nombre: (metodo?.nombre as string) ?? '',
+    metodo_pago_nombre: metodoNombre,
+    metodo_pago_tipo: metodoTipo,
     monto: Number(raw.monto),
     fecha: raw.fecha as string,
     referencia_pago: raw.referencia_pago as string | undefined,
-    moneda: raw.moneda === 'USD' ? 'USD' : raw.moneda === 'VES' ? 'VES' : undefined,
+    moneda: normalizeCurrency(raw.moneda ?? raw.moneda_pago ?? raw.currency),
     monto_recibido: raw.monto_recibido !== undefined ? Number(raw.monto_recibido) : undefined,
     monto_usd: raw.monto_usd !== undefined ? Number(raw.monto_usd) : undefined,
     vuelto: raw.vuelto !== undefined ? Number(raw.vuelto) : undefined,

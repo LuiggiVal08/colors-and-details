@@ -1,55 +1,52 @@
-import { View, Text, Dimensions } from 'react-native';
+import { useState } from 'react';
+import { View, Text, LayoutChangeEvent, useColorScheme } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import type { SalesByDateItem } from '@/services/analytics.service';
-
-const screenWidth = Dimensions.get('window').width;
+import { getChartConfig } from '@/components/charts/chartConfig';
 
 interface SalesChartProps {
   data: SalesByDateItem[];
 }
 
 export default function SalesChart({ data }: SalesChartProps) {
+  const isDark = useColorScheme() === 'dark';
+  const [width, setWidth] = useState(0);
   const labels = data.map((item) =>
     new Date(item.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
   );
   const values = data.map((item) => item.total);
 
   return (
-    <View className="mb-4 rounded-2xl bg-white p-4 dark:bg-primary-dark">
+    <View
+      onLayout={(event: LayoutChangeEvent) => setWidth(event.nativeEvent.layout.width)}
+      className="mb-4 rounded-2xl bg-white p-4 dark:bg-primary-dark">
       <View className="mb-3 flex-row items-center gap-2">
-        <View className="rounded-md bg-cyan-200 px-2 py-1">
-          <Text className="text-xs font-bold text-cyan-800">$</Text>
+        <View className="rounded-md bg-cyan-200 px-2 py-1 dark:bg-cyan-950">
+          <Text className="text-xs font-bold text-cyan-800 dark:text-cyan-200">USD</Text>
         </View>
-        <Text className="text-base font-semibold text-slate-800">Total Ventas</Text>
+        <Text className="text-base font-semibold text-slate-800 dark:text-slate-100">Ventas totales</Text>
       </View>
 
-      <BarChart
-        data={{
-          labels,
-          datasets: [{ data: values }],
-        }}
-        width={screenWidth - 72}
-        height={220}
-        yAxisLabel="$"
-        yAxisSuffix=""
-        chartConfig={{
-          backgroundGradientFrom: '#ffffff',
-          backgroundGradientTo: '#ffffff',
-          fillShadowGradient: '#06B6D4',
-          fillShadowGradientOpacity: 1,
-          color: () => '#06B6D4',
-          barPercentage: 0.5,
-          propsForBackgroundLines: {
-            strokeDasharray: '3,3',
-            stroke: '#E2E8F0',
-          },
-          propsForLabels: {
-            fill: '#94A3B8',
-            fontSize: 10,
-          },
-        }}
-        style={{ borderRadius: 12 }}
-      />
+      {width > 0 && (
+        <BarChart
+          data={{
+            labels,
+            datasets: [{ data: values }],
+          }}
+          width={width - 32}
+          height={220}
+          yAxisLabel="$ "
+          yAxisSuffix=""
+          chartConfig={{
+            ...getChartConfig(isDark),
+            fillShadowGradient: '#4DB6AC',
+            fillShadowGradientOpacity: 1,
+            color: (opacity = 1) => `rgba(77, 182, 172, ${opacity})`,
+            barPercentage: 0.5,
+          }}
+          style={{ borderRadius: 12 }}
+        />
+      )}
     </View>
   );
 }

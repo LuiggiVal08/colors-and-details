@@ -79,7 +79,7 @@ export default function ServiceCreate() {
                 label="Precio ($)"
                 control={control}
                 error={errors.precio?.message}
-                keyboardType="numeric"
+                keyboardType="decimal-pad"
               />
             </View>
             <View className="">

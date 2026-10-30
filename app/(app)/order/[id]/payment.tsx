@@ -219,7 +219,7 @@ export default function OrderPaymentScreen() {
               <TextInput
                 value={amountText}
                 onChangeText={setAmountText}
-                keyboardType="numbers-and-punctuation"
+                keyboardType="decimal-pad"
                 placeholder="0.00"
                 className="flex-1 py-3 text-base text-slate-900"
               />

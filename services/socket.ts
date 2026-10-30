@@ -5,7 +5,11 @@ import { useAuthStore } from '@/store/auth';
 let socket: Socket | null = null;
 
 export const connectSocket = (token: string) => {
-  if (socket) return;
+  if (socket) {
+    // Keep the new token for the next handshake without restarting an active connection.
+    socket.auth = { token };
+    return;
+  }
 
   socket = io(BASE_URL, {
     auth: { token },

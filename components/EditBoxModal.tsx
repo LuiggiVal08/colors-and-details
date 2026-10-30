@@ -137,7 +137,7 @@ const EditBoxModal = forwardRef<EditBoxModalRef, EditBoxModalProps>(({ box, onSa
               value={montoInicial}
               onChangeText={setMontoInicial}
               placeholder="0.00"
-              keyboardType="numbers-and-punctuation"
+              keyboardType="decimal-pad"
               className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 dark:border-slate-600 dark:bg-primary-dark dark:text-white"
             />
           </View>

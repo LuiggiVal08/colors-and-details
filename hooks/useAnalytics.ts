@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '@/services/analytics.service';
 
@@ -5,26 +6,29 @@ const getDateRange = () => {
   const endDate = new Date();
   const startDate = new Date();
   startDate.setFullYear(endDate.getFullYear() - 1);
-  return startDate;
+  return {
+    startDate,
+    dateKey: startDate.toISOString().slice(0, 10),
+  };
 };
 
 export const useAnalytics = () => {
-  const startDate = getDateRange();
+  const { startDate, dateKey } = useMemo(() => getDateRange(), []);
 
   const kpisQuery = useQuery({
-    queryKey: ['analytics-kpis'],
-    queryFn: analyticsService.getKPIs,
+    queryKey: ['analytics-kpis', dateKey],
+    queryFn: () => analyticsService.getKPIs(startDate),
     staleTime: 1000 * 60 * 5,
   });
 
   const salesQuery = useQuery({
-    queryKey: ['analytics-sales'],
+    queryKey: ['analytics-sales', dateKey],
     queryFn: () => analyticsService.getSalesByDate(startDate),
     staleTime: 1000 * 60 * 5,
   });
 
   const ordersQuery = useQuery({
-    queryKey: ['analytics-orders'],
+    queryKey: ['analytics-orders', dateKey],
     queryFn: () => analyticsService.getOrdersByMonth(startDate),
     staleTime: 1000 * 60 * 5,
   });
@@ -45,29 +49,31 @@ export const useAnalytics = () => {
     kpis: kpisQuery.data,
     kpisLoading: kpisQuery.isLoading,
     kpisError: kpisQuery.error,
+    kpisFetching: kpisQuery.isFetching,
+    retryKpis: kpisQuery.refetch,
 
     sales: salesQuery.data,
     salesLoading: salesQuery.isLoading,
     salesError: salesQuery.error,
+    salesFetching: salesQuery.isFetching,
+    retrySales: salesQuery.refetch,
 
     orders: ordersQuery.data,
     ordersLoading: ordersQuery.isLoading,
     ordersError: ordersQuery.error,
+    ordersFetching: ordersQuery.isFetching,
+    retryOrders: ordersQuery.refetch,
 
     stock: stockQuery.data,
     stockLoading: stockQuery.isLoading,
     stockError: stockQuery.error,
+    stockFetching: stockQuery.isFetching,
+    retryStock: stockQuery.refetch,
 
     lowStock: lowStockQuery.data,
     lowStockLoading: lowStockQuery.isLoading,
     lowStockError: lowStockQuery.error,
-
-    refetch: () => {
-      kpisQuery.refetch();
-      salesQuery.refetch();
-      ordersQuery.refetch();
-      stockQuery.refetch();
-      lowStockQuery.refetch();
-    },
+    lowStockFetching: lowStockQuery.isFetching,
+    retryLowStock: lowStockQuery.refetch,
   };
 };

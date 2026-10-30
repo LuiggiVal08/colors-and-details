@@ -114,7 +114,7 @@ export default function IvaScreen() {
                 label="Porcentaje"
                 value={porcentaje}
                 onChangeText={setPorcentaje}
-                keyboardType="numbers-and-punctuation"
+                keyboardType="decimal-pad"
                 mode="outlined"
                 className="mb-3 bg-white"
                 placeholder="Ej: 16"

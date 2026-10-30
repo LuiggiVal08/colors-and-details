@@ -222,7 +222,7 @@ export default function EditProductScreen() {
               label="Precio USD"
               control={control}
               error={errors.precio?.message}
-              keyboardType="numeric"
+              keyboardType="decimal-pad"
               onChangeText={Format.monto}
               onBlur={handlePrecioBlur}
             />

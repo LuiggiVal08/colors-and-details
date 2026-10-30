@@ -123,7 +123,7 @@ export default function ServicePeriodCreate() {
                   label="Monto ($)"
                   value={value}
                   onChangeText={onChange}
-                  keyboardType="numbers-and-punctuation"
+                  keyboardType="decimal-pad"
                   mode="outlined"
                   className="mb-4 bg-white"
                   placeholder="0.00"

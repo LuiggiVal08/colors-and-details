@@ -140,7 +140,7 @@ export default function TasaScreen() {
                 label="Tasa (Bs. por 1 USD)"
                 value={nuevaTasa}
                 onChangeText={setNuevaTasa}
-                keyboardType="numbers-and-punctuation"
+                keyboardType="decimal-pad"
                 mode="outlined"
                 className="mb-4 bg-white"
                 placeholder="Ej: 50.25"

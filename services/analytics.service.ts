@@ -110,7 +110,7 @@ export const analyticsService = {
       .sort((a, b) => a.stock - b.stock);
   },
 
-  getKPIs: async (): Promise<AnalyticsKPIs> => {
+  getKPIs: async (startDate: Date): Promise<AnalyticsKPIs> => {
     const [salesRes, ordersRes, clientsRes, productsRes] = await Promise.all([
       api.get('/shopping'),
       api.get('/orders'),
@@ -118,16 +118,19 @@ export const analyticsService = {
       api.get('/product'),
     ]);
 
-    const sales: { total: string | number }[] = salesRes.data || [];
-    const orders: unknown[] = ordersRes.data || [];
+    const sales: { fecha: string; total: string | number }[] = salesRes.data || [];
+    const orders: { fecha: string }[] = ordersRes.data || [];
     const clients: unknown[] = clientsRes.data || [];
     const products: unknown[] = productsRes.data || [];
 
-    const totalSales = sales.reduce((sum, s) => sum + Number(s.total), 0);
+    const totalSales = sales
+      .filter((sale) => new Date(sale.fecha) >= startDate)
+      .reduce((sum, sale) => sum + Number(sale.total), 0);
+    const totalOrders = orders.filter((order) => new Date(order.fecha) >= startDate).length;
 
     return {
       totalSales: Math.round(totalSales * 100) / 100,
-      totalOrders: orders.length,
+      totalOrders,
       totalClients: clients.length,
       totalProducts: products.length,
     };
